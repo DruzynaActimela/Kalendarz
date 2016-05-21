@@ -21,7 +21,7 @@ public class CalendarApp {
 	private StorageIntf storage;
 	private List<CalendarEvent> eventsList;
 	
-	public CalendarApp() throws FileNotFoundException {
+	public CalendarApp() {
 		gson = new GsonBuilder().disableHtmlEscaping().create();
 		
 		storage = new FileStorage(this, Const.FILE_STORAGE_PATH);

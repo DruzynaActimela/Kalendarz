@@ -1,5 +1,6 @@
 package com.actimel.calendar.impl;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import com.actimel.calendar.CalendarApp;
 import com.actimel.controllers.SessionController;
+import com.actimel.utils.HtmlTemplate;
 import com.actimel.utils.Utils;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -33,11 +35,11 @@ public class WebServer extends NanoHTTPD {
     	
     	
     	try {
+    		String SEPARATOR = File.separator;
     		
     		
     		
-    		
-        	String www_root_dir = "www";
+        	String www_root_dir = "";
         	String uri = session.getUri();
         	
 			
@@ -79,18 +81,19 @@ public class WebServer extends NanoHTTPD {
         			
         		} else {
         			// pokazanie strony logowania
-        			
+        			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("login.html");        			
+        			return newFixedLengthResponse(loginTemplate.render());
         		}
-        	} else {
+        	} else if(uri.equals("/") || uri.contains("index.")) {
+    			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("index.html");        			
+    			return newFixedLengthResponse(loginTemplate.render());
+    		} else {
         		
         		String resource_path = (www_root_dir + uri).trim();
-            	
+
         		
-            	if(uri.equals("/") || uri.contains("index.")) {
-            		resource_path = www_root_dir + "/index.html";
-            	
-            	}
-            	
+            	resource_path = resource_path.replaceAll("\\|\\/", SEPARATOR);
+            	resource_path = resource_path.substring(1);
             	String ext = Utils.getExtension(resource_path);
             	Utils.log("extension: " + ext);
             	

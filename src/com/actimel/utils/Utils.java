@@ -6,6 +6,7 @@ import java.awt.geom.Path2D;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,8 +50,11 @@ public class Utils {
 	public static String readFile(File f) {
 
 		try {
-			FileReader reader = new FileReader(f);
-			BufferedReader br = new BufferedReader(reader);
+
+			FileInputStream fis = new FileInputStream(f);			
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+			
 		    StringBuilder sb = new StringBuilder();
 		    String line = br.readLine();
 
@@ -61,7 +65,8 @@ public class Utils {
 		    }
 		    
 		    br.close();
-		    reader.close();
+		    isr.close();
+		    fis.close();
 		    
 		    return sb.toString();
 		} catch(Exception e) {
@@ -69,6 +74,7 @@ public class Utils {
 		}
 		return "";
 	}
+	
 
 	public static int rand(int min, int max) {
 		Random rand = new Random();

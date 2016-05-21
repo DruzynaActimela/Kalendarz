@@ -1,6 +1,13 @@
 package com.actimel.calendar;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Enumeration;
+
+import com.actimel.utils.HtmlTemplate;
+import com.actimel.utils.Utils;
 
 public class Starter {
 	
@@ -9,9 +16,33 @@ public class Starter {
 	}
 	
 	public Starter(String[] args) {
+		URL res = Starter.class.getClassLoader().getResource(File.separator);
+		if(res != null) {
+			try {
+	            final File apps = new File(res.toURI());
+	            for (File app : apps.listFiles()) {
+	                System.out.println(app);
+	            }
+	        } catch (URISyntaxException ex) {
+	        	ex.printStackTrace();
+	        }
+		} else {
+			Utils.log("Something went wrong");
+		}
+	
+		HtmlTemplate index = HtmlTemplate.loadFromResource("index.html");
+		Utils.log("-- render -- ");
+		String renderedTemplate = index.render();
+		
+		Utils.log(renderedTemplate);
+		
+		
+		
+		
+		
 		try {
 			CalendarApp app = new CalendarApp();
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

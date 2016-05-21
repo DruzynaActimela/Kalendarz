@@ -6,17 +6,18 @@ import java.util.List;
 
 import com.actimel.intfs.StorageIntf;
 import com.actimel.models.CalendarEvent;
+import com.actimel.utils.Utils;
 
 public class FileStorage implements StorageIntf {
 	
 	private File storageFile;
 	private CalendarApp app;
 	
-	public FileStorage(CalendarApp appInstance, String path) throws FileNotFoundException {
+	public FileStorage(CalendarApp appInstance, String path) {
 		this.app = appInstance;
 		storageFile = new File(path);
 		if(!storageFile.exists()) {
-			throw new FileNotFoundException("Plik " + storageFile.getAbsolutePath() + " nie istnieje!");
+			Utils.log("Plik " + storageFile.getAbsolutePath() + " nie istnieje!");
 		}
 		
 	}

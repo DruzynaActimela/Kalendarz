@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>@yield('title', 'Domyślny tytuł strony')</title>
+
+    <link media="all" type="text/css" rel="stylesheet" href="css/style.css">
+    <link media="all" type="text/css" rel="stylesheet" href="fullcalendar/fullcalendar.min.css">
+    <link media="all" type="text/css" rel="stylesheet" href="fullcalendar/fullcalendar.print.css">
+    <script src='js/jquery.min.js'></script>
+    <script src='js/jquery-ui.custom.min.js'></script>
+    <script src='js/moment.min.js'></script>
+    <script src='fullcalendar/fullcalendar.min.js'></script>
+
+    <script>
+    window.REMODAL_GLOBALS = {
+      NAMESPACE: 'remodal',
+      DEFAULTS: {
+        hashTracking: false
+      }
+    };
+    </script>
+    <script src="js/remodal.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <meta property="og:title" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:description" content="" />
+
+
+    <!-- Apple -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#287EB6">
+
+    <!-- Windows -->
+    <meta name="application-name" content="" />
+    <meta name="msapplication-TileColor" content=" " />
+    <meta name="msapplication-TileImage" content="" />
+    <meta name="msapplication-square310x310logo" content="" />
+    </head>
+    <body ontouchstart="">
+        @yield('content')
+
+
+        <div class="remodal modal_confirm" data-remodal-id="modal_confirm">
+          <button data-remodal-action="close" class="remodal-close"></button>
+          <h1 class='modal-title'>Title</h1>
+          <p class='modal-body'>
+            Message
+          </p>
+          <br>
+          <button data-remodal-action="cancel" class="remodal-cancel">Nie</button>
+          <button data-remodal-action="confirm" class="remodal-confirm">Tak</button>
+        </div>
+
+    </body>
+
+</html>
