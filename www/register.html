@@ -1,16 +1,16 @@
 @extends('template.html')
 @section('title')
-	Logowanie
+	Rejestracja
 @stop
 @section('content')
 <div class="container">
 	<div class="row">
 		<div class="col-md-5 col-md-offset-3 vert-offset-top-2">
-			<h1 class="text-center login-title">Logowanie</h1>
+			<h1 class="text-center login-title">Rejestracja</h1>
 			<div class="account-wall">
 				
 				<div class='login-photo'></div>
-				<form class="form-signin" method='post' action='/login'>
+				<form class="form-signin" method='post' action='/register'>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-user'></i></div>
 						<input type="text" class="form-control" placeholder="Nazwa użytkownika" required autofocus>
@@ -19,13 +19,22 @@
 						<div class='fcontrol-icon'><i class='fa fa-lock'></i></div>
 						<input type="password" class="form-control" placeholder="Hasło" required>
 					</div>
+					<div class='fcontrol-wrap'>
+						<div class='fcontrol-icon'><i class='fa fa-lock'></i></div>
+						<input type="password" class="form-control" placeholder="Powtórz hasło" required>
+					</div>
+					<div class='fcontrol-wrap'>
+						<div class='fcontrol-icon'><i class='fa fa-envelope-o'></i></div>
+						<input type="text" class="form-control" placeholder="Adres e-mail" required>
+					</div>
+
 					<br>
 					<button class="btn btn-lg btn-primary btn-block btn-green" type="submit">
-						Zaloguj się
+						Zarejestruj się
 					</button>
 					</form>
 				</div>
-				<a href="/register" class="text-center new-account">Utwórz konto</a>
+				<a href="/register" class="text-center new-account">Zaloguj się</a>
 			</div>
 		</div>
 @stop

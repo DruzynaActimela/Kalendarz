@@ -84,6 +84,17 @@ public class WebServer extends NanoHTTPD {
         			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("login.html");        			
         			return newFixedLengthResponse(loginTemplate.render());
         		}
+        	} else if(uri.startsWith("/register")) {
+        		// rejestracja
+        		if(session.getMethod().equals(Method.POST)) {
+        			// sprawdzenie danych
+        			
+        			
+        		} else {
+        			// pokazanie strony
+        			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("register.html");        			
+        			return newFixedLengthResponse(loginTemplate.render());
+        		}
         	} else if(uri.equals("/") || uri.contains("index.")) {
     			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("index.html");        			
     			return newFixedLengthResponse(loginTemplate.render());
