@@ -2,6 +2,7 @@ package com.actimel.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -51,15 +52,22 @@ public class HtmlTemplate {
 		variablesToReplace.put(name, val);
 	}
 	
+	private boolean isExcludedLine(String line, List<String> excluded) {
+		for(String el : excluded) {
+			if(line.equals(el)) return true;
+		}
+		return false;
+	}
 	private void parse() {
 		content = Utils.readFile(template);
-		String[] lines = content.split("\\r?\\n");
+		String newline = "\\r?\\n";
+		String[] lines = content.split(newline);
 		StringBuilder builder = new StringBuilder();
 		
 		int currentLine = 0;
 		
-		List<String> leftOvers = new ArrayList<String>();
-		
+		List<String> excludedLines = new ArrayList<String>();
+				
 		for(String line : lines) {
 			
 			int lineIndex = content.indexOf(line);
@@ -125,8 +133,9 @@ public class HtmlTemplate {
 						int stopPosition = content.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
 						int substrStart = lineIndex + sectionPhraseLength;
 						sectionValue = content.substring(substrStart, stopPosition);
-						leftOvers.add(sectionValue);
 						
+						excludedLines.addAll(Arrays.asList(sectionValue.split(newline)));
+
 					} else if(secondValue != null) {
 						sectionValue = secondValue;
 					}
@@ -144,20 +153,11 @@ public class HtmlTemplate {
 				Utils.log("--while end--");
 				builder.append(newLine + "\n");
 			} else {
-				boolean is_leftover = false;
-				for(String leftover : leftOvers) {
-					if(leftover.trim().equals(line.trim())) {
-						is_leftover = true;
-					}
-				}
-				if(!is_leftover) {
+				if(!isExcludedLine(line, excludedLines)) {
 					builder.append(line + "\n");
-				}
-				
+				}			
 				
 			}
-			
-		
 			
 			currentLine++;
 		}

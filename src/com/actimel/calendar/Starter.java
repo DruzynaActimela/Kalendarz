@@ -30,7 +30,7 @@ public class Starter {
 			Utils.log("Something went wrong");
 		}
 	
-		HtmlTemplate index = HtmlTemplate.loadFromResource("index.html");
+		HtmlTemplate index = HtmlTemplate.loadFromResource("login.html");
 		Utils.log("-- render -- ");
 		String renderedTemplate = index.render();
 		
