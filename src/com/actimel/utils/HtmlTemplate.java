@@ -74,7 +74,7 @@ public class HtmlTemplate {
 			Utils.log("["+template.getName()+"] " + line);
 			Matcher matcher = tVarRegex.matcher(line);
 			
-			if(line.matches("(.*)" + tVarRegex.pattern() + "(.*)")) {
+			if(line.matches("(.*)" + tVarRegex.pattern() + "(.*)") && !isExcludedLine(line, excludedLines)) {
 				String newLine = "";
 				Utils.log("--while begin--");
 				int i = 0;
@@ -109,7 +109,7 @@ public class HtmlTemplate {
 					Utils.log(actionName + ", " + firstValue + ", " + secondValue);
 					
 					if("extends".equals(actionName) && masterTemplate == null) {
-						masterTemplate = HtmlTemplate.loadFromResource(firstValue);
+						masterTemplate = HtmlTemplate.loadFromResource(firstValue, false);
 						Utils.log("Got master template: " + firstValue);
 					}
 					

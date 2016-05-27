@@ -2,6 +2,9 @@
 @section('title')
 	Rejestracja
 @stop
+@section('scripts')
+	<script src='js/sha256.js'></script>
+@stop
 @section('content')
 <div class="container">
 	<div class="row">
@@ -13,28 +16,28 @@
 				<form class="form-signin" method='post' action='/register'>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-user'></i></div>
-						<input type="text" class="form-control" placeholder="Nazwa użytkownika" required autofocus>
+						<input type="text" class="form-control username" placeholder="Nazwa użytkownika" required autofocus>
 					</div>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-lock'></i></div>
-						<input type="password" class="form-control" placeholder="Hasło" required>
+						<input type="password" class="form-control password" placeholder="Hasło" required>
 					</div>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-lock'></i></div>
-						<input type="password" class="form-control" placeholder="Powtórz hasło" required>
+						<input type="password" class="form-control password2" placeholder="Powtórz hasło" required>
 					</div>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-envelope-o'></i></div>
-						<input type="text" class="form-control" placeholder="Adres e-mail" required>
+						<input type="text" class="form-control email" placeholder="Adres e-mail" required>
 					</div>
 
-					<br>
-					<button class="btn btn-lg btn-primary btn-block btn-green" type="submit">
+					<br>					
+					</form>
+					<button class="btn btn-lg btn-primary btn-block btn-green btn-register">
 						Zarejestruj się
 					</button>
-					</form>
 				</div>
-				<a href="/register" class="text-center new-account">Zaloguj się</a>
+				<a href="/login" class="text-center new-account">Zaloguj się</a>
 			</div>
 		</div>
 @stop

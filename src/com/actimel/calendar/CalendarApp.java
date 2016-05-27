@@ -24,7 +24,7 @@ public class CalendarApp {
 	public CalendarApp() {
 		gson = new GsonBuilder().disableHtmlEscaping().create();
 		
-		storage = new FileStorage(this, Const.FILE_STORAGE_PATH);
+		storage = new FileStorage(this, Const.EVENTS_STORAGE_PATH, Const.USERS_STORAGE_PATH);
 		eventsList = storage.loadEvents();
 		
 		
@@ -43,5 +43,9 @@ public class CalendarApp {
 	
 	public Gson getGson() {
 		return gson;
+	}
+	
+	public StorageIntf getStorage() {
+		return storage;
 	}
 }

@@ -163,3 +163,7 @@ body {
 	width: 100%;
 	height: 220px;
 }
+.btn-login, .btn-register {
+    max-width: 330px;
+    margin:0 auto;
+}

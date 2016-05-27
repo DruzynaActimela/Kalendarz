@@ -2,28 +2,31 @@
 @section('title')
 	Logowanie
 @stop
+@section('scripts')
+	<script src='js/sha256.js'></script>
+@stop
 @section('content')
 <div class="container">
 	<div class="row">
 		<div class="col-md-5 col-md-offset-3 vert-offset-top-2">
 			<h1 class="text-center login-title">Logowanie</h1>
 			<div class="account-wall">
-				
 				<div class='login-photo'></div>
 				<form class="form-signin" method='post' action='/login'>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-user'></i></div>
-						<input type="text" class="form-control" placeholder="Nazwa użytkownika" required autofocus>
+						<input type="text" class="form-control username" name='username' placeholder="Nazwa użytkownika" required autofocus>
 					</div>
 					<div class='fcontrol-wrap'>
 						<div class='fcontrol-icon'><i class='fa fa-lock'></i></div>
-						<input type="password" class="form-control" placeholder="Hasło" required>
+						<input type="password" class="form-control password" name='password' placeholder="Hasło" required>
 					</div>
 					<br>
-					<button class="btn btn-lg btn-primary btn-block btn-green" type="submit">
+					</form>
+
+					<button class="btn btn-lg btn-primary btn-block btn-green btn-login">
 						Zaloguj się
 					</button>
-					</form>
 				</div>
 				<a href="/register" class="text-center new-account">Utwórz konto</a>
 			</div>
