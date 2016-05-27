@@ -167,3 +167,99 @@ body {
     max-width: 330px;
     margin:0 auto;
 }
+.left {
+    float:left;
+}
+.right {
+    float:right;
+}
+.clear {
+    clear:both;
+}
+.top-header {
+    background: #3A404C;
+    color: white;
+}
+.th-logo {
+    font-family: opensansbold;
+    padding: 12px;
+    font-size: 15px;
+}
+.dropdown {
+    position: relative;
+    cursor: pointer;
+    min-width: 200px;
+}
+.dropdown-block {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    -webkit-transition:background .2s ease-in-out;
+}
+.dropdown:hover .dropdown-block {
+    background: white;
+    color: #3d3d3d;
+}
+.dropdown:hover .dropdown-contextmenu {
+    visibility: visible;
+    -webkit-transform: translate3d(0,0px,0);
+    opacity: 1.0;
+    z-index: 100;
+}
+
+.dropdown-contextmenu {
+    visibility: hidden;
+    position: absolute;
+    background: #FFF;
+    color: #3d3d3d;
+    width: 230px;
+    right: 0px;
+    top: 45px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+    border-radius: 2px 0px 0px 2px;
+    padding: 5px 0;
+    opacity: 0.0;
+    -webkit-transform: translate3d(0,20px,0);    
+    -webkit-transition:visibility .2s linear 0s, -webkit-transform 0.2s ease-in-out, opacity .2s ease-in-out;
+}
+.db-username {
+    font-size: 17px;
+
+}
+.db-icon {
+    font-size: 18px;
+}
+.dd-item {
+    padding: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    -webkit-transition:background .2s ease-in-out;
+}
+.dd-icon {
+    font-size: 17px;
+    margin-right: 10px;
+    margin-left: 5px;
+}
+.dd-item:hover {
+    background: #04C489;
+    color: #FFF;
+}
+.lm-option {
+    color: #3d3d3d;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 3px;
+}
+.lm-option:hover, .lm-current {
+    background: #04C489;
+    color: #FFF;
+    cursor: pointer;
+}
+.lm-option i {
+    color: #04C489;
+    margin-right: 10px;
+    font-size: 18px;
+}
+.lm-option:hover i, .lm-current i {
+    color: white;
+}

@@ -98,7 +98,8 @@ public class WebServer extends NanoHTTPD {
 			
 			
 			if(!allowedRoutesWithoutLogin.contains(currentRoute) && userSession == null && !excludeFoldersFromLoginCheck.contains(currentRoute)) {
-				return doRedirect("login#message:not-authorized");
+				// wy³¹czone na czas pisania
+				//return doRedirect("login#message:not-authorized");
 			}
 
         	if(uri.startsWith("/api")) {
@@ -131,7 +132,8 @@ public class WebServer extends NanoHTTPD {
         	} else if(uri.startsWith("/dashboard")) {
         		
         		HtmlTemplate dashboardTemplate = HtmlTemplate.loadFromResource("dashboard.html", false);
-        		dashboardTemplate.putYieldVar("current_username", userSession.getUser().getName());
+        		dashboardTemplate.putYieldVar("current_username", "user");
+        		//dashboardTemplate.putYieldVar("current_username", userSession.getUser().getName());
     			return newFixedLengthResponse(dashboardTemplate.render());
         	} else if(uri.startsWith("/login")) {
         		

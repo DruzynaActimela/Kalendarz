@@ -7,22 +7,62 @@
 	<div class='th-logo left'>
 		Kalendarz
 	</div>
-
-	<div class='dropdown user-dropdown'>
+	<div class='dropdown right user-dropdown'>
 		<div class='dropdown-block'>
-			@yield('current_username', 'Aktualny użytkownik')
+			<div class='db-username left'>
+				@yield('current_username', 'Aktualny użytkownik')
+			</div>
+			<div class='db-icon right'>
+				<i class='fa fa-chevron-down'></i>
+			</div>
+			<div class='clear'></div>
 		</div>
 		<div class='dropdown-contextmenu'>
-
+			<div class='dd-item'>
+				<i class='fa fa-user dd-icon'></i>Profil
+			</div>			
+			<div class='dd-divider'></div>
+			<div class='dd-item'>
+				<i class='fa fa-sign-out dd-icon'></i>Wyloguj się
+			</div>
 		</div>
 	</div>
 	<div class='clear'></div>
 </div>
 <div class="container">
 	<div class="row">
-		<div class="col-md-5 col-md-offset-3 vert-offset-top-2">
-			
+		<div class="col-md-12 col-md-offset-0 vert-offset-top-2">
+			<div class='col-md-3 left-panel left'>
+				<div class='left-menu-options'>
+					<div class='lm-option lm-current'>
+						<i class='fa fa-calendar'></i>Kalendarz
+					</div>
+					<div class='lm-option'>
+						<i class='fa fa-calendar'></i>Zdarzenia
+					</div>
+					<div class='lm-option'>
+						<i class='fa fa-cogs'></i>Ustawienia
+					</div>
+
+				</div>
+			</div>
+			<div class='col-md-6 center-content left'>
+				<div class='page-screen screen-calendar'>
+					<div id='calendar'></div>
+				</div>
+			</div>
+			<div class='col-md-3 right-panel left'>
+				right
+			</div>
+			<div class='clear'></div>
 		</div>
 	</div>
 </div>
+<script>
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+
+    })
+});
+</script>
 @stop

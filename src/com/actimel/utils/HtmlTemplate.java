@@ -200,7 +200,7 @@ public class HtmlTemplate {
 			
 			String yieldVar = YIELD_VAR_PREFIX + variableName + YIELD_VAR_SUFFIX;
 			
-			content = content.replaceAll(yieldVar, variableValue);
+			content = content.replaceAll(yieldVar, Matcher.quoteReplacement(variableValue));
 		}
 		return content;
 	}
