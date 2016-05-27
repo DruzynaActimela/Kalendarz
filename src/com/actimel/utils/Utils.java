@@ -31,7 +31,7 @@ public class Utils {
 	}
 
 	public static void writeToFile(File f, String content) {
-		
+
 		try {
 			FileWriter fw = new FileWriter(f);
 			BufferedWriter bw = new BufferedWriter(fw);			
@@ -41,9 +41,18 @@ public class Utils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+	public static String getRandomString(int length) {
+		final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder result = new StringBuilder();
+		while(length > 0) {
+			Random rand = new Random();
+			result.append(characters.charAt(rand.nextInt(characters.length())));
+			length--;
+		}
+		return result.toString();
+	}
 	public static String readFile(File f) {
 
 		try {
@@ -51,27 +60,27 @@ public class Utils {
 			FileInputStream fis = new FileInputStream(f);			
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
-			
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
 
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    
-		    br.close();
-		    isr.close();
-		    fis.close();
-		    
-		    return sb.toString();
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+
+			while (line != null) {
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+
+			br.close();
+			isr.close();
+			fis.close();
+
+			return sb.toString();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		return "";
 	}
-	
+
 
 	public static int rand(int min, int max) {
 		Random rand = new Random();
@@ -114,18 +123,18 @@ public class Utils {
 		return Utils.readFromStream(Utils.class.getClassLoader().getResource(internalPath).openStream());
 
 	}
-	
+
 	public static String sha256(String input) throws NoSuchAlgorithmException {
-        MessageDigest mDigest = MessageDigest.getInstance("SHA-256");
-        byte[] result = mDigest.digest(input.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < result.length; i++) {
-            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
-        }
-         
-        return sb.toString();
-    }
-	
+		MessageDigest mDigest = MessageDigest.getInstance("SHA-256");
+		byte[] result = mDigest.digest(input.getBytes());
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < result.length; i++) {
+			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+		}
+
+		return sb.toString();
+	}
+
 	public static boolean isUsernameValid(String input) {
 		if(input == null) return false;
 		return input.matches("[a-zA-Z0-9_]{3,16}");

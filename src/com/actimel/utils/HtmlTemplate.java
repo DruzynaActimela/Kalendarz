@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,12 +26,12 @@ public class HtmlTemplate {
 	private String content;
 	
 	private HtmlTemplate masterTemplate = null;
+	private boolean parsed = false;
 	
 	
 	public HtmlTemplate(File template) {
 		this.template = template;
-		
-		parse();
+
 	}
 	
 	public static HtmlTemplate loadFromResource(String resName) {
@@ -58,14 +59,22 @@ public class HtmlTemplate {
 		}
 		return false;
 	}
-	private void parse() {
+	
+	private void parseTemplate() {
+		if(parsed) return;
+		
 		content = Utils.readFile(template);
+		content = parse(content);
+		parsed = true;
+	}
+	
+	private String parse(String content) {
+		
 		String newline = "\\r?\\n";
 		String[] lines = content.split(newline);
 		StringBuilder builder = new StringBuilder();
 		
-		int currentLine = 0;
-		
+
 		List<String> excludedLines = new ArrayList<String>();
 				
 		for(String line : lines) {
@@ -110,6 +119,7 @@ public class HtmlTemplate {
 					
 					if("extends".equals(actionName) && masterTemplate == null) {
 						masterTemplate = HtmlTemplate.loadFromResource(firstValue, false);
+						masterTemplate.parseTemplate();
 						Utils.log("Got master template: " + firstValue);
 					}
 					
@@ -121,8 +131,10 @@ public class HtmlTemplate {
 						strbuf = strbuf.replace(startPos, endPos, replacement);
 						Utils.log("REPLACING ["+line.substring(startPos, endPos )+"] to ["+replacement+"]");
 						newLine += strbuf.toString();
-						String defaultVal = (secondValue != null) ? secondValue : "";
-						putYieldVar(firstValue, defaultVal);
+						if(!variablesToReplace.containsKey(firstValue)) {
+							String defaultVal = (secondValue != null) ? secondValue : "";
+							putYieldVar(firstValue, defaultVal);
+						}
 					}
 					
 					if("section".equals(actionName) && secondValue == null) {
@@ -132,9 +144,12 @@ public class HtmlTemplate {
 						int sectionPhraseLength = matcher.group().length();
 						int stopPosition = content.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
 						int substrStart = lineIndex + sectionPhraseLength;
-						sectionValue = content.substring(substrStart, stopPosition);
-						
-						excludedLines.addAll(Arrays.asList(sectionValue.split(newline)));
+						String _sVal = content.substring(substrStart, stopPosition);
+						List<String> excluded = (Arrays.asList(_sVal.split(newline)));
+						String parsedSection = parse(_sVal);
+						Utils.log("PARSED SECTION" + parsedSection);
+						sectionValue = replaceVars(parsedSection, variablesToReplace);						
+						excludedLines.addAll(excluded);
 
 					} else if(secondValue != null) {
 						sectionValue = secondValue;
@@ -158,19 +173,38 @@ public class HtmlTemplate {
 				}			
 				
 			}
-			
-			currentLine++;
+
 		}
 		
 		Utils.log("-- post parse -- ");
 		
 		Utils.log(builder.toString());
 		
-		content = builder.toString();
+		//content = builder.toString();
+		return builder.toString();
 	}
 	
 	public String render() {
+		if(!parsed) parseTemplate();
 		
+		Utils.log("RENDER IN " + template.getName());
+		return _render(content, variablesToReplace);
+	}
+	
+	private String replaceVars(String content, HashMap<String, String> vars) {
+		
+		for(Entry<String, String> entry : vars.entrySet()) {
+			String variableName = entry.getKey();
+			String variableValue = entry.getValue();
+			Utils.log(variableName + "=>" + variableValue);
+			
+			String yieldVar = YIELD_VAR_PREFIX + variableName + YIELD_VAR_SUFFIX;
+			
+			content = content.replaceAll(yieldVar, variableValue);
+		}
+		return content;
+	}
+	private String _render(String content, HashMap<String, String> vars) {
 		
 		String render = "";
 		String parsed_content = content;
@@ -178,36 +212,12 @@ public class HtmlTemplate {
 			render += masterTemplate.render();
 		}
 		
-		Utils.log("RENDER IN " + template.getName());
-		
-		for(Entry<String, String> entry : variablesToReplace.entrySet()) {
-			String variableName = entry.getKey();
-			String variableValue = entry.getValue();
-			Utils.log(variableName + "=>" + variableValue);
-			
-			String yieldVar = YIELD_VAR_PREFIX + variableName + YIELD_VAR_SUFFIX;
-			
-			parsed_content = parsed_content.replaceAll(yieldVar, variableValue);
-		}
+
+		parsed_content = replaceVars(content, vars);
 		
 		
 		render += parsed_content;
 		
 		return render.trim();
-		
-		
-		
-		
-
-			/*
-	      if (m.find( )) {
-	         System.out.println("Found value: " + m.group(0) );
-	         System.out.println("Found value: " + m.group(1) );
-	         System.out.println("Found value: " + m.group(2) );
-	      } else {
-	         System.out.println("NO MATCH");
-	      }
-	      */
-	   
 	}
 }

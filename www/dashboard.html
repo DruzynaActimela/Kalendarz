@@ -1,0 +1,28 @@
+@extends('template.html')
+@section('title')
+	Dashboard
+@stop
+@section('content')
+<div class='top-header'>
+	<div class='th-logo left'>
+		Kalendarz
+	</div>
+
+	<div class='dropdown user-dropdown'>
+		<div class='dropdown-block'>
+			@yield('current_username', 'Aktualny użytkownik')
+		</div>
+		<div class='dropdown-contextmenu'>
+
+		</div>
+	</div>
+	<div class='clear'></div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-5 col-md-offset-3 vert-offset-top-2">
+			
+		</div>
+	</div>
+</div>
+@stop

@@ -128,9 +128,11 @@ public class WebServer extends NanoHTTPD {
 	        	if("buy-city".equals(requestMode)) {
 
 		        }
-        	} else if(uri.startsWith("/dashboard")) {  
+        	} else if(uri.startsWith("/dashboard")) {
         		
-        		return newFixedLengthResponse("dashboard");
+        		HtmlTemplate dashboardTemplate = HtmlTemplate.loadFromResource("dashboard.html", false);
+        		dashboardTemplate.putYieldVar("current_username", userSession.getUser().getName());
+    			return newFixedLengthResponse(dashboardTemplate.render());
         	} else if(uri.startsWith("/login")) {
         		
         		if(userSession != null) {

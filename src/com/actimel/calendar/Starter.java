@@ -30,8 +30,9 @@ public class Starter {
 			Utils.log("Something went wrong");
 		}
 	
-		HtmlTemplate index = HtmlTemplate.loadFromResource("login.html");
+		HtmlTemplate index = HtmlTemplate.loadFromResource("dashboard.html", false);
 		Utils.log("-- render -- ");
+		index.putYieldVar("current_username", "test");
 		String renderedTemplate = index.render();
 		
 		Utils.log(renderedTemplate);
