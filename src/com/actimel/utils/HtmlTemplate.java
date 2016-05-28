@@ -35,16 +35,28 @@ public class HtmlTemplate {
 	}
 	
 	public static HtmlTemplate loadFromResource(String resName) {
-		return loadFromResource(resName, true);
+		String uniqCacheKey = "";
+		if(resName != null && resName.contains("@")) {
+			int pos = resName.indexOf("@");
+			uniqCacheKey = resName.substring(pos+1);
+			resName = resName.substring(0, pos);
+			Utils.log("Got uniqueCacheKey: " + uniqCacheKey);
+		}
+		return loadFromResource(resName, true, uniqCacheKey);
 	}
 	public static HtmlTemplate loadFromResource(String resName, boolean cachedIfExists) {
+		return loadFromResource(resName, cachedIfExists, "");
+	}
+	public static HtmlTemplate loadFromResource(String resName, boolean cachedIfExists, String uniqCacheKey) {
+		String cacheKey = resName + "_" + uniqCacheKey;
 		if(cachedIfExists) {
-			if(templateCache.containsKey(resName)) {
-				return templateCache.get(resName);
+			if(templateCache.containsKey(cacheKey)) {
+				return templateCache.get(cacheKey);
 			}
 		}
 		HtmlTemplate inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
-		templateCache.put(resName, inst);
+		Utils.log("Putting " + resName + " at: " + cacheKey);
+		templateCache.put(cacheKey, inst);
 		return inst;
 		
 	}
@@ -186,6 +198,7 @@ public class HtmlTemplate {
 	
 	public String render() {
 		if(!parsed) parseTemplate();
+		Utils.log("render");
 		
 		Utils.log("RENDER IN " + template.getName());
 		return _render(content, variablesToReplace);
