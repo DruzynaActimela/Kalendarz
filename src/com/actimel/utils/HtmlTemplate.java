@@ -145,19 +145,54 @@ public class HtmlTemplate {
 						newLine += strbuf.toString();
 						if(!variablesToReplace.containsKey(firstValue)) {
 							String defaultVal = (secondValue != null) ? secondValue : "";
-							putYieldVar(firstValue, defaultVal);
+							if(secondValue != null) {
+								putYieldVar(firstValue, defaultVal);
+							}
 						}
+					}
+					
+					if("isset".equals(actionName)) {
+						String endPhrase = "@endIsset";
+						String elsePhrase = "@else";
+						
+						int sectionPhraseLength = matcher.group().length();
+						int sectionOffset = matcher.start();
+						int stopPosition = content.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
+						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
+						String _sVal = content.substring(substrStart, stopPosition);
+						Utils.log("znaleziony isset: (match offset: "+sectionOffset+") " + _sVal);
+						String ifExists = "", ifNotExists = "";
+												
+						if(_sVal.contains(elsePhrase)) {
+							String[] split = _sVal.split(elsePhrase);
+							ifExists = parse(split[0]);
+							ifNotExists = parse(split[1]);
+						} else {
+							ifExists = parse(_sVal);
+						}	
+						List<String> excluded = (Arrays.asList(_sVal.split(newline)));
+					
+						Utils.log("IF EXISTS" + ifExists);
+						Utils.log("IF NOT EXISTS" + ifNotExists);
+						
+						if(variablesToReplace.containsKey(firstValue)) {
+							newLine += replaceVars(ifExists, variablesToReplace).trim();
+						} else {
+							newLine += replaceVars(ifNotExists, variablesToReplace).trim();
+						}
+						excludedLines.addAll(excluded);
 					}
 					
 					if("section".equals(actionName) && secondValue == null) {
 						
 						String endPhrase = "@stop";
-						
+						int sectionOffset = matcher.start();
 						int sectionPhraseLength = matcher.group().length();
 						int stopPosition = content.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
-						int substrStart = lineIndex + sectionPhraseLength;
+						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String _sVal = content.substring(substrStart, stopPosition);
 						List<String> excluded = (Arrays.asList(_sVal.split(newline)));
+						Utils.log("Parsing section... (match offset: "+sectionOffset+")");
 						String parsedSection = parse(_sVal);
 						Utils.log("PARSED SECTION" + parsedSection);
 						sectionValue = replaceVars(parsedSection, variablesToReplace);						

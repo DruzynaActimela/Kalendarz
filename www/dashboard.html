@@ -2,7 +2,7 @@
 @section('title')
 	Dashboard
 @stop
-@section('content')
+   @section('content')
 <div class='top-header'>
 	<div class='th-logo left'>
 		Kalendarz
@@ -29,6 +29,7 @@
 	</div>
 	<div class='clear'></div>
 </div>
+
 <div class="container">
 	<div class="row">
 		<div class="col-md-12 col-md-offset-0 vert-offset-top-2">
@@ -43,7 +44,11 @@
 					<div class='lm-option'>
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
-
+					@isset('is_admin')
+						Jest admin
+					@else 
+						Nie ma admina
+					@endIsset
 				</div>
 			</div>
 			<div class='col-md-6 center-content left'>

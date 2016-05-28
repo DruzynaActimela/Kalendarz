@@ -33,6 +33,7 @@ public class Starter {
 		HtmlTemplate index = HtmlTemplate.loadFromResource("dashboard.html", false);
 		Utils.log("-- render -- ");
 		index.putYieldVar("current_username", "test");
+		//index.putYieldVar("zmienna", "wartosc zmiennej");
 		String renderedTemplate = index.render();
 		
 		Utils.log(renderedTemplate);

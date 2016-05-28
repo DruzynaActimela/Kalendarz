@@ -131,9 +131,14 @@ public class WebServer extends NanoHTTPD {
 		        }
         	} else if(uri.startsWith("/dashboard")) {
         		String username = "user"; //userSession.getUser().getName();
+        		int admin_level = 1;
         		HtmlTemplate dashboardTemplate = HtmlTemplate.loadFromResource("dashboard.html@" + username); // mo¿liwoœæ cache'owania dla poszczegolnych uzytkownikow
         		dashboardTemplate.putYieldVar("current_username", username);
-        		//dashboardTemplate.putYieldVar("current_username", username);
+        		if(admin_level > 0) {
+        			dashboardTemplate.putYieldVar("is_admin", "" + admin_level);
+        		}
+        		
+        		
     			return newFixedLengthResponse(dashboardTemplate.render());
         	} else if(uri.startsWith("/login")) {
         		
