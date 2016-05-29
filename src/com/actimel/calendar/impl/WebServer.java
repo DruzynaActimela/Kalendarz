@@ -120,14 +120,22 @@ public class WebServer extends NanoHTTPD {
         		
         		Map<String, String> params = httpSession.getParms();
         		String requestMode = params.get("m");
+        		if(requestMode == null && uriSplit.length > 2) {
+        			requestMode = uriSplit[2];
+        		}
         		if(requestMode != null) {
         			requestMode = requestMode.toLowerCase().trim();
         		}
         		
-        		Utils.log(params.toString());
+        		
+        		Utils.log(requestMode, params.toString());
 	        		
-	        	if("buy-city".equals(requestMode)) {
-
+	        	if("events".equals(requestMode)) { // {start=2016-04-25, end=2016-06-06, _=1464436912054}
+	        		String start = params.get("start");
+	        		String end = params.get("end");
+	        		
+	        		
+	        		
 		        }
         	} else if(uri.startsWith("/dashboard")) {
         		String username = "user"; //userSession.getUser().getName();

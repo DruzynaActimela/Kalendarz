@@ -6,7 +6,18 @@ var app = {
 		app.updateUI();
 	},
 	updateUI: function() {
+        var content = $(".center-content");
+        var leftcol = $(".left-panel");
+        var rightcol = $(".right-panel");
+        var topbar = $(".top-header");
 
+        var contentWidth = wWidth;
+        if(!$(".page-body").hasClass("columns-full-width")) {
+            contentWidth = 1024;
+        }
+        content.width(contentWidth - leftcol.outerWidth() - rightcol.outerWidth());
+        leftcol.height(wHeight - topbar.outerHeight());
+        rightcol.height(wHeight - topbar.outerHeight());
 	},
     doLogin: function() {
         var login = $(".username").val();
@@ -148,6 +159,17 @@ $(document).ready(function() {
     });
     $(".btn-register").click(function() {
         app.doRegister();
+    });
+
+    $(".screen-trigger").click(function() {
+        var btn = $(this);
+        var screen = btn.attr("data-screen");
+        $(".screen-trigger").removeClass("lm-current");
+        btn.addClass("lm-current");
+        if(screen) {
+            $(".page-screen").hide();
+            $(".screen-"+screen).show();
+        }
     });
 
 

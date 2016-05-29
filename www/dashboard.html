@@ -7,6 +7,7 @@
 	<div class='th-logo left'>
 		Kalendarz
 	</div>
+
 	<div class='dropdown right user-dropdown'>
 		<div class='dropdown-block'>
 			<div class='db-username left'>
@@ -22,26 +23,38 @@
 				<i class='fa fa-user dd-icon'></i>Profil
 			</div>			
 			<div class='dd-divider'></div>
-			<div class='dd-item'>
+			<a class='dd-item' href='/logout'>
 				<i class='fa fa-sign-out dd-icon'></i>Wyloguj się
-			</div>
+			</a>
 		</div>
+	</div>
+
+	<div class='right'>
+		<div class='button green no-label trigger-search'>
+			<i class='fa fa-search'></i>
+		</div>
+		
+		<div class='button green btn-add-event trigger-add-event'>
+			<i class='fa fa-plus'></i>Dodaj zdarzenie
+		</div>
+
 	</div>
 	<div class='clear'></div>
 </div>
 
-<div class="container">
-	<div class="row">
-		<div class="col-md-12 col-md-offset-0 vert-offset-top-2">
-			<div class='col-md-3 left-panel left'>
+<div class="page-body columns-full-width">
+
+	<div class="page-body-inner">
+		<div class='left-panel left'>
+			<div class='inner-panel-content'>
 				<div class='left-menu-options'>
-					<div class='lm-option lm-current'>
+					<div class='lm-option lm-current screen-trigger' data-screen='calendar'>
 						<i class='fa fa-calendar'></i>Kalendarz
 					</div>
-					<div class='lm-option'>
+					<div class='lm-option screen-trigger' data-screen='events'>
 						<i class='fa fa-calendar'></i>Zdarzenia
 					</div>
-					<div class='lm-option'>
+					<div class='lm-option screen-trigger' data-screen='settings'>
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
 					@isset('is_admin')
@@ -51,23 +64,41 @@
 					@endIsset
 				</div>
 			</div>
-			<div class='col-md-6 center-content left'>
-				<div class='page-screen screen-calendar'>
-					<div id='calendar'></div>
-				</div>
-			</div>
-			<div class='col-md-3 right-panel left'>
-				right
-			</div>
-			<div class='clear'></div>
 		</div>
+		<div class='center-content left'>
+			<div class='page-screen page-screen-first screen-calendar'>
+				<div id='calendar'></div>
+			</div>
+			<div class='page-screen screen-events'>
+				events
+			</div>
+			<div class='page-screen screen-settings'>
+				settings
+			</div>
+		</div>
+		<div class='right-panel left'>
+			<div class='inner-panel-content'>
+				<div id="datepicker"></div>
+			</div>
+		</div>
+		<div class='clear'></div>
 	</div>
+
 </div>
 <script>
 $(document).ready(function() {
     $('#calendar').fullCalendar({
-
-    })
+    	header: {
+		    left:   'title',
+		    center: '',
+		    right:  'today prev,next'
+		},
+		firstDay: 1,
+    	events: "/api/events",
+    });
+    $( "#datepicker" ).datepicker({
+    	showOtherMonths: true
+    });
 });
 </script>
 @stop

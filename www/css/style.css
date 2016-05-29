@@ -1,6 +1,7 @@
 body, html {
 	padding: 0;
 	margin:0;
+    overflow: hidden;
 }
 
 @font-face {
@@ -233,6 +234,10 @@ body {
     padding: 10px;
     font-size: 15px;
     cursor: pointer;
+    text-decoration: none;
+    cursor: pointer;
+    display: block;
+    color: #3d3d3d;
     -webkit-transition:background .2s ease-in-out;
 }
 .dd-icon {
@@ -242,13 +247,55 @@ body {
 }
 .dd-item:hover {
     background: #04C489;
+    text-decoration: none;
     color: #FFF;
 }
+.button {
+    text-align: left;
+    color: white;
+    font-size: 13px;
+    margin: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: inline-block;
+}
+.button:active {
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.2) inset;
+}
+.button i {
+    margin-right: 10px;
+    font-size: 14px;
+    vertical-align: 0px;
+}
+.button.green i {
+    color:#04C489;
+}
+
+.button.green {
+    color: #FFF;
+    border:1px solid #04C489;
+}
+.button.green:hover {
+    background: #04C489;
+    color: #FFF;
+}
+.button.green:hover i {
+    color:white;
+}
+.btn-add-event {
+    margin-right: 52px;
+}
+.no-label i {
+    margin: 0;
+}
 .lm-option {
+    text-align: left;
     color: #3d3d3d;
     font-size: 15px;
     padding: 10px;
     border-radius: 3px;
+    margin-bottom: 5px;
 }
 .lm-option:hover, .lm-current {
     background: #04C489;
@@ -262,4 +309,127 @@ body {
 }
 .lm-option:hover i, .lm-current i {
     color: white;
+}
+.page-screen {
+    padding: 10px;
+}
+.page-screen:not(.page-screen-first) {
+    display: none;
+}
+.left-panel {
+    width: 250px;
+}
+.center-content {
+    width: 600px;
+}
+.right-panel {
+    width: 250px;
+    background: #EFEFEF;
+    /*box-shadow: 0px 0px 10px rgba(0,0,0,0.1);*/
+}
+.inner-panel-content {
+    padding: 10px;
+}
+.columns-full-width .left-panel {
+    width: 250px;
+}
+.columns-full-width .center-content {
+    width: 60%;
+}
+.columns-full-width .right-panel {
+    width: 250px;
+}
+.page-body {
+    text-align: center;
+}
+.page-body-inner {
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.ui-datepicker-calendar {
+    width: 100%;
+    text-align: center;
+}
+.ui-datepicker-calendar thead th {
+    padding: 5px;
+    color:gray;
+
+}
+.ui-datepicker-calendar thead th span {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+.ui-datepicker-calendar td {
+    padding: 5px 6px;
+}
+.ui-datepicker-calendar td span {
+    width: 100%;
+}
+.ui-datepicker-calendar td a {
+    color: #3d3d3d;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none !important;
+}
+.ui-datepicker-other-month {
+    color: gray;
+    opacity: 0.9;
+}
+.ui-datepicker-header {
+    position: relative;
+    height: 36px;
+}
+.ui-datepicker-title {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    padding: 2px;
+    top: 3px;
+    left: 0;
+    z-index: 1;
+    font-size: 15px;
+}
+.ui-datepicker-prev {
+    position: absolute;
+    left: -2px;
+    top: 0;
+    z-index: 3;
+}
+.ui-datepicker-next {
+    position: absolute;
+    right: 2px;
+    top: 0;
+    z-index: 3;
+}
+.ui-datepicker-next, .ui-datepicker-prev {
+       color: transparent !important;
+       text-decoration:none;
+       top: 6px;
+       cursor: pointer;
+}
+.ui-datepicker-next:hover .ui-datepicker-next:after, .ui-datepicker-prev:hover .ui-datepicker-prev:before {
+    color: #3d3d3d;
+}
+
+.ui-datepicker-prev:before {
+   content: '\f053';
+   font-family: FontAwesome;
+   font-weight: normal;
+   font-style: normal;
+   margin:0px 0px 0px 10px;
+   text-decoration:none;
+
+   color: gray;
+}
+.ui-datepicker-next:after {
+   content: '\f054';
+   font-family: FontAwesome;
+   font-weight: normal;
+   font-style: normal;
+   margin:0px 0px 0px 10px;
+   text-decoration:none;
+
+   color: gray;
 }
