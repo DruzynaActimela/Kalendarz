@@ -1,5 +1,15 @@
 var wWidth, wHeight;
 
+function parse_template(elem, vars) {
+    elem = (typeof elem == 'string') ? $(elem) : elem;
+    var html = elem.html();
+    for (var i in vars) {
+        var val = vars[i] ? vars[i] : "";
+        html = html.replace(new RegExp("{" + i + "}", "gi"), "" + val);
+    }
+    return html;
+}
+
 var app = {
 	init: function() {
 		
@@ -140,8 +150,71 @@ var app = {
                 if(callback) callback(response);
             }
         });
+    },
+    lastWindowId: 0,
+    showWindow: function(options) {
+        var title = options.title ? options.title : "Brak tytułu";
+        var body = options.body ? options.body : "";
+        var close_label = options.closeLabel ? options.closeLabel : "Anuluj";
+        var continue_label = options.continueLabel ? options.continueLabel : "Kontynuuj";
+
+        var cancelFunc = options.cancelFunc ? options.cancelFunc : null;
+        var confirmFunc = options.confirmFunc ? options.confirmFunc : null;
+
+        var newWindowId = "window_" + (++app.lastWindowId);
+        var window_html = parse_template("#window_template", {
+            title: title,
+            body: body,
+            window_name_id: newWindowId,
+            close_label: close_label,
+            continue_label: continue_label
+        });
+
+        var container = $("body");
+
+
+        var handle = $(window_html).appendTo(container);
+        $(handle).modal({
+
+        }).show();
+
+        var _closeFunc = function(h) {
+            $(h).modal('hide')
+            setTimeout(function() {
+                $(h).next(".modal-backdrop").remove();
+                $(h).remove();
+            }, 500);
+        };
+
+        handle.find(".modal-btn-close").click(function() {
+            var t = $(this);
+            var tModal = t.parents(".modal");
+            _closeFunc(tModal);
+
+            if(cancelFunc != null) cancelFunc();
+        });
+        handle.find(".modal-btn-continue").click(function() {
+            var t = $(this);
+            var tModal = t.parents(".modal");
+            _closeFunc(tModal);
+
+            if(confirmFunc != null) confirmFunc();
+        });
+
+    },
+    showCreateEventWindow: function() {
+        var body_template = parse_template("#create_event_template", {
+
+        });
+
+        app.showWindow({
+            title: "Dodawanie nowego zdarzenia",
+            body: body_template
+        });
     }
 };
+
+
 
 $(window).resize(function() {
 	wWidth = $(window).width();
@@ -160,6 +233,10 @@ $(document).ready(function() {
     $(".btn-register").click(function() {
         app.doRegister();
     });
+    $(".trigger-add-event").click(function() {
+        app.showCreateEventWindow();
+    });
+
 
     $(".screen-trigger").click(function() {
         var btn = $(this);

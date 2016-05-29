@@ -7,4 +7,7 @@ public class Const {
 	public static String COOKIE_SESSION_KEY = "_CalendarAppSessId";
 	public static int COOKIE_SESSION_LIFETIME = 3; //days
 	
+	public static boolean LOAD_FROM_DISK = true;
+	public static boolean FORCE_DISABLE_CACHE = true;
+	
 }

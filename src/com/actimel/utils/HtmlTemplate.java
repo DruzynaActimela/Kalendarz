@@ -1,6 +1,7 @@
 package com.actimel.utils;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +10,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.actimel.calendar.Const;
+
 
 public class HtmlTemplate {
 	private static HashMap<String, HtmlTemplate> templateCache = new HashMap<String, HtmlTemplate>();
@@ -49,12 +53,23 @@ public class HtmlTemplate {
 	}
 	public static HtmlTemplate loadFromResource(String resName, boolean cachedIfExists, String uniqCacheKey) {
 		String cacheKey = resName + "_" + uniqCacheKey;
-		if(cachedIfExists) {
+		if(cachedIfExists && !Const.FORCE_DISABLE_CACHE) {
 			if(templateCache.containsKey(cacheKey)) {
 				return templateCache.get(cacheKey);
 			}
 		}
-		HtmlTemplate inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
+		
+		HtmlTemplate inst = null; 
+		if(Const.LOAD_FROM_DISK) {
+			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
+			File directory = new File(location.getFile());
+			Utils.log(directory.getAbsolutePath());
+			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
+			
+			inst = new HtmlTemplate(new File(www_directory, resName));
+		} else {
+			inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
+		}
 		Utils.log("Putting " + resName + " at: " + cacheKey);
 		templateCache.put(cacheKey, inst);
 		return inst;

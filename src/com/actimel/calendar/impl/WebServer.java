@@ -244,6 +244,15 @@ public class WebServer extends NanoHTTPD {
             	//Utils.log("resource_path: " + resource_path);
             	
             	URL resourceURL = getClass().getClassLoader().getResource(resource_path);
+        		if(Const.LOAD_FROM_DISK) {
+        			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
+        			File directory = new File(location.getFile());
+        			Utils.log(directory.getAbsolutePath());
+        			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
+        			
+        			resourceURL = new File(www_directory, resource_path).toURI().toURL();
+        		}
+            	
             	if(resourceURL != null) {
                 	InputStream is = resourceURL.openStream();            	
                 	return newChunkedResponse(Response.Status.OK, mime, is);
