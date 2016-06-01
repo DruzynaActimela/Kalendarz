@@ -1,5 +1,11 @@
 var wWidth, wHeight;
 
+var MOMENT_DATE_FORMAT_DAY = "DD-MM-YYYY";
+var MOMENT_DATE_FORMAT_DAY_TIME = MOMENT_DATE_FORMAT_DAY + " hh:mm";
+
+var WINDOW_NO_CLOSE = 123551;
+var WINDOW_CLOSE = 123555;
+
 function parse_template(elem, vars) {
     elem = (typeof elem == 'string') ? $(elem) : elem;
     var html = elem.html();
@@ -161,6 +167,8 @@ var app = {
         var cancelFunc = options.cancelFunc ? options.cancelFunc : null;
         var confirmFunc = options.confirmFunc ? options.confirmFunc : null;
 
+        var postShowFunc = options.postShow ? options.postShow : null;
+
         var newWindowId = "window_" + (++app.lastWindowId);
         var window_html = parse_template("#window_template", {
             title: title,
@@ -178,29 +186,50 @@ var app = {
 
         }).show();
 
+        setTimeout(function() {
+            if(postShowFunc != null) postShowFunc(handle);
+        }, 1);
+
         var _closeFunc = function(h) {
-            $(h).modal('hide')
-            setTimeout(function() {
-                $(h).next(".modal-backdrop").remove();
-                $(h).remove();
-            }, 500);
+            app.closeWindow(h);
         };
+
+        handle.next(".modal-backdrop").click(function() {
+            var t = $(this);
+            var tModal = t.prev(".modal");
+            
+            var funcReturnStatus = WINDOW_CLOSE;
+            if(cancelFunc != null) funcReturnStatus = cancelFunc(tModal);
+            if(funcReturnStatus === WINDOW_CLOSE) _closeFunc(tModal);
+        });
 
         handle.find(".modal-btn-close").click(function() {
             var t = $(this);
             var tModal = t.parents(".modal");
-            _closeFunc(tModal);
 
-            if(cancelFunc != null) cancelFunc();
+            var funcReturnStatus = WINDOW_CLOSE;
+            if(cancelFunc != null) funcReturnStatus = cancelFunc(tModal);
+            if(funcReturnStatus === WINDOW_CLOSE) _closeFunc(tModal);
+
         });
         handle.find(".modal-btn-continue").click(function() {
             var t = $(this);
             var tModal = t.parents(".modal");
-            _closeFunc(tModal);
 
-            if(confirmFunc != null) confirmFunc();
+            var funcReturnStatus = WINDOW_CLOSE;
+            if(confirmFunc != null) funcReturnStatus = confirmFunc(tModal);
+            if(funcReturnStatus === WINDOW_CLOSE) _closeFunc(tModal);
         });
 
+    },
+    closeWindow: function(h) {
+        if(h) {            
+            $(h).modal('hide')
+            setTimeout(function() {
+                $(h).next(".modal-backdrop").remove();
+                $(h).remove();
+            }, 1000);
+        }
     },
     showCreateEventWindow: function() {
         var body_template = parse_template("#create_event_template", {
@@ -209,9 +238,139 @@ var app = {
 
         app.showWindow({
             title: "Dodawanie nowego zdarzenia",
-            body: body_template
+            body: body_template,
+            continueLabel: "Dodaj zdarzenie",
+            postShow: function(handle) {
+                handle.find("select").selectpicker();
+                handle.find(".bind-datepicker").datetimepicker({
+                    controlType: 'select',
+                    oneLine: true,
+                    dateFormat: "dd-mm-yy",
+                    timeFormat:  "hh:mm",
+                    firstDay: 1
+                });
+            },
+            confirmFunc: function(handle) {
+                var name = handle.find(".new-event-name").val();
+                var group = handle.find(".new-event-name").val();
+                var date_start = handle.find(".new-event-date-start").val();
+                var date_end = handle.find(".new-event-date-end").val();
+
+                var is_wholeday = (handle.find(".new-event-whole-day:checked").length > 0) ? 1 : 0;
+                var is_public = (handle.find(".new-event-public:checked").length > 0) ? 1 : 0;
+
+                if(!name || name.trim().length < 1 
+                    || !group || group.trim().length < 1
+                    || !date_start || date_start.trim().length < 1
+                    || !date_end || date_end.trim().length < 1
+                    ) {
+                    app.showConfirmBox({
+                        title: "Błąd",
+                        body: "Nie podano poprawnych danych.",
+                        hideCancel: true,
+                        confirmText: "OK"
+                    });
+                    return WINDOW_NO_CLOSE;
+                }
+                var minute_diff = moment(date_end, MOMENT_DATE_FORMAT_DAY_TIME).diff(moment(date_start, MOMENT_DATE_FORMAT_DAY_TIME), "minutes");
+                if(minute_diff <= 0) {
+                    app.showConfirmBox({
+                        title: "Błąd",
+                        body: "Data zakończenia zdarzenia nie może być szybciej niż data rozpoczęcia.",
+                        hideCancel: true,
+                        confirmText: "OK"
+                    });
+                    return WINDOW_NO_CLOSE;
+                }
+                app.doCreateEventRequest(name, group, date_start, date_end, is_wholeday, is_public, function() {
+                    app.closeWindow(handle);
+                });
+            }
+
         });
-    }
+    },
+    showCreateGroupWindow: function() {
+        var body_template = parse_template("#create_group_template", {
+
+        });
+
+        app.showWindow({
+            title: "Dodawanie grupy zdarzeń",
+            body: body_template,
+            continueLabel: "Dodaj grupę",
+            postShow: function(handle) {
+                handle.find('#cp2').colorpicker();
+            },
+            confirmFunc: function(handle) {
+                var name = handle.find(".new-group-name").val();
+                var color = handle.find(".new-group-color").val();
+                var is_public = (handle.find(".new-group-public:checked").length > 0) ? 1 : 0;
+
+                if(!name || name.trim().length < 1 || !color || color.trim().length < 1) {
+                    app.showConfirmBox({
+                        title: "Błąd",
+                        body: "Nie podano poprawnych danych.",
+                        hideCancel: true,
+                        confirmText: "OK"
+                    });
+                    return WINDOW_NO_CLOSE;
+                }
+
+                app.doCreateGroupRequest(name, color, is_public, function() {
+                    app.closeWindow(handle);
+                });
+            }
+        });
+    },
+    doCreateGroupRequest: function(name, color, is_public, onSuccess, onFailure) {
+
+        app.doRequest("/api/groups/create", {
+            name: name,
+            color: color,
+            "public": is_public
+        }, "POST", function(resp) {
+            var is_success = (resp.type == "success");
+            app.showConfirmBox({
+                title: (is_success ? "Sukces!" : "Błąd"),
+                body: resp.message,
+                hideCancel: true,
+                confirmText: "OK",
+                confirmClick: function() {
+                    if(is_success) {
+                        if(onSuccess) onSuccess(resp);
+                    } else {
+                        if(onFailure) onFailure(resp);
+                    }
+                }
+            });
+        });
+    },
+    doCreateEventRequest: function(name, group, date_start, date_end, is_wholeday, is_public, onSuccess, onFailure) {
+        app.doRequest("/api/events/create", {
+            name: name,
+            group: group,
+            date_start: date_start,
+            date_end: date_end,
+            wholeday: is_wholeday,
+            "public": is_public
+        }, "POST", function(resp) {
+            var is_success = (resp.type == "success");
+            app.showConfirmBox({
+                title: (is_success ? "Sukces!" : "Błąd"),
+                body: resp.message,
+                hideCancel: true,
+                confirmText: "OK",
+                confirmClick: function() {
+                    if(is_success) {
+                        if(onSuccess) onSuccess(resp);
+                    } else {
+                        if(onFailure) onFailure(resp);
+                    }
+                }
+            });
+        });
+    },
+
 };
 
 
@@ -236,6 +395,11 @@ $(document).ready(function() {
     $(".trigger-add-event").click(function() {
         app.showCreateEventWindow();
     });
+
+    $(".trigger-add-group").click(function() {
+        app.showCreateGroupWindow();
+    });
+
 
 
     $(".screen-trigger").click(function() {

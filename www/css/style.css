@@ -284,7 +284,7 @@ body {
     color:white;
 }
 .btn-add-event {
-    margin-right: 52px;
+    margin-right: 60px;
 }
 .no-label i {
     margin: 0;
@@ -346,7 +346,9 @@ body {
     margin: 0 auto;
     display: inline-block;
 }
-
+.ui-datepicker {
+    z-index: 90001 !important;
+}
 .ui-datepicker-calendar {
     width: 100%;
     text-align: center;
@@ -399,7 +401,7 @@ body {
 }
 .ui-datepicker-next {
     position: absolute;
-    right: 2px;
+    right: 6px;
     top: 0;
     z-index: 3;
 }
@@ -447,22 +449,25 @@ body {
 .custom-checkbox > .box {
   position: relative;
   display: block;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border: 1px solid #E2E2E2;
   background-color: #FFF;
   border-radius: 4px;
+  -webkit-transition:all .2s ease-in-out;
+  -moz-transition:all .2s ease-in-out;
+  transition:all .2s ease-in-out;
 
   transition: .4s transform ease-in-out;
 }
 .custom-checkbox > .box > .tick {
   position: absolute;
-  left: 4px;
-  top: 5px;
-  width: 8px;
-  height: 4px;
-  border-bottom: 2px solid #48B426;
-  border-left: 2px solid #48B426;
+    left: 5px;
+    top: 6px;
+    width: 11px;
+    height: 6px;
+  border-bottom: 2px solid white;
+  border-left: 2px solid white;
   -webkit-transform: rotate(-45deg);
   -moz-transform: rotate(-45deg);
   -o-transform: rotate(-45deg);
@@ -486,8 +491,8 @@ body {
   left: 0;
   top: 0;
   padding: 0;
-  width: 19px;
-  height: 20px;
+  width: 100%;
+  height: 100%;
   border: none;
   margin: 0;
   opacity: 0;
@@ -495,6 +500,203 @@ body {
 }
 
 .custom-checkbox > input:active + .box {
-  border-color: #DADADA;
-  background-color: #F7F7F7;
+  border-color: #3BD8A8;
+  background-color: #3BD8A8;
 }
+.custom-checkbox > input:checked + .box {
+  border-color: #04C489;
+  background-color: #04C489;
+}
+.input-group .custom-checkbox {
+    vertical-align: -5px;
+    margin-right: 10px;
+}
+#ui-datepicker-div {
+    background: #FFF;
+    border: 1px solid #D2D2D2;
+    box-shadow: 0px 5px 10px rgba(0,0,0,0.2);
+    border-radius: 3px;
+    margin-top: 1px;
+    width: 300px;
+}
+#ui-datepicker-div .ui-datepicker-calendar td {
+    padding: 11px 6px;
+    border-radius: 100px;
+}
+
+#ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-today {
+    background: none;    
+}
+
+#ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-current-day {
+    background: #04C489;
+}
+
+#ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-current-day a {
+    color: white;
+}
+
+
+.column-label {
+    font-size: 11px;
+    margin: 2px 5px;
+    border-bottom: 1px solid #C5C5C5;
+    padding: 2px;
+    text-transform: uppercase;
+    font-family: opensansbold;
+    color: #505050;
+    text-align: left;
+}
+.user-event-group {
+    margin-bottom: 5px;
+}
+.column-widget {
+    text-align: left;
+    margin-top: 20px;
+}
+.ueg-color {
+    border-radius: 3px;
+    width: 16px;
+    height:16px;
+    background-color: gray;
+    float: left;
+    margin-right: 10px;
+    margin-top: 2px;
+}
+.ueg-name {
+    font-size: 13px;
+    font-family: opensans;
+    color: #3d3d3d;
+    float: left;
+}
+.user-groups-list {
+    padding: 8px;
+}
+.fc-view-container {
+    background: white;
+}
+
+.widget-button {
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0px 11px;
+}
+.widget-button i {
+    margin-right: 12px;
+}
+.widget-button:hover {
+    text-decoration: underline;
+}
+.fc-day-header {
+    font-weight: normal;
+    font-family: opensansbold;
+    font-size: 14px;
+    color: gray;
+    vertical-align: middle;
+}
+.timeline {
+    position: absolute;    
+    border-top: 2px dashed red;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+}
+
+.fc-button-group {
+
+}
+.fc-button-group .fc-state-default {
+    background: none;
+    border-color: #04C489;
+}
+.fc-button-group .fc-state-active {
+    background: #04C489;
+    color: white;
+    text-shadow: none;
+    box-shadow: none;
+}
+.fc-month-button {
+    width: 70px;
+}
+.fc-agendaDay-button  {
+    width: 60px;
+}
+.fc-agendaWeek-button {
+    width: 60px;
+}
+.fc-center {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+.ui-datepicker-today {
+    background: #04C489;
+    border-radius: 100px;
+}
+.ui-datepicker-calendar .ui-datepicker-today a {
+    color: white;
+}
+.ui-datepicker-today {
+    background: #04C489;
+    border-radius: 100px;
+}
+.ui-datepicker-calendar > tbody > tr > td:hover {
+    background: #C7C7C7;
+    color: white;
+    cursor: pointer;
+    border-radius: 100px;
+}
+.ui-datepicker-calendar > tbody > tr > td.ui-datepicker-today:hover {
+    background: #3BD8A8;
+}
+*:focus, *:active {
+    outline:none;
+}
+.calendarApp .fc-state-default {
+    box-shadow: none;
+    text-shadow: none;
+    border:1px solid #04C489;
+}
+.calendarApp .fc-today-button:not(.fc-state-disabled) {
+    color: white;
+    background: #04C489;
+}
+.app-btn {
+    border-radius: 3px;
+    font-family: opensans;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    color: white;
+    border: 1px solid #A0A0A0;
+    color: gray;
+    margin-left: 10px;
+}
+.app-btn:active {
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.2) inset;
+}
+.btn-green-rounded {
+    color: white;
+    background: #04C489;   
+    border-color:  #04C489;
+}
+.btn-green-rounded:hover, .btn-green-rounded:focus {
+    background: #04C489;
+}
+.btn-green-rounded:active {
+    background: #04C489;
+}
+
+.btn-red-rounded {
+    color: #D46767;
+    border-color:  #D46767;
+}
+.btn-red-rounded:hover, .btn-red-rounded:focus {
+    background: #D46767;
+    color: white;
+}
+.btn-red-rounded:active {
+    color: white;
+    background: #D46767;
+}
+

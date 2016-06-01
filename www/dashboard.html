@@ -1,8 +1,8 @@
 @extends('template.html')
 @section('title')
-	Dashboard
+Dashboard
 @stop
-   @section('content')
+@section('content')
 <div class='top-header'>
 	<div class='th-logo left'>
 		Kalendarz
@@ -36,7 +36,6 @@
 		<div class='button green btn-add-event trigger-add-event'>
 			<i class='fa fa-plus'></i>Dodaj zdarzenie
 		</div>
-
 	</div>
 	<div class='clear'></div>
 </div>
@@ -53,13 +52,17 @@
 					<div class='lm-option screen-trigger' data-screen='events'>
 						<i class='fa fa-calendar'></i>Zdarzenia
 					</div>
+					<div class='lm-option screen-trigger' data-screen='checklists'>
+						<i class='fa fa-check-square-o'></i>Listy To-Do
+					</div>
+
 					<div class='lm-option screen-trigger' data-screen='settings'>
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
 					@isset('is_admin')
-						Jest admin
+					Jest admin
 					@else 
-						Nie ma admina
+					Nie ma admina
 					@endIsset
 				</div>
 			</div>
@@ -71,13 +74,42 @@
 			<div class='page-screen screen-events'>
 				events
 			</div>
+			<div class='page-screen screen-checklists'>
+				checklists
+			</div>
+			
 			<div class='page-screen screen-settings'>
 				settings
 			</div>
 		</div>
 		<div class='right-panel left'>
 			<div class='inner-panel-content'>
-				<div id="datepicker"></div>
+				<div>
+					<div class='column-label'>
+						Kalendarz
+					</div>
+					<div id="datepicker"></div>
+				</div>
+				<div class='column-widget'>
+					<div class='column-label'>
+						Twoje grupy zdarzeń
+					</div>
+					<div class='user-groups-list'>
+						<div class='user-event-group'>
+							<div class='ueg-color' style='background-color: #04C489;'></div>
+							<div class='ueg-name'>Grupa zielona</div>
+							<div class='clear'></div>
+						</div>
+						<div class='user-event-group'>
+							<div class='ueg-color' style='background-color: #C43904;'></div>
+							<div class='ueg-name'>Grupa czerwona</div>
+							<div class='clear'></div>
+						</div>
+					</div>
+					<div class='widget-button trigger-add-group'>
+						<i class='fa fa-plus'></i>Dodaj grupę
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class='clear'></div>
@@ -85,19 +117,34 @@
 
 </div>
 <script>
-$(document).ready(function() {
-    $('#calendar').fullCalendar({
-    	header: {
-		    left:   'title',
-		    center: '',
-		    right:  'today prev,next'
-		},
-		firstDay: 1,
-    	events: "/api/events",
+	$(document).ready(function() {
+		$('#calendar').fullCalendar({
+			events: [
+			{
+				title: "Nazwa eventu",
+				start: moment("2016-05-29 09:30").format(MOMENT_DATE_FORMAT_DAY_TIME),
+				end: moment("2016-05-29 11:30").format(MOMENT_DATE_FORMAT_DAY_TIME)
+			}
+			],
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			editable: true,
+			eventLimit: true,
+			timeFormat: 'H(:mm)',
+			firstDay: 1,
+			eventRender: function(event, element) {
+
+		    },
+		    nowIndicator: true,
+    	//events: "/api/events",
     });
-    $( "#datepicker" ).datepicker({
-    	showOtherMonths: true
-    });
-});
+		$( "#datepicker" ).datepicker({
+			showOtherMonths: true,
+			firstDay: 1
+		});
+	});
 </script>
 @stop

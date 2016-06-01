@@ -238,9 +238,8 @@ public class WebServer extends NanoHTTPD {
             	mimes.put("html", MIME_HTML);
             	
             	String mime = (mimes.containsKey(ext) ? mimes.get(ext) : defaultMime);
-            	
-            	
-            	
+
+
             	//Utils.log("resource_path: " + resource_path);
             	
             	URL resourceURL = getClass().getClassLoader().getResource(resource_path);
@@ -253,8 +252,9 @@ public class WebServer extends NanoHTTPD {
         			resourceURL = new File(www_directory, resource_path).toURI().toURL();
         		}
             	
-            	if(resourceURL != null) {
-                	InputStream is = resourceURL.openStream();            	
+        		File resourceFile = new File(resourceURL.getFile());
+            	if(resourceURL != null && resourceFile.exists()) {
+                	InputStream is = resourceURL.openStream();
                 	return newChunkedResponse(Response.Status.OK, mime, is);
             	}
         	}
