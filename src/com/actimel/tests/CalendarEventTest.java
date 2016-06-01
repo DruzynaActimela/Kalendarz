@@ -16,7 +16,7 @@ public class CalendarEventTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		evt = new CalendarEvent(1, "Testowy event", 13, 14, true);
+		evt = new CalendarEvent(1, "Testowy event", 13, 14, true, true);
 	}
 
 	@AfterClass

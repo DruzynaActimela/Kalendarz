@@ -18,8 +18,9 @@ function parse_template(elem, vars) {
 
 var app = {
 	init: function() {
-		
+		app.displayUserGroups();
 		app.updateUI();
+
 	},
 	updateUI: function() {
         var content = $(".center-content");
@@ -241,26 +242,41 @@ var app = {
             body: body_template,
             continueLabel: "Dodaj zdarzenie",
             postShow: function(handle) {
-                handle.find("select").selectpicker();
+                
                 handle.find(".bind-datepicker").datetimepicker({
                     controlType: 'select',
                     oneLine: true,
                     dateFormat: "dd-mm-yy",
-                    timeFormat:  "hh:mm",
+                    timeFormat:  "HH:mm",
                     firstDay: 1
                 });
+
+                app.getUserGroups(function(groups) {
+                    var sel = handle.find(".new-event-group");
+                    sel.empty();
+                    sel.append("<option value='-1' data-tokens=\"brak grupy\">Brak grupy</option>");
+
+                    for(var i in groups) {
+                        var group = groups[i];
+                        var option = "<option data-tokens='"+group.name+"' value='"+group.id+"'>"+group.name+"</option>";
+                        sel.append(option);
+                    }
+                    
+
+                    handle.find("select").selectpicker();
+                });
+
             },
             confirmFunc: function(handle) {
                 var name = handle.find(".new-event-name").val();
-                var group = handle.find(".new-event-name").val();
+                var group = handle.find(".new-event-group").selectpicker('val');
                 var date_start = handle.find(".new-event-date-start").val();
                 var date_end = handle.find(".new-event-date-end").val();
 
                 var is_wholeday = (handle.find(".new-event-whole-day:checked").length > 0) ? 1 : 0;
                 var is_public = (handle.find(".new-event-public:checked").length > 0) ? 1 : 0;
 
-                if(!name || name.trim().length < 1 
-                    || !group || group.trim().length < 1
+                if(!name || name.trim().length < 1                     
                     || !date_start || date_start.trim().length < 1
                     || !date_end || date_end.trim().length < 1
                     ) {
@@ -318,6 +334,7 @@ var app = {
 
                 app.doCreateGroupRequest(name, color, is_public, function() {
                     app.closeWindow(handle);
+                    app.displayUserGroups();
                 });
             }
         });
@@ -370,7 +387,32 @@ var app = {
             });
         });
     },
+    getUserGroups: function(onResponse) {
+        app.doRequest("/api/groups", {}, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+    displayUserGroups: function() {
+        app.getUserGroups(function(resp) {
+            var gcontainer = $(".user-groups-list");
+            gcontainer.empty();
+            if(resp && resp.length > 0) {
+                for(var i in resp) {
+                    var group = resp[i];
+                    var html = parse_template("#user_group_legend_template", {
+                        id: group.id,
+                        color: group.color,
+                        name: group.name
+                    });
+                    var elem = $(html).appendTo(gcontainer);
+                }
+            } else {
+                gcontainer.html("<div style='padding:10px;text-align:center;margin-bottom:10px;'>Brak dodanych grup.</div>");
+            }
+        });
 
+
+    }
 };
 
 

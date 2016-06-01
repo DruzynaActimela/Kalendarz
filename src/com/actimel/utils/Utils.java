@@ -11,6 +11,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -138,5 +143,25 @@ public class Utils {
 	public static boolean isUsernameValid(String input) {
 		if(input == null) return false;
 		return input.matches("[a-zA-Z0-9_]{3,16}");
+	}
+	public static boolean isGroupNameValid(String input) {
+		if(input == null) return false;
+		return input.matches("[a-zA-Z0-9_\\s]{3,128}");
+	}
+	
+	public static long dateToTimestamp(String strDate, String format) {
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		Date date = null;
+		try {
+			date = dateFormat.parse(strDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(date == null) return 0;
+		
+		long time = date.getTime();
+		return new Timestamp(time).getTime();
+		
 	}
 }

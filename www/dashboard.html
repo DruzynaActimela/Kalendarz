@@ -77,7 +77,7 @@ Dashboard
 			<div class='page-screen screen-checklists'>
 				checklists
 			</div>
-			
+
 			<div class='page-screen screen-settings'>
 				settings
 			</div>
@@ -94,17 +94,9 @@ Dashboard
 					<div class='column-label'>
 						Twoje grupy zdarzeń
 					</div>
+
 					<div class='user-groups-list'>
-						<div class='user-event-group'>
-							<div class='ueg-color' style='background-color: #04C489;'></div>
-							<div class='ueg-name'>Grupa zielona</div>
-							<div class='clear'></div>
-						</div>
-						<div class='user-event-group'>
-							<div class='ueg-color' style='background-color: #C43904;'></div>
-							<div class='ueg-name'>Grupa czerwona</div>
-							<div class='clear'></div>
-						</div>
+					
 					</div>
 					<div class='widget-button trigger-add-group'>
 						<i class='fa fa-plus'></i>Dodaj grupę
@@ -139,7 +131,29 @@ Dashboard
 
 		    },
 		    nowIndicator: true,
-    	//events: "/api/events",
+			events: function(start, end, timezone, callback) {
+		        $.ajax({
+		            url: '/api/events',
+		            dataType: 'json',
+		            data: {
+		                start: start.unix(),
+		                end: end.unix()
+		            },
+		            success: function(json) {
+		                var events = [];
+		                for(var i in json) {
+		                	var evt = json[i];
+		                	console.log(evt);
+		                	events.push({
+		                        title: evt.title,
+		                        start: moment.unix(json.start),
+		                        end: moment.unix(json.end)
+		                    });
+		                }
+		                callback(events);
+		            }
+		        });
+			}
     });
 		$( "#datepicker" ).datepicker({
 			showOtherMonths: true,

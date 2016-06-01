@@ -2,8 +2,10 @@ package com.actimel.calendar.impl;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +15,15 @@ import com.actimel.calendar.CalendarApp;
 import com.actimel.calendar.Const;
 import com.actimel.calendar.FileStorage;
 import com.actimel.controllers.SessionController;
+import com.actimel.models.CalendarEvent;
+import com.actimel.models.EventGroup;
 import com.actimel.models.Session;
 import com.actimel.models.User;
 import com.actimel.utils.HtmlTemplate;
 import com.actimel.utils.HttpResponseBuilder;
 import com.actimel.utils.JsonResponseBuilder;
 import com.actimel.utils.Utils;
+import com.google.gson.reflect.TypeToken;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
@@ -107,9 +112,6 @@ public class WebServer extends NanoHTTPD {
         		HashMap<String, String> response = new HashMap<String, String>();
         		
         		InetAddress IP=InetAddress.getLocalHost();
-        		//System.out.println("IP of my system is := "+IP.getHostAddress());
-        		//System.out.println("Remote addr is: " + session.getHeaders().toString());
-        		
         		
         		if(whitelistEnabled && apiWhitelist.contains(clientIp) == false) {
         			response.put("type", "error");
@@ -119,23 +121,114 @@ public class WebServer extends NanoHTTPD {
         		
         		
         		Map<String, String> params = httpSession.getParms();
-        		String requestMode = params.get("m");
-        		if(requestMode == null && uriSplit.length > 2) {
-        			requestMode = uriSplit[2];
-        		}
-        		if(requestMode != null) {
-        			requestMode = requestMode.toLowerCase().trim();
-        		}
+        		String requestMode = null; // /api/mode
+        		String subRequestMode = null; // /api/mode/submode
         		
-        		
+        		if(uriSplit.length > 2) {
+        			requestMode = uriSplit[2].trim();
+        		}
+        		if(uriSplit.length > 3) {
+        			subRequestMode = uriSplit[3].trim();
+        		}
+
         		Utils.log(requestMode, params.toString());
 	        		
 	        	if("events".equals(requestMode)) { // {start=2016-04-25, end=2016-06-06, _=1464436912054}
-	        		String start = params.get("start");
-	        		String end = params.get("end");
-	        		
-	        		
-	        		
+	        		if(subRequestMode != null) {
+	        			if("create".equals(subRequestMode)) {
+	        				String name = params.get("name");
+	        				
+	        				if(Utils.isGroupNameValid(name)) {
+	        					String groupId = params.get("group");
+	        					int groupIdNum = Integer.parseInt(groupId);
+	        					EventGroup eGroup = app.getStorage().loadEventGroup(groupIdNum);
+	        					if(eGroup != null) {
+			        				String date_start = params.get("date_start");
+			        				String date_end = params.get("date_end");
+			        				boolean is_public = ("1".equals(params.get("public")));
+			        				boolean is_wholeday = ("1".equals(params.get("wholeday")));
+			        				
+			        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
+			        				
+			        				int uid = 0;
+			        				if(app.getStorage() instanceof FileStorage) {
+			        					uid = ((FileStorage) app.getStorage()).getHighestEventId() + 1;
+			        				}
+			        				long timestamp_start = Utils.dateToTimestamp(date_start, "DD-MM-YYYY HH:mm");
+			        				long timestamp_end = Utils.dateToTimestamp(date_end, "DD-MM-YYYY HH:mm");
+	
+	
+			        				CalendarEvent event = new CalendarEvent(uid, name, timestamp_start, timestamp_end, is_wholeday, is_public);
+			        				event.setOwnerId(ownerId);
+			        				event.setParentGroupId(groupIdNum);
+			        				
+			        				app.getStorage().saveEvent(event);
+			        				
+			        				if(app.getStorage() instanceof FileStorage) {
+			        					((FileStorage) app.getStorage()).saveEvents();
+			        				}
+
+			        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o utworzone!").put("type", "success").create();
+	        					} else {
+	        						return jsonResponse("message", "Podana grupa nie istnieje!").put("type", "error").create();
+	        					}
+	        				} else {
+	        					return jsonResponse("message", "W nazwie zdarzenia znajduj¹ siê niedozwolone znaki!").put("type", "error").create();
+	        				}
+	        			} else {
+	        				// nie ma takiego zapytania dla eventów
+	        			}
+	        		} else {
+	        			// display events
+		        		String start = params.get("start");
+		        		String end = params.get("end");
+	        			// wyœwietl listê grup u¿ytkownika
+		        		
+	        			int sessionUserId = (userSession != null) ? userSession.getUser().getId() : 1;	        			
+	        			List<CalendarEvent> events = app.getStorage().searchEvents("" + sessionUserId, "owner_id");
+	        			Type t = new TypeToken<List<CalendarEvent>>(){}.getType();
+	        			String json = app.getGson().toJson(events, t);
+	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
+	        		}	 
+	        	} else if("groups".equals(requestMode)) {
+	        		if(subRequestMode != null) {
+	        			if("create".equals(subRequestMode)) {
+	        				String name = params.get("name");
+	        				if(Utils.isGroupNameValid(name)) {		        					
+		        				
+		        				String color = params.get("color");
+		        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
+		        				boolean is_public = ("1".equals(params.get("public")));
+		        				
+		        				int uid = 0;
+		        				if(app.getStorage() instanceof FileStorage) {
+		        					uid = ((FileStorage) app.getStorage()).getHighestEventGroupId() + 1;
+		        				}
+		        				
+		        				EventGroup group = new EventGroup(uid, name, color, ownerId, is_public);
+		        				app.getStorage().saveEventGroup(group);
+		        				
+		        				if(app.getStorage() instanceof FileStorage) {
+		        					((FileStorage) app.getStorage()).saveEventGroups();
+		        				}
+		        				
+		        				return jsonResponse("message", "Grupa zdarzeñ '"+name+"' zosta³a utworzona!").put("type", "success").create();
+	        				} else {
+	        					return jsonResponse("message", "Nazwa zawiera niedozwolone znaki.").put("type", "error").create();
+	        				}
+	        			} else {
+	        				// nie ma takiego zapytania dla grup
+	        			}
+	        		} else {
+	        			// wyœwietl listê grup u¿ytkownika
+	        			int sessionUserId = (userSession != null) ? userSession.getUser().getId() : 1;	        			
+	        			List<EventGroup> groups = app.getStorage().searchEventsGroups("" + sessionUserId, "owner_id");
+	        			Type t = new TypeToken<List<EventGroup>>(){}.getType();
+	        			String json = app.getGson().toJson(groups, t);
+	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
+	        		}
+		        } else {
+		        	// nie ma takiego zapytania
 		        }
         	} else if(uri.startsWith("/dashboard")) {
         		String username = "user"; //userSession.getUser().getName();

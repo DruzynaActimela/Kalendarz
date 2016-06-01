@@ -48,6 +48,8 @@ public class Starter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Utils.log("date: " + Utils.dateToTimestamp("16-04-2016", "DD-MM-YYYY"));
+		Utils.log("date with time: " + Utils.dateToTimestamp("16-04-2016 13:30", "DD-MM-YYYY HH:mm"));
 		
 	}
 }

@@ -1,22 +1,27 @@
 package com.actimel.models;
 
-import net.fortuna.ical4j.model.component.VEvent;
+import com.google.gson.annotations.SerializedName;
 
 public class CalendarEvent {
 	
+	@SerializedName("_id")
 	private int id;
-	private String name;
-	private long stamp_start;
-	private long stamp_end;
+	
+	private String title;
+	private long start;
+	private long end;
 	private boolean allday;
+	private boolean is_public;
+	private int owner_id;
+	private int parent_group_id;
 	
-	
-	public CalendarEvent(int id, String name, long stamp_start, long stamp_end, boolean allday) {
+	public CalendarEvent(int id, String name, long stamp_start, long stamp_end, boolean allday, boolean is_public) {
 		this.id = id;
-		this.name = name;
-		this.stamp_start = stamp_start;
-		this.stamp_end = stamp_end;
+		this.title = name;
+		this.start = stamp_start;
+		this.end = stamp_end;
 		this.allday = allday;
+		this.is_public = is_public;
 	}
 
 	public int getId() {
@@ -28,27 +33,27 @@ public class CalendarEvent {
 	}
 
 	public String getName() {
-		return name;
+		return title;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.title = name;
 	}
 
 	public long getStampStart() {
-		return stamp_start;
+		return start;
 	}
 
 	public void setStampStart(long stamp_start) {
-		this.stamp_start = stamp_start;
+		this.start = stamp_start;
 	}
 
 	public long getStampEnd() {
-		return stamp_end;
+		return end;
 	}
 
 	public void setStampEnd(long stamp_end) {
-		this.stamp_end = stamp_end;
+		this.end = stamp_end;
 	}
 
 	public boolean isAllDay() {
@@ -59,6 +64,29 @@ public class CalendarEvent {
 		this.allday = allday;
 	}
 	
+	public boolean isPublic() {
+		return is_public;
+	}
+	
+	public void setPublic(boolean p) {
+		this.is_public = p;
+	}
+	
+	public void setOwnerId(int id) {
+		owner_id = id;
+	}
+	
+	public int getOwnerId() {
+		return owner_id;
+	}
+	
+	public void setParentGroupId(int id) {
+		parent_group_id = id;
+	}
+	
+	public int getParentGroupId() {
+		return parent_group_id;
+	}
 	
 	
 	

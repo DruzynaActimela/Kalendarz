@@ -19,15 +19,11 @@ public class CalendarApp {
 	private Gson gson;
 	private WebServer webServer;
 	private StorageIntf storage;
-	private List<CalendarEvent> eventsList;
-	
+
 	public CalendarApp() {
 		gson = new GsonBuilder().disableHtmlEscaping().create();
 		
-		storage = new FileStorage(this, Const.EVENTS_STORAGE_PATH, Const.USERS_STORAGE_PATH);
-		eventsList = storage.loadEvents();
-		
-		
+		storage = new FileStorage(this, Const.EVENTS_STORAGE_PATH, Const.EVENTS_GROUPS_STORAGE_PATH, Const.USERS_STORAGE_PATH);
 		webServer = new WebServer(this, 9090);
 		
         try {
@@ -35,6 +31,13 @@ public class CalendarApp {
         } catch (IOException ioe) {
             System.err.println("Couldn't start server:\n" + ioe);
             System.exit(-1);
+        }
+        
+        if(storage instanceof FileStorage) {
+        	FileStorage fs = (FileStorage) storage;
+        	fs.preloadEvents();
+        	fs.preloadUsers();
+        	fs.preloadEventGroups();
         }
         
         Utils.log("CalendarApp :: init success");
