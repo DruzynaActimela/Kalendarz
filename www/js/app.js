@@ -1,7 +1,8 @@
 var wWidth, wHeight;
 
 var MOMENT_DATE_FORMAT_DAY = "DD-MM-YYYY";
-var MOMENT_DATE_FORMAT_DAY_TIME = MOMENT_DATE_FORMAT_DAY + " hh:mm";
+var MOMENT_DATE_FORMAT_TIME = "HH:mm";
+var MOMENT_DATE_FORMAT_DAY_TIME = MOMENT_DATE_FORMAT_DAY + " " + MOMENT_DATE_FORMAT_TIME;
 
 var WINDOW_NO_CLOSE = 123551;
 var WINDOW_CLOSE = 123555;
@@ -17,10 +18,23 @@ function parse_template(elem, vars) {
 }
 
 var app = {
+    userEventGroups: [],
+    getEventGroup: function(gId) {
+        for(var i in app.userEventGroups) {
+            var gr = app.userEventGroups[i];
+            if(gr.id == gId) return gr;
+        }
+        return null;
+    },
+
 	init: function() {
 		app.displayUserGroups();
-		app.updateUI();
+        app.updateUI();
+        setTimeout(function() {
+            initialize_calendar();
+    		app.updateUI();
 
+        }, 1);
 	},
 	updateUI: function() {
         var content = $(".center-content");
@@ -33,8 +47,12 @@ var app = {
             contentWidth = 1024;
         }
         content.width(contentWidth - leftcol.outerWidth() - rightcol.outerWidth());
+        content.height(wHeight - topbar.outerHeight());
         leftcol.height(wHeight - topbar.outerHeight());
         rightcol.height(wHeight - topbar.outerHeight());
+
+        $('#calendar').fullCalendar('option', 'height', content.height());
+
 	},
     doLogin: function() {
         var login = $(".username").val();
@@ -251,6 +269,18 @@ var app = {
                     firstDay: 1
                 });
 
+                handle.find(".new-event-date-start").change(function() {
+                    var t = $(this);
+                    var d = t.val();
+                    if(d && d.length > 0) {
+                        var dObj = moment(d, MOMENT_DATE_FORMAT_DAY_TIME);
+                        var endBox = t.parents(".modal").find(".new-event-date-end");
+                        if(dObj && endBox.val() == "") {
+                            endBox.val(dObj.add(30, "minutes").format(MOMENT_DATE_FORMAT_DAY_TIME));
+                        }
+                    }
+                });
+
                 app.getUserGroups(function(groups) {
                     var sel = handle.find(".new-event-group");
                     sel.empty();
@@ -300,6 +330,7 @@ var app = {
                 }
                 app.doCreateEventRequest(name, group, date_start, date_end, is_wholeday, is_public, function() {
                     app.closeWindow(handle);
+                    $("#calendar").fullCalendar( 'refetchEvents' );
                 });
             }
 
@@ -389,6 +420,7 @@ var app = {
     },
     getUserGroups: function(onResponse) {
         app.doRequest("/api/groups", {}, "POST", function(resp) {
+            app.userEventGroups = resp;
             if(onResponse) onResponse(resp);
         });
     },
@@ -412,6 +444,16 @@ var app = {
         });
 
 
+    },
+    eventChanged: function(event, delta, revertFunc) {
+        console.log("app.eventChanged", event, delta);
+        app.doRequest("/api/events/change", {
+            "eventId": event.appEventData._id,
+            'new_start': event.start.format(MOMENT_DATE_FORMAT_DAY_TIME),
+            'new_end': event.end.format(MOMENT_DATE_FORMAT_DAY_TIME)
+        }, "POST", function(resp) {
+            console.log(resp);
+        });
     }
 };
 

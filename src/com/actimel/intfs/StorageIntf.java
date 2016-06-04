@@ -11,6 +11,7 @@ public interface StorageIntf {
 	public CalendarEvent loadEvent(int eventId);
 	public void saveEvent(CalendarEvent event);
 	public List<CalendarEvent> searchEvents(String query, String searchFieldName);
+	public List<CalendarEvent> searchEventsBetween(long timestamp_start, long timestamp_end, int user_id);
 	
 	public EventGroup loadEventGroup(int eventGroupId);
 	public void saveEventGroup(EventGroup eventGroup);

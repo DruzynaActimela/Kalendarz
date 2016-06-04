@@ -4,14 +4,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,7 +37,7 @@ public class Utils {
 	}
 
 	public static void writeToFile(File f, String content) {
-
+		/*
 		try {
 			FileWriter fw = new FileWriter(f);
 			BufferedWriter bw = new BufferedWriter(fw);			
@@ -44,6 +45,19 @@ public class Utils {
 			bw.close();
 			fw.close();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		*/
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(f);// 
+			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+			BufferedWriter bw = new BufferedWriter(osw);
+			bw.write(content);
+			bw.close();
+			osw.close();
+			fos.close();
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 
@@ -146,22 +160,50 @@ public class Utils {
 	}
 	public static boolean isGroupNameValid(String input) {
 		if(input == null) return false;
-		return input.matches("[a-zA-Z0-9_\\s]{3,128}");
+		return input.matches("[êó¹œ³¿Ÿæña-zA-Z0-9_\\s]{3,128}");
 	}
 	
 	public static long dateToTimestamp(String strDate, String format) {
 		DateFormat dateFormat = new SimpleDateFormat(format);
+		Utils.log("strDate: "  + strDate);
+		Utils.log("Using format: "  + format);
+		
 		Date date = null;
+		
 		try {
 			date = dateFormat.parse(strDate);
+			Utils.log("Parsed date: " + date.toString());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(date == null) return 0;
-		
-		long time = date.getTime();
-		return new Timestamp(time).getTime();
+
+		return date.getTime();
 		
 	}
+	
+	public static Integer parseInt(Object val, Integer defaultVal) {
+		try {
+			return Integer.parseInt(String.valueOf(val));
+		} catch (Exception e) {
+			return defaultVal;
+		}
+	}
+	public static Float parseFloat(Object val, Float defaultVal) {
+		try {
+			return Float.parseFloat(String.valueOf(val));
+		} catch (Exception e) {
+			return defaultVal;
+		}
+	}
+	public static Long parseLong(Object val, Long defaultVal) {
+		try {
+			return Long.parseLong(String.valueOf(val));
+		} catch (Exception e) {
+			return defaultVal;
+		}
+	}
+	
+	
 }

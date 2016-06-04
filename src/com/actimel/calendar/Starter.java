@@ -44,12 +44,18 @@ public class Starter {
 		
 		try {
 			CalendarApp app = new CalendarApp();
+			if(app.getStorage() instanceof FileStorage) {
+				Utils.log("Highest Event Id: " + ((FileStorage) app.getStorage()).getHighestEventId());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Utils.log("date: " + Utils.dateToTimestamp("16-04-2016", "DD-MM-YYYY"));
-		Utils.log("date with time: " + Utils.dateToTimestamp("16-04-2016 13:30", "DD-MM-YYYY HH:mm"));
+		Utils.log("date: " + Utils.dateToTimestamp("16-04-2016", Const.DATE_FORMAT_DAY));
+		Utils.log("date with time: " + Utils.dateToTimestamp("16-04-2016 14:30", Const.DATE_FORMAT_DAY_TIME));
+		
+		
+		
 		
 	}
 }

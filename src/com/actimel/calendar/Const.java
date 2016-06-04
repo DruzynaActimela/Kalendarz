@@ -12,4 +12,7 @@ public class Const {
 	public static boolean LOAD_FROM_DISK = true;
 	public static boolean FORCE_DISABLE_CACHE = true;
 	
+	public static String DATE_FORMAT_DAY = "dd-MM-yyyy";
+	public static String DATE_FORMAT_DAY_TIME = DATE_FORMAT_DAY + " HH:mm";
+	
 }

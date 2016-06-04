@@ -218,5 +218,22 @@ public class FileStorage implements StorageIntf {
 		Utils.writeToFile(eventsGroupsStorageFile, json);		
 		Utils.log("FileStorage: Event groups saved");
 	}
+	
+	@Override
+	public List<CalendarEvent> searchEventsBetween(long timestamp_start, long timestamp_end, int user_id) {
+		List<CalendarEvent> result = new ArrayList<CalendarEvent>();
+		if(timestamp_start == 0 || timestamp_end == 0) return result;
+		
+		for(Entry<Integer, CalendarEvent> eg : cachedEvents.entrySet()) {
+			CalendarEvent evt = eg.getValue();
+			if(evt.getOwnerId() == user_id) {
+				if(evt.getStampStart() >= timestamp_start && evt.getStampStart() <= timestamp_end) {
+					result.add(evt);
+				}
+			}
+		}	
+		
+		return result;
+	}
 
 }

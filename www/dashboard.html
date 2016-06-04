@@ -68,7 +68,7 @@ Dashboard
 			</div>
 		</div>
 		<div class='center-content left'>
-			<div class='page-screen page-screen-first screen-calendar'>
+			<div class='page-screen page-screen-first screen-calendar'>				
 				<div id='calendar'></div>
 			</div>
 			<div class='page-screen screen-events'>
@@ -109,26 +109,144 @@ Dashboard
 
 </div>
 <script>
-	$(document).ready(function() {
-		$('#calendar').fullCalendar({
-			events: [
-			{
-				title: "Nazwa eventu",
-				start: moment("2016-05-29 09:30").format(MOMENT_DATE_FORMAT_DAY_TIME),
-				end: moment("2016-05-29 11:30").format(MOMENT_DATE_FORMAT_DAY_TIME)
-			}
-			],
+	var calendarRef;
+	var is24h = true;
+
+	function translate_time(time) {
+		var split = time.split(":");
+
+		var hr = parseInt(split[0]);
+		var apm = " AM";
+		if(hr > 12) {
+			apm = " PM";
+			hr = hr - 12;
+		}
+		var newtime = hr;
+		if(split.length > 1) newtime += ":" + split[1];
+		newtime += apm;
+		return newtime;
+	}
+
+	function initialize_calendar() {
+		calendarRef = $('#calendar').fullCalendar({
+			customButtons: {
+		        hour12: {
+		            text: '12H',
+		            click: function() {
+		                $(".fc-hour24-button").removeClass("fc-state-active");
+		                $(".fc-hour12-button").addClass("fc-state-active");
+
+		                is24h = false;
+		                calendarRef.fullCalendar( 'rerenderEvents' );
+		            }
+		        },
+		        hour24: {
+		            text: '24H',
+		            click: function() {
+		                $(".fc-hour12-button").removeClass("fc-state-active");
+		                $(".fc-hour24-button").addClass("fc-state-active");
+
+		               	is24h = true;
+		                calendarRef.fullCalendar( 'rerenderEvents' );
+		            }
+		        }
+		    },
 			header: {
 				left: 'prev,next today',
 				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
+				right: 'hour12,hour24 month,agendaWeek,agendaDay'
 			},
+			weekends: true,
 			editable: true,
 			eventLimit: true,
-			timeFormat: 'H(:mm)',
+			timeFormat: 'HH(:mm)',
+			axisFormat: 'HH(:mm)',
 			firstDay: 1,
 			eventRender: function(event, element) {
+				console.log("Event Render");
+				var appEventData = event.appEventData;
+				if(appEventData) {
+					var currentView = $('#calendar').fullCalendar('getView');
 
+					var groupId = appEventData.parent_group_id;
+					var group = app.getEventGroup(groupId);
+					element.css({
+						borderColor: group.color,
+						background: "white"
+					});
+					element.find(".fc-content").css({
+						background: group.color,
+						padding: "1px 0px"
+					});
+					element.find(".fc-time").css({
+						fontFamily: "opensansbold",
+						fontWeight: "normal"
+					});
+					element.find(".fc-title").css({
+						fontFamily: "opensans",
+						fontWeight: "normal",
+						fontSize: "13px"
+					});
+
+					var date_format = MOMENT_DATE_FORMAT_TIME;
+
+					console.log($("#calendar").fullCalendar("timeFormat"));
+					if(!is24h) {
+						date_format = date_format.replace("HH:mm", "h(:mm) a");
+					}
+					var time_start = event.start.format(date_format);
+					var time_end = event.end.format(date_format);
+
+					var diff = Math.abs(event.end.diff(event.start, "minutes"));
+					var diffText = diff + " min";
+
+					console.log(currentView);
+
+					if(!is24h) {
+						var time = element.find(".fc-time").text();
+						var newtime = "";
+						if(time.indexOf("-") == -1) {
+							newtime = translate_time(time);
+						} else {
+							var split = time.split("-");
+							newtime = translate_time(split[0].trim()) + " - " + translate_time(split[1].trim());
+						}
+						
+						element.find(".fc-time").html(newtime);
+					}
+
+					if(diff >= 89 || currentView.name == "month") {
+						if(diff >= 60) {
+							var hours = Math.floor(diff / 60);
+							var minutes = diff - (hours * 60);
+							diffText = hours + "H";
+							if(minutes > 0) {
+								diffText += ", "+minutes+"M";
+							}
+						}
+
+						var aiHtml = [
+							"<div class='event-additional-info'>",
+								"<div class='eai-label'>",
+									"<div class='eai-title'>",
+										"Czas trwania",
+									"</div>",
+									"<div class='eai-value'>",
+										time_start + " - " + time_end + " ("+diffText+")",
+									"</div>",
+
+								"</div>",
+							"</div>"
+						];
+						var ai = $(aiHtml.join("")).appendTo(element);
+					} else {
+						element.css("background", group.color);
+					}
+				}
+				console.log(app.userEventGroups);
+				console.log(event, element);
+
+				return true;
 		    },
 		    nowIndicator: true,
 			events: function(start, end, timezone, callback) {
@@ -144,21 +262,81 @@ Dashboard
 		                for(var i in json) {
 		                	var evt = json[i];
 		                	console.log(evt);
+
 		                	events.push({
+		                		appEventData: evt,
 		                        title: evt.title,
-		                        start: moment.unix(json.start),
-		                        end: moment.unix(json.end)
+		                        start: moment.unix(evt.start/1000),
+		                        end: moment.unix(evt.end/1000)
 		                    });
+
 		                }
+		                console.log("events: ", events);
 		                callback(events);
 		            }
 		        });
-			}
-    });
+			},
+			viewRender: function(view, element) {
+
+			},
+			eventDrop: function(event, delta, revertFunc) {
+		        app.eventChanged(event, delta, revertFunc);
+		    },
+			eventResize: function(event, delta, revertFunc) {
+		        app.eventChanged(event, delta, revertFunc);
+		    }
+   		});
+
+		calendarRef = $('#calendar');
+		$(".fc-hour24-button").addClass("fc-state-active");
+	}
+
+	$(document).ready(function() {
+
 		$( "#datepicker" ).datepicker({
 			showOtherMonths: true,
-			firstDay: 1
+			firstDay: 1,
+			onSelect: function(dateText, event) {
+				console.log(event);
+			    var day = event.currentDay;
+			    var month = parseInt(event.currentMonth)+1;
+			    if(day < 10) day = "0" + day;
+			    if(month < 10) month = "0" + month;
+
+			    var date = day + "-" + month + "-" + event.currentYear;
+
+			    var dateObj = moment(date, MOMENT_DATE_FORMAT_DAY);
+
+			    calendarRef.fullCalendar('gotoDate', dateObj);
+			}
 		});
+
+		$("body").on("mouseover", '.ui-datepicker-calendar td[data-handler="selectDay"]', function(e) {
+			var t = $(this);
+			var day = parseInt(t.find("a").text());
+			var month = parseInt(t.attr("data-month"))+1;
+			var year = t.attr("data-year");
+		    if(day < 10) day = "0" + day;
+		    if(month < 10) month = "0" + month;
+
+		    var date = year + "-" + month + "-" + day;
+		    $(".fc-day[data-date='"+date+"']").css("background", "#CEFFF0");
+
+		});
+
+		$("body").on("mouseout", '.ui-datepicker-calendar td[data-handler="selectDay"]', function(e) {
+			var t = $(this);
+			var day = parseInt(t.find("a").text());
+			var month = parseInt(t.attr("data-month"))+1;
+			var year = t.attr("data-year");
+		    if(day < 10) day = "0" + day;
+		    if(month < 10) month = "0" + month;
+
+		    var date = year + "-" + month + "-" + day;
+		    $(".fc-day[data-date='"+date+"']").css("background", "");
+
+		});
+
 	});
 </script>
 @stop

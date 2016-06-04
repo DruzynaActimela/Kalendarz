@@ -154,8 +154,8 @@ public class WebServer extends NanoHTTPD {
 			        				if(app.getStorage() instanceof FileStorage) {
 			        					uid = ((FileStorage) app.getStorage()).getHighestEventId() + 1;
 			        				}
-			        				long timestamp_start = Utils.dateToTimestamp(date_start, "DD-MM-YYYY HH:mm");
-			        				long timestamp_end = Utils.dateToTimestamp(date_end, "DD-MM-YYYY HH:mm");
+			        				long timestamp_start = Utils.dateToTimestamp(date_start, Const.DATE_FORMAT_DAY_TIME);
+			        				long timestamp_end = Utils.dateToTimestamp(date_end, Const.DATE_FORMAT_DAY_TIME);
 	
 	
 			        				CalendarEvent event = new CalendarEvent(uid, name, timestamp_start, timestamp_end, is_wholeday, is_public);
@@ -168,13 +168,36 @@ public class WebServer extends NanoHTTPD {
 			        					((FileStorage) app.getStorage()).saveEvents();
 			        				}
 
-			        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o utworzone!").put("type", "success").create();
+			        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o utworzone!").put("type", "success").put("eventId", ""+uid).create();
 	        					} else {
 	        						return jsonResponse("message", "Podana grupa nie istnieje!").put("type", "error").create();
 	        					}
 	        				} else {
 	        					return jsonResponse("message", "W nazwie zdarzenia znajduj¹ siê niedozwolone znaki!").put("type", "error").create();
 	        				}
+	        			} else if("change".equals(subRequestMode)) {
+	        				Integer eventId = Utils.parseInt(params.get("eventId"), -1);
+	        				Long newStart = Utils.dateToTimestamp(params.get("new_start"), Const.DATE_FORMAT_DAY_TIME);
+	        				Long newEnd =  Utils.dateToTimestamp(params.get("new_end"), Const.DATE_FORMAT_DAY_TIME);
+	        				
+	        				if(eventId > 0 && newStart > 0 && newEnd > 0) {
+	        					CalendarEvent evt = app.getStorage().loadEvent(eventId);
+	        					if(evt != null) {
+	        						evt.setStampStart(newStart);
+	        						evt.setStampEnd(newEnd);
+	        						app.getStorage().saveEvent(evt);
+	        						
+	        						if(app.getStorage() instanceof FileStorage) {
+			        					((FileStorage) app.getStorage()).saveEvents();
+			        				}	        						
+	        						
+	        						return jsonResponse("message", "Zmiany zosta³y zapisane.").put("type", "success").create();
+	        					} else {
+	        						return jsonResponse("message", "Nie ma takiego zdarzenia!").put("type", "error").create();
+	        					}	        					
+	        				} else {
+	        					return jsonResponse("message", "B³êdne dane!").put("type", "error").create();
+	        				}	        				
 	        			} else {
 	        				// nie ma takiego zapytania dla eventów
 	        			}
@@ -184,8 +207,17 @@ public class WebServer extends NanoHTTPD {
 		        		String end = params.get("end");
 	        			// wyœwietl listê grup u¿ytkownika
 		        		
+		        		long multiply_start = 1, multiply_end = 1;
+		        		if(start != null && start.length() == 10) multiply_start = 1000;
+		        		if(end != null && end.length() == 10) multiply_end = 1000;
+		        		
+		        		
+		        		long tStart = Long.valueOf(start) * multiply_start;
+		        		long tEnd = Long.valueOf(end) * multiply_end;
+		        		
+		        		
 	        			int sessionUserId = (userSession != null) ? userSession.getUser().getId() : 1;	        			
-	        			List<CalendarEvent> events = app.getStorage().searchEvents("" + sessionUserId, "owner_id");
+	        			List<CalendarEvent> events = app.getStorage().searchEventsBetween(tStart, tEnd, sessionUserId);
 	        			Type t = new TypeToken<List<CalendarEvent>>(){}.getType();
 	        			String json = app.getGson().toJson(events, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
