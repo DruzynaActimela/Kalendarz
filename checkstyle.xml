@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!--
+    This configuration file was written by the eclipse-cs plugin configuration editor
+-->
+<!--
+    Checkstyle-Configuration: Odraczkowywanie Checkstylera
+    Description: none
+-->
+<module name="Checker">
+  <property name="severity" value="warning"/>
+  <module name="TreeWalker">
+    <module name="LineLength">
+      <property name="max" value="800"/>
+    </module>
+    <module name="MethodLength">
+      <property name="max" value="1500"/>
+    </module>
+  </module>
+  <module name="FileLength"/>
+</module>

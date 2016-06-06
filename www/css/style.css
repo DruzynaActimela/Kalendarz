@@ -1,7 +1,7 @@
 body, html {
-	padding: 0;
+	padding: 0 !important;
 	margin:0;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 @font-face {
@@ -299,6 +299,14 @@ body {
     padding: 10px;
     border-radius: 3px;
     margin-bottom: 5px;
+}
+.lm-divider {
+    height: 1px;
+    border-bottom: 1px solid #BFBFBF;
+    margin: 14px 0;
+}
+.lm-option-bordered {
+    border: 1px solid rgba(4, 196, 137, 0.38);
 }
 .lm-option:hover, .lm-current {
     background: #04C489;
@@ -727,4 +735,162 @@ body {
 }
 .eai-value {
     margin-left: 2px;
+}
+.page-screen {
+    text-align: left;
+}
+
+.screen-title {
+    font-family: opensansbold;
+    font-size: 30px;
+    text-align: left;
+    margin: 10px 0;
+    color: #525252;
+    
+    
+}
+.screen-title-label {
+
+}
+.with-go-back {
+    padding: 7px;
+    border-bottom: 1px solid #bfbfbf;
+
+}
+.export-select-type {
+    display: inline-block;
+
+
+}
+.export-type {
+    border: 1px solid #C5C5C5;
+    background: white;
+    padding: 35px 20px;
+    border-radius: 3px;
+    margin: 10px;
+    float: left;
+    width: 160px;
+    height: 140px;
+    text-align: center;
+}
+.export-type:hover {
+    cursor: pointer;
+    border-color: gray;
+}
+.et-icon {
+    font-size: 29px;
+    color: gray;
+}
+.et-title {
+    color: #3d3d3d;
+}
+.alert {
+    text-align: left;
+}
+.screen-export {
+    text-align: left;
+}
+
+.screen-go-back {
+    font-size: 21px;
+    color: #3d3d3d;
+    float: left;
+    cursor: pointer;
+    margin-right: 15px;
+}
+.screen-go-back:hover {
+    text-decoration: underline;
+}
+.screen-go-back i {
+    font-size: 17px;
+    margin-right: 10px;
+    vertical-align: 1px;
+}
+.with-go-back {
+    font-size: 21px;
+}
+.app-btn {
+    cursor: pointer;
+}
+.app-btn i {
+    margin-right: 10px;
+}
+.bottom-buttons {
+    border-top: 1px solid #bfbfbf;
+    padding: 10px;
+}
+.bottom-buttons .app-btn {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 10px;
+
+}
+.egs-holder {
+    border: 1px solid #BFBFBF;
+    background: white;
+    display: inline-block;
+    padding: 5px;
+    border-radius: 3px;
+    height: 34px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.egs-checkbox {
+    float: left;
+    margin-right: 5px;
+}
+.egs-name {
+    float: left;
+    font-size: 14px;
+}
+.export-wizard {
+    padding: 10px;
+}
+.keyval-holder {
+    width: 100%;
+    display: table;
+}
+.keyval-key {
+    width: 20%;
+    padding: 1%;
+    display: table-cell;
+    vertical-align: middle;
+}
+.keyval-val {
+    width: 80%;
+    padding: 1%;
+    display: table-cell;
+}
+.context-menu {
+    border: 1px solid #bfbfbf;
+    border-radius: 3px;
+    background: white;
+    color: gray;
+    box-shadow: 0px 2px 20px rgba(0,0,0,0.2);
+    position: absolute;
+    z-index: 10000;
+    min-width: 200px;
+}
+.cm-inner {
+    padding: 5px 0;
+}
+.cm-item {
+    padding: 10px 20px;
+}
+.cm-item i {
+    margin-right: 10px;
+    color: #3d3d3d;
+}
+.cm-item:hover {
+    color: white;
+    background: #04C489;
+    cursor: pointer;
+}
+.cm-item:hover i {
+    color: white;
+}
+.cm-spacer {
+    border-top: 1px solid #bfbfbf;
+    height:1px;
+    margin: 3px 5px;
 }

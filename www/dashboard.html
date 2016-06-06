@@ -50,7 +50,7 @@ Dashboard
 						<i class='fa fa-calendar'></i>Kalendarz
 					</div>
 					<div class='lm-option screen-trigger' data-screen='events'>
-						<i class='fa fa-calendar'></i>Zdarzenia
+						<i class='fa fa-calendar-check-o'></i>Zdarzenia
 					</div>
 					<div class='lm-option screen-trigger' data-screen='checklists'>
 						<i class='fa fa-check-square-o'></i>Listy To-Do
@@ -59,11 +59,11 @@ Dashboard
 					<div class='lm-option screen-trigger' data-screen='settings'>
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
-					@isset('is_admin')
-					Jest admin
-					@else 
-					Nie ma admina
-					@endIsset
+					<div class='lm-divider'></div>
+					<div class='lm-option screen-trigger lm-option-bordered' data-screen='export'>
+						<i class='fa fa-cloud-download'></i>Eksport
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -80,7 +80,112 @@ Dashboard
 
 			<div class='page-screen screen-settings'>
 				settings
+					@isset('is_admin')
+					Jest admin
+					@else 
+					Nie ma admina
+					@endIsset
 			</div>
+			<div class='page-screen screen-export'>
+				<div class='screen-title'>
+					Eksport Twojego kalendarza
+				</div>
+				<div class="alert alert-info">Wybierz typ, do którego chcesz wyeksportować swój kalendarz.</div>
+				<div class='export-select-type'>
+					<div class='export-type export-csv screen-trigger' data-screen='export-csv'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							CSV
+						</div>
+					</div>
+					<div class='export-type export-ical screen-trigger' data-screen='export-ical'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							iCal
+						</div>
+					</div>
+					<div class='clear'></div>
+				</div>
+			</div>
+
+			<div class='page-screen screen-export-csv'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='export'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Eksport CSV
+					</div>
+				</div>
+
+				asd
+			</div>
+
+			<div class='page-screen screen-export-ical group-fill-trigger' data-group-fill-container='.export-groups-select-ical'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='export'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Eksport iCal
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-ical'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupy
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select export-groups-select-ical'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data początkowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-start" placeholder="Data początkowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data końcowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-end" placeholder="Data końcowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-export-ical'>
+						<i class='fa fa-check'></i>
+						Eksportuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
 		</div>
 		<div class='right-panel left'>
 			<div class='inner-panel-content'>
@@ -116,7 +221,7 @@ Dashboard
 		var split = time.split(":");
 
 		var hr = parseInt(split[0]);
-		var apm = " AM";
+		var apm = (hr == 12) ? " PM" : " AM";
 		if(hr > 12) {
 			apm = " PM";
 			hr = hr - 12;
@@ -170,6 +275,9 @@ Dashboard
 
 					var groupId = appEventData.parent_group_id;
 					var group = app.getEventGroup(groupId);
+
+
+
 					element.css({
 						borderColor: group.color,
 						background: "white"
@@ -194,15 +302,22 @@ Dashboard
 					if(!is24h) {
 						date_format = date_format.replace("HH:mm", "h(:mm) a");
 					}
-					var time_start = event.start.format(date_format);
-					var time_end = event.end.format(date_format);
+					console.log("EVENT", event);
 
-					var diff = Math.abs(event.end.diff(event.start, "minutes"));
+					var is_allday = event._allDay;
+
+					
+					var time_start = event.start.format(date_format);
+					var time_end = !is_allday ? event.end.format(date_format) : "";
+
+					var diff = !is_allday ? Math.abs(event.end.diff(event.start, "minutes")) : -1;
 					var diffText = diff + " min";
+
+					element.attr("data-event-id", event.appEventData._id);
 
 					console.log(currentView);
 
-					if(!is24h) {
+					if(!is24h && !is_allday) {
 						var time = element.find(".fc-time").text();
 						var newtime = "";
 						if(time.indexOf("-") == -1) {
@@ -224,6 +339,9 @@ Dashboard
 								diffText += ", "+minutes+"M";
 							}
 						}
+						var time_period_label = time_start + " - " + time_end + " ("+diffText+")";
+
+						if(is_allday) time_period_label = "Cały dzień";
 
 						var aiHtml = [
 							"<div class='event-additional-info'>",
@@ -232,7 +350,7 @@ Dashboard
 										"Czas trwania",
 									"</div>",
 									"<div class='eai-value'>",
-										time_start + " - " + time_end + " ("+diffText+")",
+										time_period_label,
 									"</div>",
 
 								"</div>",
@@ -267,7 +385,8 @@ Dashboard
 		                		appEventData: evt,
 		                        title: evt.title,
 		                        start: moment.unix(evt.start/1000),
-		                        end: moment.unix(evt.end/1000)
+		                        end: moment.unix(evt.end/1000),
+		                        allDay: evt.allday
 		                    });
 
 		                }

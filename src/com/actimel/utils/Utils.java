@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,55 +23,80 @@ import java.util.Random;
 import com.google.gson.reflect.TypeToken;
 
 
-
-public class Utils {
-	public static void log(String ... strings) {
+/**
+ * Klasa skupiaj¹ca w sobie wszystkie 
+ * niezbêdne funkcje do poprawnego dzia³ania aplikacji.
+ * @author ActimelTeam
+ *
+ */
+public final class Utils {
+	
+	/** 
+	 * Czy ten konstruktor nie jest super();?.
+	 */
+	private Utils() {
+		super();
+	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca logowanie do konsoli.
+	 * @param strings Lista elementów, które maj¹ zostac wyswietlone
+	 */
+	public static void log(final String ... strings) {
 		String msg = "";
 		for (int i = 0; i < strings.length; i++) {
-			if (msg.length() > 0)
+			if (msg.length() > 0) {
 				msg += " ";
+			}
 			msg += strings[i];
 		}
 		System.out.println(msg);
 	}
 
-	public static void writeToFile(File f, String content) {
-		/*
+	/**
+	 * Funkcja umo¿liwiaj¹ca zapis tekstu do pliku.
+	 * @param f Plik, do którego ma zostac zapisany tekst
+	 * @param content Tresc do zapisania
+	 */
+	public static void writeToFile(final File f, final String content) {
 		try {
-			FileWriter fw = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(fw);			
-			bw.write(content);
-			bw.close();
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
-		
-		try {
-			FileOutputStream fos = new FileOutputStream(f);// 
+			FileOutputStream fos = new FileOutputStream(f);
 			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 			BufferedWriter bw = new BufferedWriter(osw);
 			bw.write(content);
 			bw.close();
 			osw.close();
 			fos.close();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	public static String getRandomString(int length) {
-		final String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890";
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca wygenerowanie losowego ci¹gu znaków.
+	 * @param length D³ugosc ci¹gu
+	 * @return Losowy ci¹g znaków o podanej d³ugoœci
+	 */
+	public static String getRandomString(final int length) {
+		final String characters = 
+				"abcdefghijklmnopqrstuvwxyzABCDEFGHIJLMNOPQRSTUVWXYZ1234567890";
+		int len = length;
 		StringBuilder result = new StringBuilder();
-		while(length > 0) {
+		while (len > 0) {
 			Random rand = new Random();
 			result.append(characters.charAt(rand.nextInt(characters.length())));
-			length--;
+			len--;
 		}
 		return result.toString();
 	}
-	public static String readFile(File f) {
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca odczytanie zawartosci pliku.
+	 * @param f Plik
+	 * @return Zawartosc pliku jako String
+	 */
+	public static String readFile(final File f) {
 
 		try {
 
@@ -94,35 +118,62 @@ public class Utils {
 			fis.close();
 
 			return sb.toString();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "";
 	}
 
-
-	public static int rand(int min, int max) {
+	/**
+	 * Metoda umo¿liwiaj¹ca wygenerowanie losowej liczby z podanego przedzia³u.
+	 * @param min Dolna granica przedzia³u
+	 * @param max Górna granica przedzia³u
+	 * @return Losowa liczba z przedzia³u
+	 */
+	public static int rand(final int min, final int max) {
 		Random rand = new Random();
 		int randomNum = rand.nextInt((max - min) + 1) + min;
 		return randomNum;
 	}
-
-	public static Type getGsonHashMapType() {		
-		return new TypeToken<HashMap<String, String>>(){}.getType();
+	
+	/**
+	 * Funkcja zwracaj¹ca token typu dla HashMap'ów typu String,String.
+	 * @return Type
+	 */
+	
+	public static Type getGsonHashMapType() {
+		return new TypeToken<HashMap<String, String>>() { }.getType();
 	}
-	public static Type getGsonListType() {		
-		return new TypeToken<List<String>>(){}.getType();
+	/**
+	 * Funkcja zwracaj¹ca token typu dla List typu String.
+	 * @return Type
+	 */
+	
+	public static Type getGsonListType() {
+		return new TypeToken<List<String>>() { }.getType();
 	}
 
-
-	public static String getExtension(String name) {
+	/**
+	 * Metoda umo¿liwiaj¹ca pobranie rozszerzenia pliku.
+	 * @param name Nazwa pliku jako String
+	 * @return Rozszerzenie podanego pliku
+	 */
+	public static String getExtension(final String name) {
 		try {
 			return name.substring(name.lastIndexOf(".") + 1);
 		} catch (Exception e) {
 			return "";
 		}
 	}
-	public static String readFromStream(InputStream in) throws IOException {
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca odczytanie zawartoœci InputSteam.
+	 * @param in InputSteam, z którego zostan¹ odczytane dane
+	 * @return Tekst, który zosta³ odczytany z InputSteam
+	 * @throws IOException B³¹d
+	 */
+	public static String readFromStream(final InputStream in) 
+			throws IOException {
 		InputStreamReader isr = new InputStreamReader(in);
 		BufferedReader reader = new BufferedReader(isr);
 		StringBuilder out = new StringBuilder();
@@ -138,32 +189,82 @@ public class Utils {
 
 		return out.toString();
 	}
-	public static String readInternalFile(String internalPath) throws IOException {
-		return Utils.readFromStream(Utils.class.getClassLoader().getResource(internalPath).openStream());
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca pobranie zawartosci pliku 
+	 * przechowywanego w JAR aplikacji.
+	 * @param internalPath Wewnêtrzna sciezka do pliku. 
+	 * (W kontekscie JARa aplikacji).
+	 * @return Zawartosc pliku
+	 * @throws IOException B³¹d
+	 */
+	public static String readInternalFile(final String internalPath) 
+			throws IOException {
+		return Utils.readFromStream(Utils.class.getClassLoader()
+				.getResource(internalPath)
+				.openStream());
 
 	}
 
-	public static String sha256(String input) throws NoSuchAlgorithmException {
+	/**
+	 * Metoda zwracaj¹ca hash SHA-256 dla podanego ci¹gu znaków.
+	 * @param input Ci¹g znaków
+	 * @return skrót SHA-256 dla ci¹gu znaków.
+	 * @throws NoSuchAlgorithmException B³¹d
+	 */
+	public static String sha256(final String input) 
+			throws NoSuchAlgorithmException {
 		MessageDigest mDigest = MessageDigest.getInstance("SHA-256");
 		byte[] result = mDigest.digest(input.getBytes());
 		StringBuffer sb = new StringBuffer();
+		final int magicStuffFF = 0xff;
+		final int magicStuff00 = 0x100;
+		final int theAlmighty16 = 16;
+		
 		for (int i = 0; i < result.length; i++) {
-			sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+			sb
+			.append(Integer.toString((result[i] & magicStuffFF)
+					+ magicStuff00, theAlmighty16)
+					.substring(1));
 		}
 
 		return sb.toString();
 	}
 
-	public static boolean isUsernameValid(String input) {
-		if(input == null) return false;
+	/**
+	 * Metoda sprawdzaj¹ca, czy podana nazwa u¿ytkownika jest poprawna.
+	 * @param input Nazwa u¿ytkownika, która ma zostac sprawdzona.
+	 * @return Rezultat sprawdzania jako true/false.
+	 */
+	public static boolean isUsernameValid(final String input) {
+		if (input == null) {
+			return false;
+		}
 		return input.matches("[a-zA-Z0-9_]{3,16}");
 	}
-	public static boolean isGroupNameValid(String input) {
-		if(input == null) return false;
+	/**
+	 * Metoda sprawdzaj¹ca, czy podana nazwa grupy jest poprawna.
+	 * @param input Nazwa, która ma zostac sprawdzona.
+	 * @return Rezultat sprawdzania jako true/false.
+	 */
+	public static boolean isGroupNameValid(final String input) {
+		if (input == null) {
+			return false;
+		}
 		return input.matches("[êó¹œ³¿Ÿæña-zA-Z0-9_\\s]{3,128}");
 	}
 	
-	public static long dateToTimestamp(String strDate, String format) {
+	/**
+	 * Metoda konwertuj¹ca datê w podanym formacie 
+	 * na timestamp w milisekundach.
+	 * @param strDate Data do przekonwertowania
+	 * @param format Format daty
+	 * @return Timestamp w milisekundach
+	 */
+	public static long dateToTimestamp(
+			final String strDate, 
+			final String format
+		) {
 		DateFormat dateFormat = new SimpleDateFormat(format);
 		Utils.log("strDate: "  + strDate);
 		Utils.log("Using format: "  + format);
@@ -175,29 +276,51 @@ public class Utils {
 			Utils.log("Parsed date: " + date.toString());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
-		if(date == null) return 0;
+		if (date == null) {
+			return 0;
+		}
 
 		return date.getTime();
 		
 	}
 	
-	public static Integer parseInt(Object val, Integer defaultVal) {
+	/**
+	 * Metoda umo¿liwiaj¹ca przekonwertowanie ci¹gu znaków na Integer.
+	 * @param val Ci¹g znaków 
+	 * @param defaultVal Wartosc domyœlna
+	 * @return Przekonwertowana wartosc lub wartosc domyœlna
+	 */	
+	public static Integer parseInt(final Object val, final Integer defaultVal) {
 		try {
 			return Integer.parseInt(String.valueOf(val));
 		} catch (Exception e) {
 			return defaultVal;
 		}
 	}
-	public static Float parseFloat(Object val, Float defaultVal) {
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca przekonwertowanie ci¹gu znaków na Float.
+	 * @param val Ci¹g znaków 
+	 * @param defaultVal Wartosc domyœlna
+	 * @return Przekonwertowana wartosc lub wartosc domyœlna
+	 */	
+	public static Float parseFloat(final Object val, final Float defaultVal) {
 		try {
 			return Float.parseFloat(String.valueOf(val));
 		} catch (Exception e) {
 			return defaultVal;
 		}
 	}
-	public static Long parseLong(Object val, Long defaultVal) {
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca przekonwertowanie ci¹gu znaków na Long.
+	 * @param val Ci¹g znaków 
+	 * @param defaultVal Wartosc domyœlna
+	 * @return Przekonwertowana wartosc lub wartosc domyœlna
+	 */	
+	public static Long parseLong(final Object val, final Long defaultVal) {
 		try {
 			return Long.parseLong(String.valueOf(val));
 		} catch (Exception e) {

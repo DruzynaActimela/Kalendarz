@@ -77,12 +77,40 @@
           <button data-remodal-action="cancel" class="remodal-cancel app-btn btn-red-rounded">Nie</button>
           <button data-remodal-action="confirm" class="remodal-confirm app-btn btn-green-rounded">Tak</button>
         </div>
+
+
+        <div class='context-menu cmenu-event'>
+            <div class='cm-inner'>
+                <div class='cm-item menu-action-edit'>
+                    <i class='fa fa-edit'></i>
+                    Edytuj
+                </div>
+                <div class="cm-spacer"></div>
+                <div class='cm-item menu-action-delete'>
+                    <i class='fa fa-times'></i>
+                    Usuń
+                </div>
+            </div>
+
+        </div>
+        
+        <div class='context-menu cmenu-cell'>
+            <div class='cm-inner'>
+                <div class='cm-item menu-action-create-event'>
+                    <i class='fa fa-plus'></i>
+                    Nowe zdarzenie
+                </div>
+            </div>
+
+        </div>
+
+
         <script type='text/html' id='create_event_template'>
             <div>
 
                 <div class="form-group">
                     <label for="labelForName">Nazwa zdarzenia</label>
-                    <input type="text" class="form-control new-event-name" id="labelForName" placeholder="Nazwa zdarzenia">
+                    <input type="text" class="form-control new-event-name" id="labelForName" placeholder="Nazwa zdarzenia" value='{title}'>
                 </div>
                 <div class="form-group">
                     <label for="selectEventGroup">Grupa</label>
@@ -101,14 +129,14 @@
                 <div class="form-group">
                     <label for="labelForStartDate">Data rozpoczęcia wydarzenia</label>
                     <div class="input-group">
-                        <input type="text" class="form-control bind-datepicker new-event-date-start" id="labelForStartDate" placeholder="Data rozpoczęcia wydarzenia">
+                        <input type="text" class="form-control bind-datepicker new-event-date-start" id="labelForStartDate" placeholder="Data rozpoczęcia wydarzenia" value='{fillDate_start}'>
                         <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
                     </div>                  
                 </div>
                 <div class="form-group">
                     <label for="labelForEndDate">Data zakończenia wydarzenia</label>
                     <div class="input-group">
-                        <input type="text" class="form-control bind-datepicker  new-event-date-end" id="labelForEndDate" placeholder="Data zakończenia wydarzenia">
+                        <input type="text" class="form-control bind-datepicker  new-event-date-end" id="labelForEndDate" placeholder="Data zakończenia wydarzenia" value='{fillDate_end}'>
                         <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
                     </div>                  
                 </div>
@@ -199,5 +227,19 @@
             </div>
         </script>
 
+        <script type='text/html' id='user_groups_export_template'>
+            <div class='egs-holder' data-group-id='{id}' style='border-color:{color};'>
+                <div class='egs-checkbox'>
+                    <span class="custom-checkbox">
+                        <input type="checkbox" id='checkbox_groupid_{id}' class='export-group-id' checked>
+                        <span class="box"><span class="tick"></span></span>
+                    </span>
+                </div>
+                <div class='egs-name'>
+                    <label for='checkbox_groupid_{id}'>{name}</label>
+                </div>
+                <div class='clear'></div>
+            </div>
+        </script>
     </body>    
 </html>

@@ -3,34 +3,67 @@ package com.actimel.utils;
 import java.util.HashMap;
 
 
+/**
+ * Parser argumentów z CLI.
+ * @author ActimelTeam
+ *
+ */
 public class SimpleArgParser {
 	
-	String[] rawArgs;
-	HashMap<String, String> parsedArgs = new HashMap<String, String>();
+	/**
+	 * Surowe argumenty.
+	 */
+	private String[] rawArgs;
 	
-	public SimpleArgParser(String[] args) {
+	/**
+	 * Przeparsowane argumenty.
+	 */
+	private HashMap<String, String> parsedArgs = new HashMap<String, String>();
+	
+	/**
+	 * Konstruktor.
+	 * @param args Surowe parametry z konsoli.
+	 */
+	public SimpleArgParser(final String[] args) {
 		rawArgs = args;
 		parse();
 	}
 	
+	/**
+	 * Metoda parsuj¹ca przekazane parametry.
+	 */
 	private void parse() {
 		
 
-		for(int i = 0; i < rawArgs.length; i++) {
+		for (int i = 0; i < rawArgs.length; i++) {
 			String arg = rawArgs[i];
-			if(arg.startsWith("-")) {
-				String value = (i + 1 < rawArgs.length) ? rawArgs[i + 1] : "";
+			if (arg.startsWith("-")) {
+				String value = "";
+				if (i + 1 < rawArgs.length) {
+					value = rawArgs[i + 1];
+				}
 				parsedArgs.put(arg.substring(1), value);
 				Utils.log(arg.substring(1), "|", value);
 			}			
 		}
 	}
 	
-	public boolean hasArg(String key) {
+	/**
+	 * Metoda umo¿liwiaj¹ca sprawdzenie, 
+	 * czy obiekt przechowuje wartosc o podanym kluczu.
+	 * @param key Klucz
+	 * @return true/false jesli wartosc zostanie znaleziona lub nie.
+	 */
+	public final boolean hasArg(final String key) {
 		return parsedArgs.containsKey(key);
 	}
 	
-	public String getArg(String key) {
+	/**
+	 * Metoda umo¿liwiaj¹ca pobranie wartosci o podanym kluczu.
+	 * @param key Klucz
+	 * @return Wartosc
+	 */
+	public final String getArg(final String key) {
 		return parsedArgs.get(key);
 	}
 }

@@ -4,8 +4,12 @@ var MOMENT_DATE_FORMAT_DAY = "DD-MM-YYYY";
 var MOMENT_DATE_FORMAT_TIME = "HH:mm";
 var MOMENT_DATE_FORMAT_DAY_TIME = MOMENT_DATE_FORMAT_DAY + " " + MOMENT_DATE_FORMAT_TIME;
 
+var FULLCALENDAR_INTERNAL_DATE_FORMAT = "YYYY-MM-DD";
+
 var WINDOW_NO_CLOSE = 123551;
 var WINDOW_CLOSE = 123555;
+
+var LAST_RIGHTCLICKED_DATE, LAST_RIGHTCLICKED_EVENT;
 
 function parse_template(elem, vars) {
     elem = (typeof elem == 'string') ? $(elem) : elem;
@@ -18,6 +22,57 @@ function parse_template(elem, vars) {
 }
 
 var app = {
+    screenShowEvents: [],
+    locationArgs: [],
+    rebuildArgs: function() {
+        var args = "";
+        for(var key in app.locationArgs) {
+            var val = app.locationArgs[key];
+            if(args.length > 0) args += "|";
+            args += key + ":" + encodeURIComponent(val);
+
+        }
+        location.hash = args;
+    },
+    setArg: function(key, val) {
+        app.locationArgs[key] = val;
+
+        app.rebuildArgs();
+    },
+    getArg: function(key) {
+        return app.locationArgs[key];
+    },
+    hasArg: function(a) {
+        return app.locationArgs[a] != undefined;
+    },
+    parseArgs: function() {
+        if(location.hash.length > 1) {
+            var strArgs = location.hash.substring(1).split("|");
+            for(var i in strArgs) {
+                var keyval = strArgs[i].split(":");
+                if(keyval.length == 2 && keyval[0] && keyval[1]) {
+                    app.locationArgs[keyval[0]] = keyval[1];
+                }
+            }
+        }
+
+    },
+    registerScreenShowEvent: function(screenName, func) {
+        if(app.screenShowEvents[screenName] == undefined) {
+            app.screenShowEvents[screenName] = [];
+        }
+        app.screenShowEvents[screenName].push(func);
+    },
+    executeScreenShowEvents: function(screenName) {
+        if(app.screenShowEvents[screenName] != undefined) {
+            for(var i in app.screenShowEvents[screenName]) {
+                var func = app.screenShowEvents[screenName][i];
+                if(typeof func == 'function') {
+                    func($(".screen-" + screenName));
+                }
+            }
+        }
+    },
     userEventGroups: [],
     getEventGroup: function(gId) {
         for(var i in app.userEventGroups) {
@@ -28,12 +83,34 @@ var app = {
     },
 
 	init: function() {
+        app.parseArgs();
 		app.displayUserGroups();
         app.updateUI();
+
+        app.registerScreenShowEvent("export-ical", function(screen) {
+            screen.find(".bind-datepicker").datetimepicker({
+                controlType: 'select',
+                oneLine: true,
+                dateFormat: "dd-mm-yy",
+                timeFormat:  "HH:mm",
+                firstDay: 1
+            });
+        });
+        app.registerScreenShowEvent("calendar", function(screen) {
+            if(calendarRef) {
+                calendarRef.fullCalendar("refetchEvents");
+            }
+        });
+
+
         setTimeout(function() {
             initialize_calendar();
     		app.updateUI();
 
+
+            if(app.hasArg("screen")) {
+                app.setCurrentScreen(app.getArg("screen"));
+            }
         }, 1);
 	},
 	updateUI: function() {
@@ -250,16 +327,49 @@ var app = {
             }, 1000);
         }
     },
-    showCreateEventWindow: function() {
-        var body_template = parse_template("#create_event_template", {
+    showCreateEventWindow: function(fillDate, is_edit, data) {
 
-        });
+        var _fillDate_start = (fillDate ? moment(fillDate, FULLCALENDAR_INTERNAL_DATE_FORMAT).format(MOMENT_DATE_FORMAT_DAY_TIME) : "");
+        var _fillDate_end = (fillDate ? moment(fillDate, FULLCALENDAR_INTERNAL_DATE_FORMAT).add(30, 'minutes').format(MOMENT_DATE_FORMAT_DAY_TIME) : "");
+
+
+        if(is_edit) {
+            _fillDate_start = moment.unix(data.start/1000).format(MOMENT_DATE_FORMAT_DAY_TIME);
+            _fillDate_end = moment.unix(data.end/1000).format(MOMENT_DATE_FORMAT_DAY_TIME);
+        }
+
+
+        var template_vars = {
+            fillDate_start: _fillDate_start,
+            fillDate_end: _fillDate_end
+        };
+
+        var data_keys = ["title"];
+
+        for(var i in data_keys) {
+            var key = data_keys[i];
+            if(data && data[key]) {
+
+                var val = data[key];
+                if(!val || val.trim().length < 1) val = "";
+                template_vars[key] = val;
+            } else {
+                template_vars[key] = "";
+            }
+        }
+
+        var body_template = parse_template("#create_event_template", template_vars);
+
+
+        var title = is_edit ? "Edycja zdarzenia" : "Dodawanie nowego zdarzenia";
+        var button_text = is_edit ? "Zapisz zdarzenie" : "Dodaj zdarzenie";
 
         app.showWindow({
-            title: "Dodawanie nowego zdarzenia",
+            title: title,
             body: body_template,
-            continueLabel: "Dodaj zdarzenie",
+            continueLabel: button_text,
             postShow: function(handle) {
+
                 
                 handle.find(".bind-datepicker").datetimepicker({
                     controlType: 'select',
@@ -294,6 +404,13 @@ var app = {
                     
 
                     handle.find("select").selectpicker();
+
+
+                    if(is_edit) {
+                        handle.find(".new-event-group").selectpicker('val', data.parent_group_id);
+                        handle.find(".new-event-whole-day").prop("checked", (data.allday == true));
+                        handle.find(".new-event-public").prop("checked", (data.is_public == true));
+                    }
                 });
 
             },
@@ -328,10 +445,17 @@ var app = {
                     });
                     return WINDOW_NO_CLOSE;
                 }
-                app.doCreateEventRequest(name, group, date_start, date_end, is_wholeday, is_public, function() {
-                    app.closeWindow(handle);
-                    $("#calendar").fullCalendar( 'refetchEvents' );
-                });
+                if(is_edit) {
+                    app.doSaveEventRequest(data._id, name, group, date_start, date_end, is_wholeday, is_public, function() {
+                        app.closeWindow(handle);
+                        $("#calendar").fullCalendar( 'refetchEvents' );
+                    });
+                } else {                    
+                    app.doCreateEventRequest(name, group, date_start, date_end, is_wholeday, is_public, function() {
+                        app.closeWindow(handle);
+                        $("#calendar").fullCalendar( 'refetchEvents' );
+                    });
+                }
             }
 
         });
@@ -393,6 +517,7 @@ var app = {
             });
         });
     },
+
     doCreateEventRequest: function(name, group, date_start, date_end, is_wholeday, is_public, onSuccess, onFailure) {
         app.doRequest("/api/events/create", {
             name: name,
@@ -418,6 +543,34 @@ var app = {
             });
         });
     },
+    
+    doSaveEventRequest: function(eventId, name, group, date_start, date_end, is_wholeday, is_public, onSuccess, onFailure) {
+        app.doRequest("/api/events/saveEvent", {
+            id: eventId,
+            name: name,
+            group: group,
+            date_start: date_start,
+            date_end: date_end,
+            wholeday: is_wholeday,
+            "public": is_public
+        }, "POST", function(resp) {
+            var is_success = (resp.type == "success");
+            app.showConfirmBox({
+                title: (is_success ? "Sukces!" : "Błąd"),
+                body: resp.message,
+                hideCancel: true,
+                confirmText: "OK",
+                confirmClick: function() {
+                    if(is_success) {
+                        if(onSuccess) onSuccess(resp);
+                    } else {
+                        if(onFailure) onFailure(resp);
+                    }
+                }
+            });
+        });
+    },
+
     getUserGroups: function(onResponse) {
         app.doRequest("/api/groups", {}, "POST", function(resp) {
             app.userEventGroups = resp;
@@ -447,13 +600,155 @@ var app = {
     },
     eventChanged: function(event, delta, revertFunc) {
         console.log("app.eventChanged", event, delta);
+        var _endDate = event.end ? event.end.format(MOMENT_DATE_FORMAT_DAY_TIME) : "";
         app.doRequest("/api/events/change", {
             "eventId": event.appEventData._id,
             'new_start': event.start.format(MOMENT_DATE_FORMAT_DAY_TIME),
-            'new_end': event.end.format(MOMENT_DATE_FORMAT_DAY_TIME)
+            'new_end': _endDate
         }, "POST", function(resp) {
             console.log(resp);
         });
+    },
+    setCurrentScreen: function(screen) {
+        $(".screen-trigger").removeClass("lm-current");
+        $(".screen-trigger[data-screen='"+screen+"']").addClass("lm-current");
+        if(screen) {
+            $(".page-screen").hide();
+            var screenObj = $(".screen-"+screen);
+            if(screenObj.hasClass("group-fill-trigger")) {
+                var cont = $(screenObj.attr("data-group-fill-container"));
+                console.log(cont);
+
+                if(cont) {
+                    cont.empty();
+                    if(app.userEventGroups.length > 0) {
+
+                        for(var i in app.userEventGroups) {
+                            var gr = app.userEventGroups[i];
+                            var html = parse_template("#user_groups_export_template", {
+                                id: gr.id,
+                                color: gr.color,
+                                name: gr.name
+                            });
+                            var elem = $(html).appendTo(cont);
+                        }
+                    } else {
+                        cont.html("Nie posiadasz żadnych grup.");
+                    }
+                }
+            }
+
+            screenObj.show();
+
+            app.executeScreenShowEvents(screen);
+        }
+        app.setArg("screen", screen);
+
+
+    },
+    openContextMenu: function(menuClass, x, y) {
+        app.hideContextMenus();
+
+        $(".cmenu-" + menuClass).css({
+            left: x + "px",
+            top: y + "px"
+        }).show();
+    },
+    hideContextMenus: function() {
+        $(".context-menu").hide();
+    },
+    iCal_doExportRequest: function() {
+        var scope = $(".wizard-ical");
+        var groupIds = "";
+        scope.find(".egs-holder").each(function() {
+            var t = $(this);
+            if(t.find(".export-group-id").is(":checked")) {
+                if(groupIds.length > 0) groupIds += ",";
+                groupIds += t.attr("data-group-id");
+            }
+        });
+
+        var start = scope.find(".export-date-start").val();
+        var end = scope.find(".export-date-end").val();
+
+        app._doExportRequest("ical", groupIds, start, end, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów pasujących do podanych kryteriów.<br>Czy chcesz je wyeksportować?",                
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doExportRequest("ical", groupIds, start, end, function(resp) {
+                            console.log('_doExportRequest', resp);
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono eventów dla podanych kryteriów.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
+    _doExportRequest: function(exportType, groupIds, start, end, onResponse, confirmation) {
+        var _confirmation = (confirmation == 1) ? "yes" : "";
+        app.doRequest("/api/events/export", {
+            exportType: exportType,
+            groupIds: groupIds,
+            start: start,
+            end: end,
+            confirm: _confirmation
+        }, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+
+    editEvent: function(id) {
+        var events = $('#calendar').fullCalendar('clientEvents');
+        if(events) {
+            for(var i in events) {
+                if(events[i].appEventData && events[i].appEventData._id == id) {
+                    app.showCreateEventWindow(false, true, events[i].appEventData);
+                    break;
+                }
+            }
+        }
+    },
+    deleteEvent: function(id, onResponse) {
+        app.showConfirmBox({
+            title: "Potwierdź",
+            body: "Czy na pewno chcesz usunąć to zdarzenie?",                
+            confirmText: "Tak",
+            confirmClick: function() {
+
+                app._doDeleteEvent(id, function(resp) {
+                    var type = (resp.type == "success") ? "Sukces" : "Błąd";
+
+                    app.showConfirmBox({
+                        title: type,
+                        body: resp.message,
+                        confirmText: "Tak"
+                    });
+
+                    if(resp.type == "success") {
+                        if(calendarRef) {
+                            calendarRef.fullCalendar("refetchEvents");
+                        }
+                    }
+                });
+            }
+        });
+    },
+    _doDeleteEvent: function(id, onResponse) {
+        app.doRequest("/api/events/delete", {
+            id: id
+        }, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        })
     }
 };
 
@@ -483,20 +778,80 @@ $(document).ready(function() {
     $(".trigger-add-group").click(function() {
         app.showCreateGroupWindow();
     });
+    
+    $(".btn-export-ical").click(function() {
+        app.iCal_doExportRequest();
+    });
+    $(".menu-action-create-event").click(function() {
+
+        app.showCreateEventWindow(LAST_RIGHTCLICKED_DATE);
+    });
+    $(".menu-action-edit").click(function() {
+        if(LAST_RIGHTCLICKED_EVENT) {
+            var id = LAST_RIGHTCLICKED_EVENT.attr("data-event-id");
+            app.editEvent(id);
+        }
+    });
+    $(".menu-action-delete").click(function() {
+        if(LAST_RIGHTCLICKED_EVENT) {
+            var id = LAST_RIGHTCLICKED_EVENT.attr("data-event-id");
+            app.deleteEvent(id);
+        }
+    });
+
+
+
+    $("body").on("click", function(e) {
+        app.hideContextMenus();
+    });
+    $("body").on("contextmenu", ".fc-day-grid-event", function(e) {
+        console.log(e);
+
+        LAST_RIGHTCLICKED_EVENT = $(this);
+
+        app.openContextMenu("event", e.pageX, e.pageY);
+
+        if(!e.ctrlKey) return false;
+    });
+    
+    $("body").on("contextmenu", ".fc-day", function(e) {
+        console.log(e);
+
+
+        LAST_RIGHTCLICKED_DATE = $(this).attr("data-date");
+
+        app.openContextMenu("cell", e.pageX, e.pageY);
+
+        if(!e.ctrlKey) return false;
+    });
+    
+
+    $("body").on("contextmenu", ".fc-content-skeleton tbody tr > td", function(e) {
+        console.log(e);
+        var index = $(this).index();
+        console.log(index);
+
+        var parent = $(this).parents(".fc-content-skeleton");
+
+        var td = parent.find("thead tr td").eq(index);
+        console.log(td.attr("data-date"));
+
+        LAST_RIGHTCLICKED_DATE = td.attr("data-date");
+
+        app.openContextMenu("cell", e.pageX, e.pageY);
+
+        if(!e.ctrlKey) return false;
+    });
+
+
 
 
 
     $(".screen-trigger").click(function() {
         var btn = $(this);
         var screen = btn.attr("data-screen");
-        $(".screen-trigger").removeClass("lm-current");
-        btn.addClass("lm-current");
-        if(screen) {
-            $(".page-screen").hide();
-            $(".screen-"+screen).show();
-        }
+        app.setCurrentScreen(screen);
     });
-
 
 	app.init();
 });

@@ -3,9 +3,8 @@ package com.actimel.calendar.impl;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.net.InetAddress;
 import java.net.URL;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,6 @@ import com.actimel.models.EventGroup;
 import com.actimel.models.Session;
 import com.actimel.models.User;
 import com.actimel.utils.HtmlTemplate;
-import com.actimel.utils.HttpResponseBuilder;
 import com.actimel.utils.JsonResponseBuilder;
 import com.actimel.utils.Utils;
 import com.google.gson.reflect.TypeToken;
@@ -29,13 +27,28 @@ import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
 
-
+/**
+ * Implementacja serwera WWW.
+ * @author 4i60r
+ *
+ */
 public class WebServer extends NanoHTTPD {
 	
-	private CalendarApp app;
-	private SessionController sessionController;
+	/**
+	 * Obiekt aplikacji kalendarza do ³atwego dostêpu przy obs³udze zapytañ.
+	 */
+	private final CalendarApp app;
 	
-	List<String> excludeFoldersFromLoginCheck = Arrays.asList(
+	/**
+	 * Obiekt kontrolera odpowiedzialnego za obs³ugê sesji u¿ytkowników.
+	 */
+	private final SessionController sessionController;
+
+	/**
+	 * Lista folderów, które nie s¹ brane pod uwagê 
+	 * przy sprawdzaniu stanu zalogowania u¿ytkownia.
+	 */
+	private final List<String> excludeFoldersFromLoginCheck = Arrays.asList(
 			"js",
 			"css",
 			"fullcalendar",
@@ -43,45 +56,60 @@ public class WebServer extends NanoHTTPD {
 			"font-awesome"			
 	);
 	
-	List<String> allowedRoutesWithoutLogin = Arrays.asList(
+	/**
+	 * Lista stron (dróg), które s¹ dostêpne bez zalogowania.
+	 */
+	private final List<String> allowedRoutesWithoutLogin = Arrays.asList(
 			"login",
 			"register"
 	);
 	
-    public WebServer(CalendarApp app, int port) {
+	/**
+	 * Konstruktor implementacji serwera WWW.
+	 * @param calendarApp Instancja aplikacji kalendarza
+	 * @param port Port, na którym serwer bêdzie nas³uchiwa³ po³¹czeñ
+	 */
+    public WebServer(final CalendarApp calendarApp, final int port) {
         super(port);
         
         sessionController = new SessionController();
         
-        this.app = app;
+        this.app = calendarApp;
     }
     
-    public HttpResponseBuilder outputResponse(String template) {
-    	HtmlTemplate tmpl = HtmlTemplate.loadFromResource(template);
-		return new HttpResponseBuilder(tmpl);
-    }
-    public JsonResponseBuilder jsonResponse(String key, Object val) {
+    /**
+     * Funkcja pomocnicza, zwraca builder odpowiedzi JSON.
+     * @param key Pocz¹tkowy klucz
+     * @param val Pocz¹tkowa wartoœc dla klucza
+     * @return builder odpowiedzi JSON
+     */
+    public final JsonResponseBuilder jsonResponse(final String key, final Object val) {
 		return new JsonResponseBuilder(app, key, String.valueOf(val));
     }
     
-    private Response doRedirect(String uri) {
+    /**
+     * Funkcja odpowiedzialna za przekierowanie u¿ytkownika pod podany adres.
+     * @param uri Adres, na który u¿ytkownik ma zostac przekierowany
+     * @return Instacja odpowiedzi NanoHTTPD z nag³ówkiem przekierowania
+     */
+    private Response doRedirect(final String uri) {
     	NanoHTTPD.Response res = newFixedLengthResponse(Status.REDIRECT, "text/plain", "");
 		res.addHeader("Location", uri);
 		return res;
     }
-    
+
     @Override
-    public Response serve(IHTTPSession httpSession) {
+	public final Response serve(final IHTTPSession httpSession) {
 
     	try {
-    		String SEPARATOR = File.separator;
+    		String filePathSeparator = File.separator;
     		
         	Map<String, String> files = new HashMap<String, String>();
         	httpSession.parseBody(files);
     		
     		
     		String clientIp = httpSession.getHeaders().get("http-client-ip");
-        	String www_root_dir = "";
+        	String wwwRootDir = "";
         	String uri = httpSession.getUri();
 
         	
@@ -97,23 +125,21 @@ public class WebServer extends NanoHTTPD {
 			String cookieSessionKey = httpSession.getCookies().read(Const.COOKIE_SESSION_KEY);
 			Session userSession = null;
 			
-			if(cookieSessionKey != null) {
+			if (cookieSessionKey != null) {
 				userSession = sessionController.getSessionByKey(cookieSessionKey.trim());
 			}
+			final int sessionUserId = (userSession != null) ? userSession.getUserId() : 1;	
 			
-			
-			if(!allowedRoutesWithoutLogin.contains(currentRoute) && userSession == null && !excludeFoldersFromLoginCheck.contains(currentRoute)) {
+			if (!allowedRoutesWithoutLogin.contains(currentRoute) && userSession == null && !excludeFoldersFromLoginCheck.contains(currentRoute)) {
 				// wy³¹czone na czas pisania
 				//return doRedirect("login#message:not-authorized");
 			}
 
-        	if(uri.startsWith("/api")) {
+        	if (uri.startsWith("/api")) {
         		
         		HashMap<String, String> response = new HashMap<String, String>();
         		
-        		InetAddress IP=InetAddress.getLocalHost();
-        		
-        		if(whitelistEnabled && apiWhitelist.contains(clientIp) == false) {
+        		if (whitelistEnabled && apiWhitelist.contains(clientIp) == false) {
         			response.put("type", "error");
         			response.put("message", "Nieautoryzowany dostêp.");
         			return newFixedLengthResponse(Response.Status.OK, "text/json", app.getGson().toJson(response, Utils.getGsonHashMapType()));
@@ -124,80 +150,186 @@ public class WebServer extends NanoHTTPD {
         		String requestMode = null; // /api/mode
         		String subRequestMode = null; // /api/mode/submode
         		
-        		if(uriSplit.length > 2) {
+        		if (uriSplit.length > 2) {
         			requestMode = uriSplit[2].trim();
         		}
-        		if(uriSplit.length > 3) {
-        			subRequestMode = uriSplit[3].trim();
+        		
+        		final int paramCountThree = 3;
+        		if (uriSplit.length > paramCountThree) {
+        			subRequestMode = uriSplit[paramCountThree].trim();
         		}
+        		
 
         		Utils.log(requestMode, params.toString());
 	        		
-	        	if("events".equals(requestMode)) { // {start=2016-04-25, end=2016-06-06, _=1464436912054}
-	        		if(subRequestMode != null) {
-	        			if("create".equals(subRequestMode)) {
+	        	if ("events".equals(requestMode)) {
+	        		if (subRequestMode != null) {
+	        			if ("create".equals(subRequestMode)) {
 	        				String name = params.get("name");
 	        				
-	        				if(Utils.isGroupNameValid(name)) {
+	        				if (Utils.isGroupNameValid(name)) {
 	        					String groupId = params.get("group");
 	        					int groupIdNum = Integer.parseInt(groupId);
 	        					EventGroup eGroup = app.getStorage().loadEventGroup(groupIdNum);
-	        					if(eGroup != null) {
-			        				String date_start = params.get("date_start");
-			        				String date_end = params.get("date_end");
+	        					if (eGroup != null) {
+			        				String dateStart = params.get("date_start");
+			        				String dateEnd = params.get("date_end");
 			        				boolean is_public = ("1".equals(params.get("public")));
 			        				boolean is_wholeday = ("1".equals(params.get("wholeday")));
 			        				
 			        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
 			        				
 			        				int uid = 0;
-			        				if(app.getStorage() instanceof FileStorage) {
+			        				if (app.getStorage() instanceof FileStorage) {
 			        					uid = ((FileStorage) app.getStorage()).getHighestEventId() + 1;
 			        				}
-			        				long timestamp_start = Utils.dateToTimestamp(date_start, Const.DATE_FORMAT_DAY_TIME);
-			        				long timestamp_end = Utils.dateToTimestamp(date_end, Const.DATE_FORMAT_DAY_TIME);
+			        				long timestampStart = Utils.dateToTimestamp(dateStart, Const.DATE_FORMAT_DAY_TIME);
+			        				long timestampEnd = Utils.dateToTimestamp(dateEnd, Const.DATE_FORMAT_DAY_TIME);
 	
 	
-			        				CalendarEvent event = new CalendarEvent(uid, name, timestamp_start, timestamp_end, is_wholeday, is_public);
+			        				CalendarEvent event = new CalendarEvent(uid, name, timestampStart, timestampEnd, is_wholeday, is_public);
 			        				event.setOwnerId(ownerId);
 			        				event.setParentGroupId(groupIdNum);
 			        				
 			        				app.getStorage().saveEvent(event);
 			        				
-			        				if(app.getStorage() instanceof FileStorage) {
+			        				if (app.getStorage() instanceof FileStorage) {
 			        					((FileStorage) app.getStorage()).saveEvents();
 			        				}
 
 			        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o utworzone!").put("type", "success").put("eventId", ""+uid).create();
 	        					} else {
-	        						return jsonResponse("message", "Podana grupa nie istnieje!").put("type", "error").create();
+	        						return jsonResponse("message", "Podany event nie istnieje!").put("type", "error").create();
 	        					}
 	        				} else {
 	        					return jsonResponse("message", "W nazwie zdarzenia znajduj¹ siê niedozwolone znaki!").put("type", "error").create();
 	        				}
-	        			} else if("change".equals(subRequestMode)) {
+	        			} else if ("saveEvent".equals(subRequestMode)) {
+	        				Integer eventId = Utils.parseInt(params.get("id"), -1);
+	        				if (eventId > 0) {
+	        					String name = params.get("name");
+		        				if (Utils.isGroupNameValid(name)) {
+		        					String groupId = params.get("group");
+		        					int groupIdNum = Integer.parseInt(groupId);
+		        					EventGroup eGroup = app.getStorage().loadEventGroup(groupIdNum);
+		        					if (eGroup != null) {
+
+				        				CalendarEvent event = app.getStorage().loadEvent(eventId);
+				        				if (event != null && event.getOwnerId() == sessionUserId) {
+				        					
+					        				String date_start = params.get("date_start");
+					        				String date_end = params.get("date_end");
+					        				boolean is_public = ("1".equals(params.get("public")));
+					        				boolean is_wholeday = ("1".equals(params.get("wholeday")));
+					        				
+					        				final long timestampStart = Utils.dateToTimestamp(date_start, Const.DATE_FORMAT_DAY_TIME);
+					        				final long timestampEnd = Utils.dateToTimestamp(date_end, Const.DATE_FORMAT_DAY_TIME);
+					        				
+					        				
+					        				event.setName(name);
+					        				event.setStampStart(timestampStart);
+					        				event.setStampEnd(timestampEnd);
+					        				event.setAllDay(is_wholeday);
+					        				event.setPublic(is_public);
+					        				event.setParentGroupId(groupIdNum);
+					        				
+					        				app.getStorage().saveEvent(event);
+					        				if (app.getStorage() instanceof FileStorage) {
+					        					((FileStorage) app.getStorage()).saveEvents();
+					        				}
+
+					        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o zapisane!").put("type", "success").create();
+				        				} else {
+				        					return jsonResponse("message", "Podany event nie istnieje lub nie jesteœ w³aœcicielem!").put("type", "error").create();
+				        				}
+		        					} else {
+		        						return jsonResponse("message", "Podany event nie istnieje!").put("type", "error").create();
+		        					}
+		        				} else {
+		        					return jsonResponse("message", "W nazwie zdarzenia znajduj¹ siê niedozwolone znaki!").put("type", "error").create();
+		        				}
+	        				} else {
+	        					return jsonResponse("message", "Zdarzenie nie istnieje!").put("type", "error").create();
+	        				}
+	        				
+	        			} else if ("change".equals(subRequestMode)) {
 	        				Integer eventId = Utils.parseInt(params.get("eventId"), -1);
 	        				Long newStart = Utils.dateToTimestamp(params.get("new_start"), Const.DATE_FORMAT_DAY_TIME);
 	        				Long newEnd =  Utils.dateToTimestamp(params.get("new_end"), Const.DATE_FORMAT_DAY_TIME);
 	        				
-	        				if(eventId > 0 && newStart > 0 && newEnd > 0) {
+	        				Response errorResponse = jsonResponse("message", "B³êdne dane!").put("type", "error").create();
+	        				
+	        				if (eventId > 0 && newStart > 0) {
 	        					CalendarEvent evt = app.getStorage().loadEvent(eventId);
-	        					if(evt != null) {
+	        					if (evt != null) {
+	        						if (newEnd < 1 && !evt.isAllDay()) {
+	        							return errorResponse;
+	        						}
+	        						
 	        						evt.setStampStart(newStart);
 	        						evt.setStampEnd(newEnd);
 	        						app.getStorage().saveEvent(evt);
 	        						
-	        						if(app.getStorage() instanceof FileStorage) {
+	        						if (app.getStorage() instanceof FileStorage) {
 			        					((FileStorage) app.getStorage()).saveEvents();
 			        				}	        						
 	        						
 	        						return jsonResponse("message", "Zmiany zosta³y zapisane.").put("type", "success").create();
 	        					} else {
 	        						return jsonResponse("message", "Nie ma takiego zdarzenia!").put("type", "error").create();
-	        					}	        					
+	        					}
 	        				} else {
-	        					return jsonResponse("message", "B³êdne dane!").put("type", "error").create();
-	        				}	        				
+	        					return errorResponse;
+	        				}	   
+	        			} else if ("delete".equals(subRequestMode)) {
+	        				Integer eventId = Utils.parseInt(params.get("id"), -1);
+	        				Response errorResponse = jsonResponse("message", "B³êdne dane!").put("type", "error").create();
+	        				
+	        				if (eventId > 0) {
+	        					CalendarEvent evt = app.getStorage().loadEvent(eventId);
+	        					if (evt != null) {
+	        						
+	        						if (evt.getOwnerId() == sessionUserId) {
+	        							evt = null;
+	        							app.getStorage().deleteEvent(eventId);
+	        							return jsonResponse("message", "Zdarzenie zosta³o usuniête.").put("type", "success").create();
+	        						} else {
+	        							return jsonResponse("message", "Nie jesteœ w³aœcicielem tego zdarzenia!").put("type", "error").create();
+	        						}	        						
+	        					} else {
+	        						return jsonResponse("message", "Nie ma takiego zdarzenia!").put("type", "error").create();
+	        					}
+	        				} else {
+	        					return errorResponse;
+	        				}	
+	        			} else if ("export".equals(subRequestMode)) {
+	        				final boolean confirmed = "yes".equals(params.get("confirm"));
+	        				
+	        				String exportType = params.get("exportType");
+	        				String groupIds = params.get("groupIds");
+	        				String[] ids = groupIds.split(",");
+	        				List<Integer> allowedGroups = new ArrayList<Integer>();
+	        				for (String id : ids) {
+	        					allowedGroups.add(Utils.parseInt(id, -1));
+	        				}
+	        				Long start = Utils.dateToTimestamp(params.get("start"), Const.DATE_FORMAT_DAY_TIME);
+	        				Long end = Utils.dateToTimestamp(params.get("end"), Const.DATE_FORMAT_DAY_TIME);
+	        				
+	        				List<CalendarEvent> eventsInTimeline = app.getStorage().searchEventsBetween(start, end, sessionUserId);
+	        				List<CalendarEvent> selectedEvents = new ArrayList<CalendarEvent>();
+	        				for (CalendarEvent evt : eventsInTimeline) {
+	        					if (allowedGroups.contains(evt.getParentGroupId())) {
+	        						selectedEvents.add(evt);
+	        					}
+	        				}
+	        				
+	        				if (confirmed) {
+	        					String downloadLink = "";
+	        					
+	        					return jsonResponse("message", "Confirmando").put("type", "success").put("download_link", downloadLink).create();
+	        				} else {
+	        					return jsonResponse("affected_events", "" + selectedEvents.size()).put("type", "success").create();
+	        				}
 	        			} else {
 	        				// nie ma takiego zapytania dla eventów
 	        			}
@@ -207,40 +339,55 @@ public class WebServer extends NanoHTTPD {
 		        		String end = params.get("end");
 	        			// wyœwietl listê grup u¿ytkownika
 		        		
-		        		long multiply_start = 1, multiply_end = 1;
-		        		if(start != null && start.length() == 10) multiply_start = 1000;
-		        		if(end != null && end.length() == 10) multiply_end = 1000;
+		        		long multiplyStart = 1, multiplyEnd = 1;
+		        		
+		        		/**
+		        		 * D³ugosc timestampa w sekundach.
+		        		 */
+		        		final int timestampLength = 10;
+		        		
+		        		/**
+		        		 * Wartosc, przez któr¹ trzeba przemno¿yc sekundy,
+		        		 * aby otrzymac milisekundy.
+		        		 */
+		        		final int multiplyMiliseconds = 1000;
+		        		if (start != null && start.length() == timestampLength) {
+							multiplyStart = multiplyMiliseconds;
+						}
+		        		if (end != null && end.length() == timestampLength) {
+							multiplyEnd = multiplyMiliseconds;
+						}
 		        		
 		        		
-		        		long tStart = Long.valueOf(start) * multiply_start;
-		        		long tEnd = Long.valueOf(end) * multiply_end;
+		        		long tStart = Long.valueOf(start) * multiplyStart;
+		        		long tEnd = Long.valueOf(end) * multiplyEnd;
 		        		
 		        		
-	        			int sessionUserId = (userSession != null) ? userSession.getUser().getId() : 1;	        			
+	        			        			
 	        			List<CalendarEvent> events = app.getStorage().searchEventsBetween(tStart, tEnd, sessionUserId);
 	        			Type t = new TypeToken<List<CalendarEvent>>(){}.getType();
 	        			String json = app.getGson().toJson(events, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
 	        		}	 
-	        	} else if("groups".equals(requestMode)) {
-	        		if(subRequestMode != null) {
-	        			if("create".equals(subRequestMode)) {
+	        	} else if ("groups".equals(requestMode)) {
+	        		if (subRequestMode != null) {
+	        			if ("create".equals(subRequestMode)) {
 	        				String name = params.get("name");
-	        				if(Utils.isGroupNameValid(name)) {		        					
+	        				if (Utils.isGroupNameValid(name)) {		        					
 		        				
 		        				String color = params.get("color");
 		        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
 		        				boolean is_public = ("1".equals(params.get("public")));
 		        				
 		        				int uid = 0;
-		        				if(app.getStorage() instanceof FileStorage) {
+		        				if (app.getStorage() instanceof FileStorage) {
 		        					uid = ((FileStorage) app.getStorage()).getHighestEventGroupId() + 1;
 		        				}
 		        				
 		        				EventGroup group = new EventGroup(uid, name, color, ownerId, is_public);
 		        				app.getStorage().saveEventGroup(group);
 		        				
-		        				if(app.getStorage() instanceof FileStorage) {
+		        				if (app.getStorage() instanceof FileStorage) {
 		        					((FileStorage) app.getStorage()).saveEventGroups();
 		        				}
 		        				
@@ -252,8 +399,7 @@ public class WebServer extends NanoHTTPD {
 	        				// nie ma takiego zapytania dla grup
 	        			}
 	        		} else {
-	        			// wyœwietl listê grup u¿ytkownika
-	        			int sessionUserId = (userSession != null) ? userSession.getUser().getId() : 1;	        			
+	        			// wyœwietl listê grup u¿ytkownika      			
 	        			List<EventGroup> groups = app.getStorage().searchEventsGroups("" + sessionUserId, "owner_id");
 	        			Type t = new TypeToken<List<EventGroup>>(){}.getType();
 	        			String json = app.getGson().toJson(groups, t);
@@ -262,31 +408,31 @@ public class WebServer extends NanoHTTPD {
 		        } else {
 		        	// nie ma takiego zapytania
 		        }
-        	} else if(uri.startsWith("/dashboard")) {
+        	} else if (uri.startsWith("/dashboard")) {
         		String username = "user"; //userSession.getUser().getName();
-        		int admin_level = 1;
+        		int adminLevel = 1;
         		HtmlTemplate dashboardTemplate = HtmlTemplate.loadFromResource("dashboard.html@" + username); // mo¿liwoœæ cache'owania dla poszczegolnych uzytkownikow
         		dashboardTemplate.putYieldVar("current_username", username);
-        		if(admin_level > 0) {
-        			dashboardTemplate.putYieldVar("is_admin", "" + admin_level);
+        		if (adminLevel > 0) {
+        			dashboardTemplate.putYieldVar("is_admin", "" + adminLevel);
         		}
         		
         		
     			return newFixedLengthResponse(dashboardTemplate.render());
-        	} else if(uri.startsWith("/login")) {
+        	} else if (uri.startsWith("/login")) {
         		
-        		if(userSession != null) {
+        		if (userSession != null) {
         			return doRedirect("dashboard");
         		}
         		
         		// logowanie
-        		if(httpSession.getMethod().equals(Method.POST)) {        			
+        		if (httpSession.getMethod().equals(Method.POST)) {        			
         			String username = httpSession.getParms().get("username");
         			String password = httpSession.getParms().get("password");
         			
         			User user = app.getStorage().loadUser(username);
-        			if(user != null) {
-        				if(user.isPasswordCorrect(password)) {
+        			if (user != null) {
+        				if (user.isPasswordCorrect(password)) {
         					Session userAuthSession = sessionController.createSession(user, clientIp);
         					httpSession.getCookies().set(Const.COOKIE_SESSION_KEY, userAuthSession.getKey(), Const.COOKIE_SESSION_LIFETIME);
         					
@@ -302,31 +448,31 @@ public class WebServer extends NanoHTTPD {
         			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("login.html");        			
         			return newFixedLengthResponse(loginTemplate.render());
         		}
-        	} else if(uri.startsWith("/register")) {
-        		if(userSession != null) {
+        	} else if (uri.startsWith("/register")) {
+        		if (userSession != null) {
         			return doRedirect("dashboard");
         		}
         		
         		// rejestracja
         		
-        		if(httpSession.getMethod().equals(Method.POST)) {
+        		if (httpSession.getMethod().equals(Method.POST)) {
         			// sprawdzenie danych
         			String username = httpSession.getParms().get("username");
         			String password = httpSession.getParms().get("password");
         			String email = httpSession.getParms().get("email");
         			
-        			if(username != null && password != null && email != null) {
-        				if(Utils.isUsernameValid(username)) {       					
+        			if (username != null && password != null && email != null) {
+        				if (Utils.isUsernameValid(username)) {       					
 	        				
 	        				int uid = 0;
-	        				if(app.getStorage() instanceof FileStorage) {
+	        				if (app.getStorage() instanceof FileStorage) {
 	        					uid = ((FileStorage) app.getStorage()).getHighestUserId() + 1;
 	        				}
 	        				
 	        				User user = new User(uid, username, password, email, 0);
 	        				app.getStorage().storeUser(user);
 	        				
-	        				if(app.getStorage() instanceof FileStorage) {
+	        				if (app.getStorage() instanceof FileStorage) {
 	        					((FileStorage) app.getStorage()).saveUsers();
 	        				}
 
@@ -342,17 +488,17 @@ public class WebServer extends NanoHTTPD {
         			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("register.html");        			
         			return newFixedLengthResponse(loginTemplate.render());
         		}
-        	} else if(uri.equals("/") || uri.contains("index.")) {
+        	} else if (uri.equals("/") || uri.contains("index.")) {
     			HtmlTemplate loginTemplate = HtmlTemplate.loadFromResource("index.html");        			
     			return newFixedLengthResponse(loginTemplate.render());
     		} else {
         		
-        		String resource_path = (www_root_dir + uri).trim();
+        		String resourcePath = (wwwRootDir + uri).trim();
 
         		
-            	resource_path = resource_path.replaceAll("\\|\\/", SEPARATOR);
-            	resource_path = resource_path.substring(1);
-            	String ext = Utils.getExtension(resource_path);
+            	resourcePath = resourcePath.replaceAll("\\|\\/", filePathSeparator);
+            	resourcePath = resourcePath.substring(1);
+            	String ext = Utils.getExtension(resourcePath);
             	//Utils.log("extension: " + ext);
             	
             	HashMap<String, String> mimes = new HashMap<String, String>();
@@ -367,24 +513,24 @@ public class WebServer extends NanoHTTPD {
 
             	//Utils.log("resource_path: " + resource_path);
             	
-            	URL resourceURL = getClass().getClassLoader().getResource(resource_path);
-        		if(Const.LOAD_FROM_DISK) {
+            	URL resourceURL = getClass().getClassLoader().getResource(resourcePath);
+        		if (Const.LOAD_FROM_DISK) {
         			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
         			File directory = new File(location.getFile());
         			Utils.log(directory.getAbsolutePath());
         			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
         			
-        			resourceURL = new File(www_directory, resource_path).toURI().toURL();
+        			resourceURL = new File(www_directory, resourcePath).toURI().toURL();
         		}
             	
         		File resourceFile = new File(resourceURL.getFile());
-            	if(resourceURL != null && resourceFile.exists()) {
+            	if (resourceURL != null && resourceFile.exists()) {
                 	InputStream is = resourceURL.openStream();
                 	return newChunkedResponse(Response.Status.OK, mime, is);
             	}
         	}
 
-    	} catch(Exception e) {
+    	} catch (Exception e) {
     		e.printStackTrace();
     	}
 

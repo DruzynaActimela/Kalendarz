@@ -9,15 +9,28 @@ import java.util.Enumeration;
 import com.actimel.utils.HtmlTemplate;
 import com.actimel.utils.Utils;
 
-public class Starter {
+/**
+ * Klasa startuj¹ca aplikacjê.
+ * @author ActimelTeam
+ *
+ */
+public final class Starter {
 	
-	public static void main(String[] args) {
+	/**
+	 * Punkt wejœciowy do aplikacji.
+	 * @param args Lista argumentów wejœciowych
+	 */
+	public static void main(final String[] args) {
 		new Starter(args);
 	}
 	
-	public Starter(String[] args) {
+	/**
+	 * Konstruktor klasy startuj¹cej.
+	 * @param args Lista argumentów
+	 */
+	private Starter(final String[] args) {
 		URL res = Starter.class.getClassLoader().getResource(File.separator);
-		if(res != null) {
+		if (res != null) {
 			try {
 	            final File apps = new File(res.toURI());
 	            for (File app : apps.listFiles()) {
@@ -30,7 +43,8 @@ public class Starter {
 			Utils.log("Something went wrong");
 		}
 	
-		HtmlTemplate index = HtmlTemplate.loadFromResource("dashboard.html", false);
+		HtmlTemplate 
+		index = HtmlTemplate.loadFromResource("dashboard.html", false);
 		Utils.log("-- render -- ");
 		index.putYieldVar("current_username", "test");
 		//index.putYieldVar("zmienna", "wartosc zmiennej");
@@ -44,7 +58,7 @@ public class Starter {
 		
 		try {
 			CalendarApp app = new CalendarApp();
-			if(app.getStorage() instanceof FileStorage) {
+			if (app.getStorage() instanceof FileStorage) {
 				Utils.log("Highest Event Id: " + ((FileStorage) app.getStorage()).getHighestEventId());
 			}
 		} catch (Exception e) {
