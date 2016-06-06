@@ -190,8 +190,9 @@ public class HtmlTemplate {
 			return;
 		}
 		
-		content = Utils.readFile(template);
-		content = parse(content);
+		setTemplateContent(Utils.readFile(template));
+		setTemplateContent(parse(content));
+		
 		parsed = true;
 	}
 	
@@ -374,7 +375,7 @@ public class HtmlTemplate {
 	 * @return Przeparsowana tresc HTML
 	 */
 	private String replaceVars(final String rawContent, final HashMap<String, String> vars) {
-		String tmpContent = "";
+		String tmpContent = rawContent;
 		for (Entry<String, String> entry : vars.entrySet()) {
 			String variableName = entry.getKey();
 			String variableValue = entry.getValue();
@@ -382,7 +383,7 @@ public class HtmlTemplate {
 			
 			String yieldVar = yieldVarPrefix + variableName + yieldVarSuffix;
 			
-			tmpContent = rawContent.replaceAll(yieldVar, Matcher.quoteReplacement(variableValue));
+			tmpContent = tmpContent.replaceAll(yieldVar, Matcher.quoteReplacement(variableValue));
 		}
 		return tmpContent;
 	}
@@ -411,4 +412,8 @@ public class HtmlTemplate {
 		return render.trim();
 	}
 
+	
+	private void setTemplateContent(String c) {
+		content = c;
+	}
 }

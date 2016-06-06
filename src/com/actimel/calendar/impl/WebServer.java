@@ -363,8 +363,14 @@ public class WebServer extends NanoHTTPD {
 		        		long tEnd = Long.valueOf(end) * multiplyEnd;
 		        		
 		        		
+		        		Utils.log("start: " + tStart);
+		        		Utils.log("end: " + tEnd);
+		        		
+		        		Utils.log("userID: " + sessionUserId);
+		        		
 	        			        			
 	        			List<CalendarEvent> events = app.getStorage().searchEventsBetween(tStart, tEnd, sessionUserId);
+	        			Utils.log("foundCount: " + events.size());
 	        			Type t = new TypeToken<List<CalendarEvent>>(){}.getType();
 	        			String json = app.getGson().toJson(events, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
@@ -400,7 +406,7 @@ public class WebServer extends NanoHTTPD {
 	        			}
 	        		} else {
 	        			// wyœwietl listê grup u¿ytkownika      			
-	        			List<EventGroup> groups = app.getStorage().searchEventsGroups("" + sessionUserId, "owner_id");
+	        			List<EventGroup> groups = app.getStorage().searchEventsGroups("" + sessionUserId, "ownerId");
 	        			Type t = new TypeToken<List<EventGroup>>(){}.getType();
 	        			String json = app.getGson().toJson(groups, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
@@ -416,7 +422,6 @@ public class WebServer extends NanoHTTPD {
         		if (adminLevel > 0) {
         			dashboardTemplate.putYieldVar("is_admin", "" + adminLevel);
         		}
-        		
         		
     			return newFixedLengthResponse(dashboardTemplate.render());
         	} else if (uri.startsWith("/login")) {

@@ -33,12 +33,12 @@ public class FileStorage implements StorageIntf {
 	private File usersStorageFile;
 	
 	/**
-	 * Referencja do pliku z grupami zdarze≈Ñ.
+	 * Referencja do pliku z grupami zdarzeÒ.
 	 */
 	private File eventsGroupsStorageFile;
 	
 	/**
-	 * Najwy≈ºsze ID u≈ºytkownika.
+	 * Najwyøsze ID uøytkownika.
 	 */
 	private int highestUserId = 0;
 	
@@ -48,7 +48,7 @@ public class FileStorage implements StorageIntf {
 	private int highestEventId = 0;
 	
 	/**
-	 * Najwy≈ºsze ID grupy zdarze≈Ñ.
+	 * Najwyøsze ID grupy zdarzeÒ.
 	 */
 	private int highestEventGroupId = 0;
 	
@@ -58,18 +58,18 @@ public class FileStorage implements StorageIntf {
 	private CalendarApp app;
 	
 	/**
-	 * Cache u≈ºytkownik√≥w w systemie.
+	 * Cache uøytkownikÛw w systemie.
 	 */
 	private HashMap<String, User> cachedUsers = new HashMap<String, User>();
 	
 	/**
-	 * Cache zdarze≈Ñ w systemie.
+	 * Cache zdarzeÒ w systemie.
 	 */
 	private HashMap<Integer, CalendarEvent> 
 	cachedEvents = new HashMap<Integer, CalendarEvent>();
 	
 	/**
-	 * Cache grup zdarze≈Ñ w systemie.
+	 * Cache grup zdarzeÒ w systemie.
 	 */
 	private HashMap<Integer, EventGroup> 
 	cachedEventGroups = new HashMap<Integer, EventGroup>();
@@ -101,7 +101,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie zdarze≈Ñ do cache.
+	 * Metoda odpowiedzialna za za≥adowanie zdarzeÒ do cache.
 	 */
 	public final void preloadEvents() {
 		Type t = new TypeToken<HashMap<Integer, CalendarEvent>>() { }.getType();
@@ -120,24 +120,24 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID u≈ºytkownika.
-	 * @return Najwy≈ºsze ID u≈ºytkownika
+	 * Getter najwyøszego ID uøytkownika.
+	 * @return Najwyøsze ID uøytkownika
 	 */
 	public final int getHighestUserId() {
 		return highestUserId;
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID zdarzenia.
-	 * @return Najwy≈ºsze ID zdarzenia
+	 * Getter najwyøszego ID zdarzenia.
+	 * @return Najwyøsze ID zdarzenia
 	 */
 	public final int getHighestEventId() {
 		return highestEventId;
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID grupy zdarze≈Ñ.
-	 * @return Najwy≈ºsze ID grupy zdarze≈Ñ
+	 * Getter najwyøszego ID grupy zdarzeÒ.
+	 * @return Najwyøsze ID grupy zdarzeÒ
 	 */
 	public final int getHighestEventGroupId() {
 		return highestEventGroupId;
@@ -145,7 +145,7 @@ public class FileStorage implements StorageIntf {
 	
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie u≈ºytkownik√≥w do cache.
+	 * Metoda odpowiedzialna za za≥adowanie uøytkownikÛw do cache.
 	 */
 	public final void preloadUsers() {
 		Type t = new TypeToken<HashMap<String, User>>() { }.getType();
@@ -170,11 +170,11 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie u≈ºytkownika, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
-	 * @param username Nazwa u≈ºytkownika
-	 * @param noCache Czy pominƒÖc cache?
-	 * @return Obiekt u≈ºytkownika
+	 * Metoda odpowiedzialna za za≥adowanie uøytkownika, 
+	 * z moøliwoúciπ pominiƒôcia cache.
+	 * @param username Nazwa uøytkownika
+	 * @param noCache Czy pominπc cache?
+	 * @return Obiekt uøytkownika
 	 */
 	public final User loadUser(final String username, final boolean noCache) {
 		if (noCache) {
@@ -195,7 +195,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za zapisanie wszystkich u≈ºytkownik√≥w.
+	 * Metoda odpowiedzialna za zapisanie wszystkich uøytkownikÛw.
 	 */
 	public final void saveUsers() {
 		Type t = new TypeToken<HashMap<String, User>>() { }.getType();
@@ -212,8 +212,8 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie zdarzenia, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
+	 * Metoda odpowiedzialna za za≥adowanie zdarzenia, 
+	 * z moøliwoúciπ pominiƒôcia cache.
 	 * @param eventId ID zdarzenia
 	 * @param noCache Czy pominac cache?
 	 * @return Obiekt zdarzenia
@@ -247,7 +247,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za zapisanie zdarze≈Ñ.
+	 * Metoda odpowiedzialna za zapisanie zdarzeÒ.
 	 */
 	public final void saveEvents() {
 		Type t = new TypeToken<HashMap<Integer, CalendarEvent>>() { }.getType();
@@ -288,11 +288,11 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie grupy zdarze≈Ñ, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
-	 * @param eventGroupId ID grupy zdarze≈Ñ
+	 * Metoda odpowiedzialna za za≥adowanie grupy zdarzeÒ, 
+	 * z moøliwoúciπ pominiƒôcia cache.
+	 * @param eventGroupId ID grupy zdarzeÒ
 	 * @param noCache Czy pominac cache?
-	 * @return Obiekt grupy zdarze≈Ñ
+	 * @return Obiekt grupy zdarzeÒ
 	 */
 	public final EventGroup 
 	loadEventGroup(final int eventGroupId, final boolean noCache) {
@@ -307,7 +307,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie grup event√≥w do cache.
+	 * Metoda odpowiedzialna za za≥adowanie grup eventÛw do cache.
 	 */
 	public final  void preloadEventGroups() {
 		Type t = new TypeToken<HashMap<Integer, EventGroup>>() { }.getType();
@@ -358,7 +358,7 @@ public class FileStorage implements StorageIntf {
 	}
 
 	/**
-	 * Metoda odpowiedzialna za zapisanie grup zdarze≈Ñ.
+	 * Metoda odpowiedzialna za zapisanie grup zdarzeÒ.
 	 */
 	public final void saveEventGroups() {
 		Type t = new TypeToken<HashMap<Integer, EventGroup>>() { }.getType();
@@ -375,6 +375,8 @@ public class FileStorage implements StorageIntf {
 		if (timestamp_start == 0 || timestamp_end == 0) {
 			return result;
 		}
+		
+		Utils.log("Searching...");
 		
 		for (Entry<Integer, CalendarEvent> eg : cachedEvents.entrySet()) {
 			CalendarEvent evt = eg.getValue();

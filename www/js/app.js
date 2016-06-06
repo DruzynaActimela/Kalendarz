@@ -84,34 +84,37 @@ var app = {
 
 	init: function() {
         app.parseArgs();
-		app.displayUserGroups();
-        app.updateUI();
+        app.getUserGroups(function() {
+            app.displayUserGroups();
+            app.updateUI();
 
-        app.registerScreenShowEvent("export-ical", function(screen) {
-            screen.find(".bind-datepicker").datetimepicker({
-                controlType: 'select',
-                oneLine: true,
-                dateFormat: "dd-mm-yy",
-                timeFormat:  "HH:mm",
-                firstDay: 1
+            app.registerScreenShowEvent("export-ical", function(screen) {
+                screen.find(".bind-datepicker").datetimepicker({
+                    controlType: 'select',
+                    oneLine: true,
+                    dateFormat: "dd-mm-yy",
+                    timeFormat:  "HH:mm",
+                    firstDay: 1
+                });
             });
+            app.registerScreenShowEvent("calendar", function(screen) {
+                if(calendarRef) {
+                    calendarRef.fullCalendar("refetchEvents");
+                }
+            });
+
+
+            setTimeout(function() {
+                initialize_calendar();
+                app.updateUI();
+
+
+                if(app.hasArg("screen")) {
+                    app.setCurrentScreen(app.getArg("screen"));
+                }
+            }, 1);
         });
-        app.registerScreenShowEvent("calendar", function(screen) {
-            if(calendarRef) {
-                calendarRef.fullCalendar("refetchEvents");
-            }
-        });
 
-
-        setTimeout(function() {
-            initialize_calendar();
-    		app.updateUI();
-
-
-            if(app.hasArg("screen")) {
-                app.setCurrentScreen(app.getArg("screen"));
-            }
-        }, 1);
 	},
 	updateUI: function() {
         var content = $(".center-content");
