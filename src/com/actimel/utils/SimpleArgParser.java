@@ -12,11 +12,14 @@ public class SimpleArgParser {
 	
 	/**
 	 * Surowe argumenty.
+	 * @uml.property  name="rawArgs" multiplicity="(0 -1)" dimension="1"
 	 */
 	private String[] rawArgs;
 	
 	/**
 	 * Przeparsowane argumenty.
+	 * @uml.property  name="parsedArgs"
+	 * @uml.associationEnd  qualifier="key:java.lang.String java.lang.String"
 	 */
 	private HashMap<String, String> parsedArgs = new HashMap<String, String>();
 	

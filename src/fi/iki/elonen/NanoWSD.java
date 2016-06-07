@@ -54,28 +54,70 @@ import fi.iki.elonen.NanoWSD.WebSocketFrame.OpCode;
 
 public abstract class NanoWSD extends NanoHTTPD {
 
+    /**
+	 * @author   4i60r
+	 */
     public static enum State {
+        /**
+		 * @uml.property  name="uNCONNECTED"
+		 * @uml.associationEnd  
+		 */
         UNCONNECTED,
+        /**
+		 * @uml.property  name="cONNECTING"
+		 * @uml.associationEnd  
+		 */
         CONNECTING,
+        /**
+		 * @uml.property  name="oPEN"
+		 * @uml.associationEnd  
+		 */
         OPEN,
+        /**
+		 * @uml.property  name="cLOSING"
+		 * @uml.associationEnd  
+		 */
         CLOSING,
+        /**
+		 * @uml.property  name="cLOSED"
+		 * @uml.associationEnd  
+		 */
         CLOSED
     }
 
+    /**
+	 * @author  4i60r
+	 */
     public static abstract class WebSocket {
 
         private final InputStream in;
 
         private OutputStream out;
 
+        /**
+		 * @uml.property  name="continuousOpCode"
+		 * @uml.associationEnd  
+		 */
         private WebSocketFrame.OpCode continuousOpCode = null;
 
         private final List<WebSocketFrame> continuousFrames = new LinkedList<WebSocketFrame>();
 
+        /**
+		 * @uml.property  name="state"
+		 * @uml.associationEnd  
+		 */
         private State state = State.UNCONNECTED;
 
+        /**
+		 * @uml.property  name="handshakeRequest"
+		 * @uml.associationEnd  
+		 */
         private final NanoHTTPD.IHTTPSession handshakeRequest;
 
+        /**
+		 * @uml.property  name="handshakeResponse"
+		 * @uml.associationEnd  
+		 */
         private final NanoHTTPD.Response handshakeResponse = new NanoHTTPD.Response(NanoHTTPD.Response.Status.SWITCH_PROTOCOL, null, (InputStream) null, 0) {
 
             @Override
@@ -164,10 +206,18 @@ public abstract class NanoWSD extends NanoHTTPD {
 
         // --------------------------------IO--------------------------------------
 
+        /**
+		 * @return
+		 * @uml.property  name="handshakeRequest"
+		 */
         public NanoHTTPD.IHTTPSession getHandshakeRequest() {
             return this.handshakeRequest;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="handshakeResponse"
+		 */
         public NanoHTTPD.Response getHandshakeResponse() {
             return this.handshakeResponse;
         }
@@ -275,12 +325,22 @@ public abstract class NanoWSD extends NanoHTTPD {
         }
     }
 
+    /**
+	 * @author  4i60r
+	 */
     public static class WebSocketException extends IOException {
 
         private static final long serialVersionUID = 1L;
 
+        /**
+		 * @uml.property  name="code"
+		 * @uml.associationEnd  
+		 */
         private final CloseCode code;
 
+        /**
+		 * @uml.property  name="reason"
+		 */
         private final String reason;
 
         public WebSocketException(CloseCode code, String reason) {
@@ -297,29 +357,91 @@ public abstract class NanoWSD extends NanoHTTPD {
             this(CloseCode.InternalServerError, cause.toString(), cause);
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="code"
+		 */
         public CloseCode getCode() {
             return this.code;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="reason"
+		 */
         public String getReason() {
             return this.reason;
         }
     }
 
+    /**
+	 * @author  4i60r
+	 */
     public static class WebSocketFrame {
 
+        /**
+		 * @author   4i60r
+		 */
         public static enum CloseCode {
+            /**
+			 * @uml.property  name="normalClosure"
+			 * @uml.associationEnd  
+			 */
             NormalClosure(1000),
+            /**
+			 * @uml.property  name="goingAway"
+			 * @uml.associationEnd  
+			 */
             GoingAway(1001),
+            /**
+			 * @uml.property  name="protocolError"
+			 * @uml.associationEnd  
+			 */
             ProtocolError(1002),
+            /**
+			 * @uml.property  name="unsupportedData"
+			 * @uml.associationEnd  
+			 */
             UnsupportedData(1003),
+            /**
+			 * @uml.property  name="noStatusRcvd"
+			 * @uml.associationEnd  
+			 */
             NoStatusRcvd(1005),
+            /**
+			 * @uml.property  name="abnormalClosure"
+			 * @uml.associationEnd  
+			 */
             AbnormalClosure(1006),
+            /**
+			 * @uml.property  name="invalidFramePayloadData"
+			 * @uml.associationEnd  
+			 */
             InvalidFramePayloadData(1007),
+            /**
+			 * @uml.property  name="policyViolation"
+			 * @uml.associationEnd  
+			 */
             PolicyViolation(1008),
+            /**
+			 * @uml.property  name="messageTooBig"
+			 * @uml.associationEnd  
+			 */
             MessageTooBig(1009),
+            /**
+			 * @uml.property  name="mandatoryExt"
+			 * @uml.associationEnd  
+			 */
             MandatoryExt(1010),
+            /**
+			 * @uml.property  name="internalServerError"
+			 * @uml.associationEnd  
+			 */
             InternalServerError(1011),
+            /**
+			 * @uml.property  name="tLSHandshake"
+			 * @uml.associationEnd  
+			 */
             TLSHandshake(1015);
 
             public static CloseCode find(int value) {
@@ -342,6 +464,9 @@ public abstract class NanoWSD extends NanoHTTPD {
             }
         }
 
+        /**
+		 * @author  4i60r
+		 */
         public static class CloseFrame extends WebSocketFrame {
 
             private static byte[] generatePayload(CloseCode code, String closeReason) throws CharacterCodingException {
@@ -357,6 +482,10 @@ public abstract class NanoWSD extends NanoHTTPD {
                 }
             }
 
+            /**
+			 * @uml.property  name="_closeCode"
+			 * @uml.associationEnd  
+			 */
             private CloseCode _closeCode;
 
             private String _closeReason;
@@ -383,12 +512,39 @@ public abstract class NanoWSD extends NanoHTTPD {
             }
         }
 
+        /**
+		 * @author   4i60r
+		 */
         public static enum OpCode {
+            /**
+			 * @uml.property  name="continuation"
+			 * @uml.associationEnd  
+			 */
             Continuation(0),
+            /**
+			 * @uml.property  name="text"
+			 * @uml.associationEnd  
+			 */
             Text(1),
+            /**
+			 * @uml.property  name="binary"
+			 * @uml.associationEnd  
+			 */
             Binary(2),
+            /**
+			 * @uml.property  name="close"
+			 * @uml.associationEnd  
+			 */
             Close(8),
+            /**
+			 * @uml.property  name="ping"
+			 * @uml.associationEnd  
+			 */
             Ping(9),
+            /**
+			 * @uml.property  name="pong"
+			 * @uml.associationEnd  
+			 */
             Pong(10);
 
             public static OpCode find(byte value) {
@@ -459,10 +615,20 @@ public abstract class NanoWSD extends NanoHTTPD {
             return payload.getBytes(WebSocketFrame.TEXT_CHARSET);
         }
 
+        /**
+		 * @uml.property  name="opCode"
+		 * @uml.associationEnd  
+		 */
         private OpCode opCode;
 
+        /**
+		 * @uml.property  name="fin"
+		 */
         private boolean fin;
 
+        /**
+		 * @uml.property  name="maskingKey"
+		 */
         private byte[] maskingKey;
 
         private byte[] payload;
@@ -530,10 +696,18 @@ public abstract class NanoWSD extends NanoHTTPD {
             return this.payload;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="maskingKey"
+		 */
         public byte[] getMaskingKey() {
             return this.maskingKey;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="opCode"
+		 */
         public OpCode getOpCode() {
             return this.opCode;
         }
@@ -551,6 +725,10 @@ public abstract class NanoWSD extends NanoHTTPD {
             return this._payloadString;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="fin"
+		 */
         public boolean isFin() {
             return this.fin;
         }
@@ -654,10 +832,18 @@ public abstract class NanoWSD extends NanoHTTPD {
             this._payloadString = null;
         }
 
+        /**
+		 * @param fin
+		 * @uml.property  name="fin"
+		 */
         public void setFin(boolean fin) {
             this.fin = fin;
         }
 
+        /**
+		 * @param maskingKey
+		 * @uml.property  name="maskingKey"
+		 */
         public void setMaskingKey(byte[] maskingKey) {
             if (maskingKey != null && maskingKey.length != 4) {
                 throw new IllegalArgumentException("MaskingKey " + Arrays.toString(maskingKey) + " hasn't length 4");
@@ -665,6 +851,10 @@ public abstract class NanoWSD extends NanoHTTPD {
             this.maskingKey = maskingKey;
         }
 
+        /**
+		 * @param opcode
+		 * @uml.property  name="opCode"
+		 */
         public void setOpCode(OpCode opcode) {
             this.opCode = opcode;
         }

@@ -40,23 +40,30 @@ public class WebServer extends NanoHTTPD {
 	
 	/**
 	 * Obiekt aplikacji kalendarza do ³atwego dostêpu przy obs³udze zapytañ.
+	 * @uml.property  name="app"
+	 * @uml.associationEnd  multiplicity="(1 1)" inverse="webServer:com.actimel.calendar.CalendarApp"
 	 */
 	private final CalendarApp app;
 	
 	/**
 	 * Obiekt kontrolera odpowiedzialnego za obs³ugê sesji u¿ytkowników.
+	 * @uml.property  name="sessionController"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private final SessionController sessionController;
 	
 	/**
 	 * Obiekt kontrolera odpowiedzialnego za obs³ugê plików.
+	 * @uml.property  name="fileController"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private FileController fileController = null;
 
 	
 	/**
-	 * Lista folderów, które nie s¹ brane pod uwagê 
-	 * przy sprawdzaniu stanu zalogowania u¿ytkownia.
+	 * Lista folderów, które nie s¹ brane pod uwagê  przy sprawdzaniu stanu zalogowania u¿ytkownia.
+	 * @uml.property  name="excludeFoldersFromLoginCheck"
+	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
 	 */
 	private final List<String> excludeFoldersFromLoginCheck = Arrays.asList(
 			"js",
@@ -67,8 +74,8 @@ public class WebServer extends NanoHTTPD {
 	);
 	
 	/**
-	 * Lista œcie¿ek, na które mog¹ 
-	 * siê zaczynac lokalizacje przy pobieraniu.
+	 * Lista œcie¿ek, na które mog¹  siê zaczynac lokalizacje przy pobieraniu.
+	 * @uml.property  name="allowedDownloadLocations"
 	 */
 	private final List<String> allowedDownloadLocations = Arrays.asList(
 			"file_storage/"
@@ -76,6 +83,8 @@ public class WebServer extends NanoHTTPD {
 	
 	/**
 	 * Lista stron (dróg), które s¹ dostêpne bez zalogowania.
+	 * @uml.property  name="allowedRoutesWithoutLogin"
+	 * @uml.associationEnd  multiplicity="(0 -1)" elementType="java.lang.String"
 	 */
 	private final List<String> allowedRoutesWithoutLogin = Arrays.asList(
 			"login",

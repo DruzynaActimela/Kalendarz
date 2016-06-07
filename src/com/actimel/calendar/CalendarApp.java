@@ -22,16 +22,22 @@ public class CalendarApp {
 	
 	/**
 	 * Obiekt GSON, odpowiedzialny za serializacjê danych do/z formatu JSON.
+	 * @uml.property  name="gson"
+	 * @uml.associationEnd  
 	 */
 	private final Gson gson;
 	
 	/**
 	 * Obiekt serwera WWW.
+	 * @uml.property  name="webServer"
+	 * @uml.associationEnd  inverse="app:com.actimel.calendar.impl.WebServer"
 	 */
 	private final WebServer webServer;
 	
 	/**
 	 * Obiekt storage odpowiedzialny za I/O danych.
+	 * @uml.property  name="storage"
+	 * @uml.associationEnd  
 	 */
 	private final StorageIntf storage;
 
@@ -78,7 +84,8 @@ public class CalendarApp {
 	
 	/**
 	 * Metoda s³u¿¹ca do pobierania obiektu GSON.
-	 * @return obiekt GSON
+	 * @return  obiekt GSON
+	 * @uml.property  name="gson"
 	 */
 	public final Gson getGson() {
 		return gson;
@@ -86,7 +93,8 @@ public class CalendarApp {
 	
 	/**
 	 * Metoda s³u¿¹ca do pobrania obiektu Storage.
-	 * @return obiekt storage
+	 * @return  obiekt storage
+	 * @uml.property  name="storage"
 	 */
 	public final StorageIntf getStorage() {
 		return storage;

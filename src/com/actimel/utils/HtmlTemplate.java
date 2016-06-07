@@ -24,24 +24,26 @@ public class HtmlTemplate {
 	private static HashMap<String, HtmlTemplate> templateCache = new HashMap<String, HtmlTemplate>();
 	
 	/**
-	 * Wartosc okreœlaj¹ca prefix zmiennej, 
-	 * która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * Wartosc okreœlaj¹ca prefix zmiennej,  która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * @uml.property  name="yieldVarPrefix"
 	 */	
 	private final String yieldVarPrefix = "__YIELD_START__";
 	
 	/**
-	 * Wartosc okreœlaj¹ca suffix zmiennej, 
-	 * która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * Wartosc okreœlaj¹ca suffix zmiennej,  która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * @uml.property  name="yieldVarSuffix"
 	 */	
 	private final String yieldVarSuffix = "__YIELD_END__";
 	
 	/**
 	 * Zmienna przechowuj¹ca plik, z którego pobrana jest zawartosc HTML.
+	 * @uml.property  name="template"
 	 */
 	private File template;
 	
 	/**
 	 * Wyra¿enie regularne, które wyszukuje dyrektyw templatek.
+	 * @uml.property  name="tVarRegex"
 	 */
 	private final Pattern tVarRegex = Pattern.compile("@([a-zA-Z0-9]+)(\\([\\'](.*?[^,])[\\'](,\\s?[\\'](.*?)[\\'])?\\))?",
 												Pattern.CASE_INSENSITIVE
@@ -49,23 +51,28 @@ public class HtmlTemplate {
 	// non-Java: @([a-zA-Z0-9]+)(\([\'](.*?[^,])[\'](,\s?[\'](.*?)[\'])?\))?
 	
 	/**
-	 * Zmienna przechowuj¹ca wartosci, 
-	 * na które zostan¹ zamienione odpowiadaj¹ce im klucze.
+	 * Zmienna przechowuj¹ca wartosci,  na które zostan¹ zamienione odpowiadaj¹ce im klucze.
+	 * @uml.property  name="variablesToReplace"
+	 * @uml.associationEnd  qualifier="name:java.lang.String java.lang.String"
 	 */
 	private final HashMap<String, String> variablesToReplace = new HashMap<String, String>(); // varName => defaultValue
 	
 	/**
 	 * Zawartosc HTML templatki.
+	 * @uml.property  name="content"
 	 */
 	private String content;
 	
 	/**
 	 * Templatka nadrzêdna do aktualnej (master).
+	 * @uml.property  name="masterTemplate"
+	 * @uml.associationEnd  
 	 */
 	private HtmlTemplate masterTemplate = null;
 	
 	/**
 	 * Zmienna okreœlaj¹ca, czy templatka zosta³a ju¿ przeparsowana.
+	 * @uml.property  name="parsed"
 	 */
 	private boolean parsed = false;
 	

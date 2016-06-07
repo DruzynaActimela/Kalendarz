@@ -17,11 +17,15 @@ public class JsonResponseBuilder {
 	
 	/**
 	 * Referencja do aplikacji kalendarza.
+	 * @uml.property  name="app"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private CalendarApp app;
 	
 	/**
 	 * Lista parametrów.
+	 * @uml.property  name="params"
+	 * @uml.associationEnd  qualifier="key:java.lang.String java.lang.String"
 	 */
 	private HashMap<String, String> params = new HashMap<String, String>();
 	

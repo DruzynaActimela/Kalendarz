@@ -15,11 +15,13 @@ public abstract class CalendarExporter {
 	
 	/**
 	 * Lista zdarzeñ do wyeksportowania.
+	 * @uml.property  name="events"
 	 */
 	private final List<CalendarEvent> events;
 	
 	/**
 	 * Domyœlna strefa czasowa.
+	 * @uml.property  name="defaultTimezone"
 	 */
 	private final 
 	TimeZone defaultTimezone = TimeZone.getTimeZone("Europe/Warsaw");
@@ -50,7 +52,8 @@ public abstract class CalendarExporter {
 	
 	/**
 	 * Funkcja umo¿liwiaj¹ca pobranie domyœlnej strefy czasowej dla zdarzeñ.
-	 * @return Obiekt domyœlnej strefy czasowej
+	 * @return  Obiekt domyœlnej strefy czasowej
+	 * @uml.property  name="defaultTimezone"
 	 */
 	public final TimeZone getDefaultTimezone() {
 		return defaultTimezone;

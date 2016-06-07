@@ -23,11 +23,13 @@ public class FileController {
 	
 	/**
 	 * Obiekt foldera, w którym bêd¹ przechowywane pliki.
+	 * @uml.property  name="store"
 	 */
 	private File store;
 	
 	/**
 	 * Suffix nazwy pliku przechowywanego w store.
+	 * @uml.property  name="filenameSuffix"
 	 */
 	private String filenameSuffix = "";
 	

@@ -12,42 +12,50 @@ public class CalendarEvent {
 	
 	/**
 	 * ID zdarzenia.
+	 * @uml.property  name="id"
 	 */
 	@SerializedName("_id")
 	private int id;
 	
 	/**
 	 * Tytu³ zdarzenia.
+	 * @uml.property  name="title"
 	 */
 	private String title;
 	
 	/**
 	 * Timestamp rozpoczêcia zdarzenia.
+	 * @uml.property  name="start"
 	 */
 	private long start;
 	
 	/**
 	 * Timestamp zakoñczenia zdarzenia.
+	 * @uml.property  name="end"
 	 */
 	private long end;
 	
 	/**
 	 * Wartoœc okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
+	 * @uml.property  name="allday"
 	 */
 	private boolean allday;
 	
 	/**
 	 * Wartosc okreœlaj¹ca, czy zdarzenie jest publiczne.
+	 * @uml.property  name="isPublic"
 	 */
 	private boolean isPublic;
 	
 	/**
 	 * Zmienna przechowuj¹ca ID w³aœciciela zdarzenia.
+	 * @uml.property  name="ownerId"
 	 */
 	private int ownerId;
 	
 	/**
 	 * Zmienna przechowuj¹ca ID grupy, w której znajduje siê zdarzenie.
+	 * @uml.property  name="parentGroupId"
 	 */
 	private int parentGroupId;
 	
@@ -72,7 +80,8 @@ public class CalendarEvent {
 
 	/**
 	 * Getter ID zdarzenia.
-	 * @return ID zdarzenia
+	 * @return  ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final int getId() {
 		return id;
@@ -80,7 +89,8 @@ public class CalendarEvent {
 
 	/**
 	 * Setter ID zdarzenia.
-	 * @param newId Nowe ID zdarzenia
+	 * @param newId  Nowe ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final void setId(final int newId) {
 		this.id = newId;
@@ -151,7 +161,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Getter w³aœciwoœci: isPublic.
-	 * @return Czy zdarzenie jest publiczne
+	 * @return  Czy zdarzenie jest publiczne
+	 * @uml.property  name="isPublic"
 	 */
 	public final boolean isPublic() {
 		return isPublic;
@@ -166,7 +177,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca ustawienie w³aœciciela zdarzenia.
-	 * @param nid ID nowego w³aœciciela
+	 * @param nid  ID nowego w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final void setOwnerId(final int nid) {
 		ownerId = nid;
@@ -174,7 +186,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie ID w³aœciciela.
-	 * @return ID w³aœciciela
+	 * @return  ID w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final int getOwnerId() {
 		return ownerId;
@@ -182,7 +195,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca ustawienie grupy zdarzenia.
-	 * @param nid ID nowej grupy
+	 * @param nid  ID nowej grupy
+	 * @uml.property  name="parentGroupId"
 	 */
 	public final void setParentGroupId(final int nid) {
 		parentGroupId = nid;
@@ -190,7 +204,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie ID grupy zdarzenia.
-	 * @return ID grupy
+	 * @return  ID grupy
+	 * @uml.property  name="parentGroupId"
 	 */
 	public final int getParentGroupId() {
 		return parentGroupId;

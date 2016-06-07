@@ -24,52 +24,66 @@ public class FileStorage implements StorageIntf {
 	
 	/**
 	 * Referencja do pliku ze zdarzeniami.
+	 * @uml.property  name="eventsStorageFile"
 	 */
 	private File eventsStorageFile;
 	
 	/**
 	 * Referencja do pliku z uzytkownikami.
+	 * @uml.property  name="usersStorageFile"
 	 */
 	private File usersStorageFile;
 	
 	/**
 	 * Referencja do pliku z grupami zdarzeñ.
+	 * @uml.property  name="eventsGroupsStorageFile"
 	 */
 	private File eventsGroupsStorageFile;
 	
 	/**
 	 * Najwy¿sze ID u¿ytkownika.
+	 * @uml.property  name="highestUserId"
 	 */
 	private int highestUserId = 0;
 	
 	/**
 	 * Najwyzsze ID zdarzenia.
+	 * @uml.property  name="highestEventId"
 	 */
 	private int highestEventId = 0;
 	
 	/**
 	 * Najwy¿sze ID grupy zdarzeñ.
+	 * @uml.property  name="highestEventGroupId"
 	 */
 	private int highestEventGroupId = 0;
 	
 	/**
 	 * Referencja do instancji aplikacji kalendarza.
+	 * @uml.property  name="app"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private CalendarApp app;
 	
 	/**
 	 * Cache u¿ytkowników w systemie.
+	 * @uml.property  name="cachedUsers"
+	 * @uml.associationEnd  qualifier="getName:java.lang.String com.actimel.models.User"
 	 */
 	private HashMap<String, User> cachedUsers = new HashMap<String, User>();
 	
 	/**
 	 * Cache zdarzeñ w systemie.
+	 * @uml.property  name="cachedEvents"
+	 * @uml.associationEnd  qualifier="valueOf:java.lang.Integer com.actimel.models.CalendarEvent"
 	 */
 	private HashMap<Integer, CalendarEvent> 
 	cachedEvents = new HashMap<Integer, CalendarEvent>();
 	
 	/**
 	 * Cache grup zdarzeñ w systemie.
+	 * @uml.property  name="cachedEventGroups"
+	 * @uml.associationEnd  qualifier="valueOf:java.lang.Integer com.actimel.models.EventGroup"
 	 */
 	private HashMap<Integer, EventGroup> 
 	cachedEventGroups = new HashMap<Integer, EventGroup>();
@@ -127,7 +141,8 @@ public class FileStorage implements StorageIntf {
 	
 	/**
 	 * Getter najwy¿szego ID u¿ytkownika.
-	 * @return Najwy¿sze ID u¿ytkownika
+	 * @return  Najwy¿sze ID u¿ytkownika
+	 * @uml.property  name="highestUserId"
 	 */
 	public final int getHighestUserId() {
 		return highestUserId;
@@ -135,7 +150,8 @@ public class FileStorage implements StorageIntf {
 	
 	/**
 	 * Getter najwy¿szego ID zdarzenia.
-	 * @return Najwy¿sze ID zdarzenia
+	 * @return  Najwy¿sze ID zdarzenia
+	 * @uml.property  name="highestEventId"
 	 */
 	public final int getHighestEventId() {
 		return highestEventId;
@@ -143,7 +159,8 @@ public class FileStorage implements StorageIntf {
 	
 	/**
 	 * Getter najwy¿szego ID grupy zdarzeñ.
-	 * @return Najwy¿sze ID grupy zdarzeñ
+	 * @return  Najwy¿sze ID grupy zdarzeñ
+	 * @uml.property  name="highestEventGroupId"
 	 */
 	public final int getHighestEventGroupId() {
 		return highestEventGroupId;
