@@ -285,6 +285,31 @@ public final class Utils {
 		return date.getTime();
 		
 	}
+
+	/**
+	 * Funkcja umo¿liwiaj¹ca przedstawienie timestampa jako daty.
+	 * @param timestampMilis Timestamp w milisekundach
+	 * @param format Format daty
+	 * @return Data jako String
+	 */
+	public static String 
+	dateFromTimestamp(final Long timestampMilis, final String format) {
+		
+		Date date = new Date(timestampMilis);
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		return dateFormat.format(date);
+
+	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca przedstawienie timestampa jako daty.
+	 * @param timestampMilis Timestamp w milisekundach
+	 * @return Data jako obiekt Date
+	 */
+	public static Date 
+	dateObjectFromTimestamp(final Long timestampMilis) {
+		return new Date(timestampMilis);
+	}
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca przekonwertowanie ci¹gu znaków na Integer.
@@ -328,5 +353,36 @@ public final class Utils {
 		}
 	}
 	
+	/**
+	 * Funkcja umo¿liwiaj¹ca obliczenie odstêpu czasu miêdzy dwoma datami.
+	 * @param startDate Data pocz¹tkowa
+	 * @param endDate Data koñcowa
+	 * @param dateFormat Format dat
+	 * @return Pozytywny odstêp czasowy 
+	 * miêdzy dwoma datami wyra¿ony w sekundach.
+	 */
+	public static long 
+	calculateDuration(final String startDate, 
+			final String endDate, final String dateFormat) {
+		long start = Utils.dateToTimestamp(startDate, dateFormat);
+		long end = Utils.dateToTimestamp(endDate, dateFormat);
+		final int milis = 1000;
+		return (Math.abs(end - start) / milis);
+	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca obliczenie odstêpu czasu miêdzy dwoma datami.
+	 * @param startDate Data pocz¹tkowa
+	 * @param endDate Data koñcowa
+	 * @return Pozytywny odstêp czasowy 
+	 * miêdzy dwoma datami wyra¿ony w sekundach.
+	 */
+	public static int 
+	calculateDuration(final Date startDate, final Date endDate) {
+		long start = startDate.getTime();
+		long end = endDate.getTime();
+		final int milis = 1000;
+		return (int) (Math.abs(end - start) / milis);
+	}
 	
 }

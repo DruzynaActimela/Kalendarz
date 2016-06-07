@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
-  <local-check-config name="Odraczkowywanie Checkstylera" location="C:\Users\4i60r\workspace\Kalendarz\checkstyle.xml" type="external" description="">
+  <local-check-config name="Customowe Checki Eclipse" location="C:\Users\4i60r\workspace\Kalendarz\sun_checks_eclipse.xml" type="external" description="">
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
-  <fileset name="all" enabled="true" check-config-name="Sun Checks (Eclipse)" local="false">
+  <fileset name="all" enabled="false" check-config-name="Sun Checks (Eclipse)" local="false">
     <file-match-pattern match-pattern="." include-pattern="true"/>
+  </fileset>
+  <fileset name="Custom Eclipse Checks" enabled="true" check-config-name="Customowe Checki Eclipse" local="true">
+    <file-match-pattern match-pattern=".java$" include-pattern="true"/>
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
     <filter-data value="src/fi"/>

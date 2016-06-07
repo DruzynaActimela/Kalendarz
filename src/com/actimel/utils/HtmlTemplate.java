@@ -132,9 +132,9 @@ public class HtmlTemplate {
 			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
 			File directory = new File(location.getFile());
 			Utils.log(directory.getAbsolutePath());
-			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
+			File wwwDirectory = new File(directory.getAbsolutePath() + File.separator + ".." + File.separator + "www");
 			
-			inst = new HtmlTemplate(new File(www_directory, resName));
+			inst = new HtmlTemplate(new File(wwwDirectory, resName));
 		} else {
 			inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
 		}
@@ -263,7 +263,7 @@ public class HtmlTemplate {
 						StringBuffer strbuf = new StringBuffer(line);
 						String replacement = yieldVarPrefix + firstValue + yieldVarSuffix;
 						strbuf = strbuf.replace(startPos, endPos, replacement);
-						Utils.log("REPLACING ["+line.substring(startPos, endPos )+"] to ["+replacement+"]");
+						Utils.log("REPLACING [" + line.substring(startPos, endPos) + "] to [" + replacement + "]");
 						newLine += strbuf.toString();
 						if (!variablesToReplace.containsKey(firstValue)) {
 							String defaultVal = (secondValue != null) ? secondValue : "";
@@ -282,7 +282,7 @@ public class HtmlTemplate {
 						int stopPosition = rawContent.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
-						Utils.log("znaleziony isset: (match offset: "+sectionOffset+") " + tmpsVal);
+						Utils.log("znaleziony isset: (match offset: " + sectionOffset + ") " + tmpsVal);
 						String ifExists = "", ifNotExists = "";
 												
 						if (tmpsVal.contains(elsePhrase)) {
@@ -314,7 +314,7 @@ public class HtmlTemplate {
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
 						List<String> excluded = (Arrays.asList(tmpsVal.split(newline)));
-						Utils.log("Parsing section... (match offset: "+sectionOffset+")");
+						Utils.log("Parsing section... (match offset: " + sectionOffset + ")");
 						String parsedSection = parse(tmpsVal);
 						Utils.log("PARSED SECTION" + parsedSection);
 						sectionValue = replaceVars(parsedSection, variablesToReplace);						
@@ -391,20 +391,20 @@ public class HtmlTemplate {
 	 * Wewnêtrzna metoda zamieniaj¹ca wartosci 
 	 * na odpowiadaj¹ce im klucze w zmiennej rawContent, 
 	 * rekursywnie razem z treœciami templatek nadrzêdnych.
-	 * @param content Surowa tresc HTML z dyrektywami templatki
+	 * @param rContent Surowa tresc HTML z dyrektywami templatki
 	 * @param vars Lista kluczy i wartosci
 	 * @return Przeparsowana tresc HTML
 	 */
-	private String recursiveRender(final String content, final HashMap<String, String> vars) {
+	private String recursiveRender(final String rContent, final HashMap<String, String> vars) {
 		
 		String render = "";
-		String parsedContent = content;
+		String parsedContent = rContent;
 		if (masterTemplate != null) {
 			render += masterTemplate.render();
 		}
 		
 
-		parsedContent = replaceVars(content, vars);
+		parsedContent = replaceVars(rContent, vars);
 		
 		
 		render += parsedContent;
@@ -412,8 +412,11 @@ public class HtmlTemplate {
 		return render.trim();
 	}
 
-	
-	private void setTemplateContent(String c) {
+	/**
+	 * Metoda umo¿liwiaj¹ca ustawienie nowej wartosci templatki.
+	 * @param c Nowa wartosc do ustawienia
+	 */
+	private void setTemplateContent(final String c) {
 		content = c;
 	}
 }

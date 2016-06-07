@@ -1,5 +1,6 @@
 package com.actimel.models;
 
+import com.actimel.calendar.CalendarApp;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -52,21 +53,21 @@ public class CalendarEvent {
 	
 	/**
 	 * Konstruktor zdarzenia w kalendarzu.
-	 * @param id ID zdarzenia
+	 * @param eid ID zdarzenia
 	 * @param name Nazwa zdarzenia
-	 * @param stamp_start Timestamp rozpoczêcia zdarzenia 
+	 * @param stampStart Timestamp rozpoczêcia zdarzenia 
 	 * wyra¿ony w milisekundach
-	 * @param stamp_end Timestamp zakoñczenia zdarzenia wyra¿ony w milisekundach
-	 * @param allday Zmienna okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
-	 * @param is_public Zmienna okreœlaj¹ca, czy zdarzenie jest publiczne.
+	 * @param stampEnd Timestamp zakoñczenia zdarzenia wyra¿ony w milisekundach
+	 * @param alldayRef Zmienna okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
+	 * @param eIsPublic Zmienna okreœlaj¹ca, czy zdarzenie jest publiczne.
 	 */
-	public CalendarEvent(final int id, final String name, final long stamp_start, final long stamp_end, final boolean allday, final boolean is_public) {
-		this.id = id;
+	public CalendarEvent(final int eid, final String name, final long stampStart, final long stampEnd, final boolean alldayRef, final boolean eIsPublic) {
+		this.id = eid;
 		this.title = name;
-		this.start = stamp_start;
-		this.end = stamp_end;
-		this.allday = allday;
-		this.isPublic = is_public;
+		this.start = stampStart;
+		this.end = stampEnd;
+		this.allday = alldayRef;
+		this.isPublic = eIsPublic;
 	}
 
 	/**
@@ -195,32 +196,29 @@ public class CalendarEvent {
 		return parentGroupId;
 	}
 	
+	/**
+	 * Metoda sprawdzaj¹ca, czy zdarzenie posiada grupê.
+	 * @return Wartosc true/false odpowiadaj¹ca stanowi posiadania grupy
+	 */
+	public final boolean hasEventGroup() {
+		return parentGroupId > 0;
+	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca pobranie instancji grupy zdarzenia.
+	 * @return Instancja grupy zdarzenia
+	 */
+	public final EventGroup getEventGroup() {
+		if (hasEventGroup()) {
+			return 
+			CalendarApp.getInstance()
+			.getStorage()
+			.loadEventGroup(parentGroupId);
+		}
+		return null;
+	}
+	
 	
 	
 }
 
-/*
-		
-		java.util.Calendar cal = java.util.Calendar.getInstance();
-		cal.set(java.util.Calendar.MONTH, java.util.Calendar.DECEMBER);
-		VEvent e = new VEvent();
-		
- * 
- * 
- * 
- * java.util.Calendar cal = java.util.Calendar.getInstance();
-cal.set(java.util.Calendar.MONTH, java.util.Calendar.DECEMBER);
-cal.set(java.util.Calendar.DAY_OF_MONTH, 25);
-
-VEvent christmas = new VEvent(new Date(cal.getTime()), "Christmas Day");
-// initialise as an all-day event..
-christmas.getProperties().getProperty(Property.DTSTART).getParameters().add(Value.DATE);
-            
-Output:
-
-BEGIN:VEVENT
-DTSTAMP:20050222T044240Z
-DTSTART;VALUE=DATE:20051225
-SUMMARY:Christmas Day
-END:VEVENT
- */

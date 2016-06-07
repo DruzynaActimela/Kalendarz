@@ -58,10 +58,18 @@ var app = {
 
     },
     registerScreenShowEvent: function(screenName, func) {
-        if(app.screenShowEvents[screenName] == undefined) {
-            app.screenShowEvents[screenName] = [];
+        var screenNames = [screenName];
+        if(screenName.indexOf(",") > -1) {
+            screenNames = screenName.split(",");
+
         }
-        app.screenShowEvents[screenName].push(func);
+        for(var i in screenNames) {
+            var name = screenNames[i].trim();
+            if(app.screenShowEvents[name] == undefined) {
+                app.screenShowEvents[name] = [];
+            }
+            app.screenShowEvents[name].push(func);   
+        }
     },
     executeScreenShowEvents: function(screenName) {
         if(app.screenShowEvents[screenName] != undefined) {
@@ -88,7 +96,7 @@ var app = {
             app.displayUserGroups();
             app.updateUI();
 
-            app.registerScreenShowEvent("export-ical", function(screen) {
+            app.registerScreenShowEvent("export-ical,export-csv", function(screen) {
                 screen.find(".bind-datepicker").datetimepicker({
                     controlType: 'select',
                     oneLine: true,
@@ -683,6 +691,9 @@ var app = {
                     confirmClick: function() {
                         app._doExportRequest("ical", groupIds, start, end, function(resp) {
                             console.log('_doExportRequest', resp);
+                            if(resp.download_link) {
+                                window.location.href = resp.download_link;
+                            }
                         }, 1);
                     }
                 });
@@ -696,6 +707,46 @@ var app = {
             }
         });
     },
+    CSV_doExportRequest: function() {
+        var scope = $(".wizard-csv");
+        var groupIds = "";
+        scope.find(".egs-holder").each(function() {
+            var t = $(this);
+            if(t.find(".export-group-id").is(":checked")) {
+                if(groupIds.length > 0) groupIds += ",";
+                groupIds += t.attr("data-group-id");
+            }
+        });
+
+        var start = scope.find(".export-date-start").val();
+        var end = scope.find(".export-date-end").val();
+
+        app._doExportRequest("csv", groupIds, start, end, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów pasujących do podanych kryteriów.<br>Czy chcesz je wyeksportować?",                
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doExportRequest("csv", groupIds, start, end, function(resp) {
+                            console.log('_doExportRequest', resp);
+                            if(resp.download_link) {
+                                window.location.href = resp.download_link;
+                            }
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono eventów dla podanych kryteriów.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
 
     _doExportRequest: function(exportType, groupIds, start, end, onResponse, confirmation) {
         var _confirmation = (confirmation == 1) ? "yes" : "";
@@ -785,6 +836,11 @@ $(document).ready(function() {
     $(".btn-export-ical").click(function() {
         app.iCal_doExportRequest();
     });
+    $(".btn-export-csv").click(function() {
+        app.CSV_doExportRequest();
+    });
+
+
     $(".menu-action-create-event").click(function() {
 
         app.showCreateEventWindow(LAST_RIGHTCLICKED_DATE);

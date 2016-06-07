@@ -32,14 +32,19 @@ public class User {
 
 	/**
 	 * Konstruktor obiektu u¿ytkownika.
+	 * @param uid ID
+	 * @param uName Nazwa
+	 * @param uPass Hash has³a
+	 * @param uEmail E-Mail
+	 * @param uPermissionLevel Poziom uprawnieñs
 	 */
-	public User(final int id, final String name, final String pass, final String email, final int permission_level) {
+	public User(final int uid, final String uName, final String uPass, final String uEmail, final int uPermissionLevel) {
 		super();
-		this.id = id;
-		this.name = name;
-		this.pass = pass;
-		this.email = email;
-		this.permissionLevel = permission_level;
+		this.id = uid;
+		this.name = uName;
+		this.pass = uPass;
+		this.email = uEmail;
+		this.permissionLevel = uPermissionLevel;
 	}
 	
 	/**

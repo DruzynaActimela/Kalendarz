@@ -34,19 +34,19 @@ public class EventGroup {
 	
 	/**
 	 * Konstrutor grupy zdarzeñ.
-	 * @param id ID grupy zdarzeñ
-	 * @param name Nazwa
-	 * @param color Kolor
-	 * @param owner_id ID w³aœciciela
-	 * @param is_public Zmienna okreœlaj¹ca, czy grupa zdarzeñ jest publiczna
+	 * @param gid ID grupy zdarzeñ
+	 * @param gname Nazwa
+	 * @param gcolor Kolor
+	 * @param gOwnerId ID w³aœciciela
+	 * @param gIsPublic Zmienna okreœlaj¹ca, czy grupa zdarzeñ jest publiczna
 	 */
-	public EventGroup(final int id, final String name, final String color, final int owner_id, final boolean is_public) {
+	public EventGroup(final int gid, final String gname, final String gcolor, final int gOwnerId, final boolean gIsPublic) {
 		super();
-		this.id = id;
-		this.name = name;
-		this.color = color;
-		this.ownerId = owner_id;
-		this.isPublic = is_public;
+		this.id = gid;
+		this.name = gname;
+		this.color = gcolor;
+		this.ownerId = gOwnerId;
+		this.isPublic = gIsPublic;
 	}
 
 	/**

@@ -30,6 +30,11 @@ public final class Const {
 	public static final String USERS_STORAGE_PATH = "users-storage.json";
 
 	/**
+	 * Lokalizacja foldera, w który przechowywane bêd¹ pliki.
+	 */
+	public static final String FILE_STORE_FOLDER = "./file_storage";
+	
+	/**
 	 * Nazwa ciastka z kluczem sesji.
 	 */
 	public static final String COOKIE_SESSION_KEY = "_CalendarAppSessId";

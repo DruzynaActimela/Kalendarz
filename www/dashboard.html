@@ -112,7 +112,7 @@ Dashboard
 				</div>
 			</div>
 
-			<div class='page-screen screen-export-csv'>
+			<div class='page-screen screen-export-csv group-fill-trigger' data-group-fill-container='.export-groups-select-csv'>
 				<div class='screen-title with-go-back'>
 					<div class='screen-go-back screen-trigger' data-screen='export'>
 						<i class='fa fa-chevron-left'></i><span>Wróć</span>
@@ -122,7 +122,55 @@ Dashboard
 					</div>
 				</div>
 
-				asd
+				<div class='export-wizard wizard-csv'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupy
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select export-groups-select-csv'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data początkowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-start" placeholder="Data początkowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data końcowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-end" placeholder="Data końcowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-export-csv'>
+						<i class='fa fa-check'></i>
+						Eksportuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
 			</div>
 
 			<div class='page-screen screen-export-ical group-fill-trigger' data-group-fill-container='.export-groups-select-ical'>

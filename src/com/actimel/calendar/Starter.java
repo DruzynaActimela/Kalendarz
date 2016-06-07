@@ -1,11 +1,14 @@
 package com.actimel.calendar;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
+import java.util.List;
 
+import com.actimel.calendar.impl.CSVExporter;
+import com.actimel.calendar.impl.ICalExporter;
+import com.actimel.intfs.CalendarExporter;
+import com.actimel.models.CalendarEvent;
 import com.actimel.utils.HtmlTemplate;
 import com.actimel.utils.Utils;
 
@@ -54,10 +57,10 @@ public final class Starter {
 		
 		
 		
-		
+		CalendarApp app = null;
 		
 		try {
-			CalendarApp app = new CalendarApp();
+			app = new CalendarApp();
 			if (app.getStorage() instanceof FileStorage) {
 				Utils.log("Highest Event Id: " + ((FileStorage) app.getStorage()).getHighestEventId());
 			}
@@ -69,7 +72,23 @@ public final class Starter {
 		Utils.log("date with time: " + Utils.dateToTimestamp("16-04-2016 14:30", Const.DATE_FORMAT_DAY_TIME));
 		
 		
+		List<CalendarEvent> 
+		eventsToExport = app.getStorage().searchEvents("1", "ownerId");
+		CalendarExporter exp = new ICalExporter(eventsToExport);
 		
+		String result = exp.export();
+		
+		File f = new File("./calendar.ics");
+		Utils.writeToFile(f, result);
+		
+		Utils.log("iCal Export result: \n" + result);
+		
+	
+		CalendarExporter csv = new CSVExporter(eventsToExport);
+		
+		String csvResult = csv.export();
+		
+		Utils.log("CSV export result: \n" + csvResult);
 		
 	}
 }

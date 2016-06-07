@@ -75,7 +75,13 @@ public class FileStorage implements StorageIntf {
 	cachedEventGroups = new HashMap<Integer, EventGroup>();
 	
 	
-	
+	/**
+	 * Konstruktor implementacji przechowywania danych aplikacji w plikach.
+	 * @param appInstance Instancja aplikacji
+	 * @param eventsPath Œcie¿ka do pliku ze zdarzeniami
+	 * @param eventsGroupsPath Œcie¿ka do pliku z grupami zdarzeñ
+	 * @param usersPath Œcie¿ka do pliku z u¿ytkownikami
+	 */
 	public FileStorage(final CalendarApp appInstance, final String eventsPath, final String eventsGroupsPath, final String usersPath) {
 		this.app = appInstance;
 		
@@ -168,6 +174,17 @@ public class FileStorage implements StorageIntf {
 	public final User loadUser(final String username) {
 		return loadUser(username, false);
 	}
+	
+	@Override
+	public final User loadUser(final int userId) {
+		for (Entry<String, User> user : cachedUsers.entrySet()) {
+			if (user.getValue().getId() == userId) {
+				return user.getValue();
+			}
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * Metoda odpowiedzialna za za³adowanie u¿ytkownika, 
@@ -370,9 +387,9 @@ public class FileStorage implements StorageIntf {
 	
 	@Override
 	public final List<CalendarEvent> 
-	searchEventsBetween(final long timestamp_start, final long timestamp_end, final int user_id) {
+	searchEventsBetween(final long timestampStart, final long timestampEnd, final int userId) {
 		List<CalendarEvent> result = new ArrayList<CalendarEvent>();
-		if (timestamp_start == 0 || timestamp_end == 0) {
+		if (timestampStart == 0 || timestampEnd == 0) {
 			return result;
 		}
 		
@@ -380,9 +397,9 @@ public class FileStorage implements StorageIntf {
 		
 		for (Entry<Integer, CalendarEvent> eg : cachedEvents.entrySet()) {
 			CalendarEvent evt = eg.getValue();
-			if (evt.getOwnerId() == user_id) {
-				if (evt.getStampStart() >= timestamp_start 
-						&& evt.getStampStart() <= timestamp_end) {
+			if (evt.getOwnerId() == userId) {
+				if (evt.getStampStart() >= timestampStart 
+						&& evt.getStampStart() <= timestampEnd) {
 					result.add(evt);
 				}
 			}

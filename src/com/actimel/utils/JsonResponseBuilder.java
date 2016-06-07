@@ -27,12 +27,12 @@ public class JsonResponseBuilder {
 	
 	/**
 	 * Konstruktor.
-	 * @param app Referencja do aplikacji kalendarza.
+	 * @param cApp Referencja do aplikacji kalendarza.
 	 * @param key Pocz¹tkowy klucz
 	 * @param val Pocz¹tkowa wartoœc
 	 */
-	public JsonResponseBuilder(final CalendarApp app, final String key, final String val) {
-		this.app = app;
+	public JsonResponseBuilder(final CalendarApp cApp, final String key, final String val) {
+		this.app = cApp;
 		params.put(key, val);
 	}
 	

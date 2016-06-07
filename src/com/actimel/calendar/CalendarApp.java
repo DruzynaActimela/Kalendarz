@@ -16,6 +16,11 @@ import fi.iki.elonen.NanoHTTPD;
 public class CalendarApp {
 	
 	/**
+	 * Kontekst aplikacji.
+	 */
+	private static CalendarApp appContext;
+	
+	/**
 	 * Obiekt GSON, odpowiedzialny za serializacjê danych do/z formatu JSON.
 	 */
 	private final Gson gson;
@@ -30,10 +35,20 @@ public class CalendarApp {
 	 */
 	private final StorageIntf storage;
 
+	/**
+	 * Funkcja umo¿liwiaj¹ca pobranie kontekstu aplikacji.
+	 * @return Kontekst aplikacji
+	 */
+	public static CalendarApp getInstance() {
+		return appContext;
+	}
+	
 	/** 
 	 * Konstruktor aplikacji.
 	 */
 	public CalendarApp() {
+		CalendarApp.appContext = this;
+		
 		gson = new GsonBuilder().disableHtmlEscaping().create();
 		
 		storage = new FileStorage(this, 

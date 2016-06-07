@@ -87,4 +87,11 @@ public interface StorageIntf {
 	 * @param user Obiekt u퓓tkownika
 	 */
 	void storeUser(User user);
+	
+	/**
+	 * Metoda umo퓄iwiaj퉏a pobranie u퓓tkownika o okre쐋onym ID.
+	 * @param userId ID u퓓tkownika.
+	 * @return Obiekt u퓓tkownika, je쐋i istnieje
+	 */
+	User loadUser(int userId);
 }

@@ -1,6 +1,8 @@
 package com.actimel.calendar.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -13,7 +15,9 @@ import java.util.Map;
 import com.actimel.calendar.CalendarApp;
 import com.actimel.calendar.Const;
 import com.actimel.calendar.FileStorage;
+import com.actimel.controllers.FileController;
 import com.actimel.controllers.SessionController;
+import com.actimel.intfs.CalendarExporter;
 import com.actimel.models.CalendarEvent;
 import com.actimel.models.EventGroup;
 import com.actimel.models.Session;
@@ -43,7 +47,13 @@ public class WebServer extends NanoHTTPD {
 	 * Obiekt kontrolera odpowiedzialnego za obs³ugê sesji u¿ytkowników.
 	 */
 	private final SessionController sessionController;
+	
+	/**
+	 * Obiekt kontrolera odpowiedzialnego za obs³ugê plików.
+	 */
+	private FileController fileController = null;
 
+	
 	/**
 	 * Lista folderów, które nie s¹ brane pod uwagê 
 	 * przy sprawdzaniu stanu zalogowania u¿ytkownia.
@@ -54,6 +64,14 @@ public class WebServer extends NanoHTTPD {
 			"fullcalendar",
 			"images",
 			"font-awesome"			
+	);
+	
+	/**
+	 * Lista œcie¿ek, na które mog¹ 
+	 * siê zaczynac lokalizacje przy pobieraniu.
+	 */
+	private final List<String> allowedDownloadLocations = Arrays.asList(
+			"file_storage/"
 	);
 	
 	/**
@@ -73,6 +91,11 @@ public class WebServer extends NanoHTTPD {
         super(port);
         
         sessionController = new SessionController();
+        try {
+			fileController = new FileController(Const.FILE_STORE_FOLDER);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         
         this.app = calendarApp;
     }
@@ -97,6 +120,7 @@ public class WebServer extends NanoHTTPD {
 		res.addHeader("Location", uri);
 		return res;
     }
+
 
     @Override
 	public final Response serve(final IHTTPSession httpSession) {
@@ -139,7 +163,7 @@ public class WebServer extends NanoHTTPD {
         		
         		HashMap<String, String> response = new HashMap<String, String>();
         		
-        		if (whitelistEnabled && apiWhitelist.contains(clientIp) == false) {
+        		if (whitelistEnabled && !apiWhitelist.contains(clientIp)) {
         			response.put("type", "error");
         			response.put("message", "Nieautoryzowany dostêp.");
         			return newFixedLengthResponse(Response.Status.OK, "text/json", app.getGson().toJson(response, Utils.getGsonHashMapType()));
@@ -174,8 +198,8 @@ public class WebServer extends NanoHTTPD {
 	        					if (eGroup != null) {
 			        				String dateStart = params.get("date_start");
 			        				String dateEnd = params.get("date_end");
-			        				boolean is_public = ("1".equals(params.get("public")));
-			        				boolean is_wholeday = ("1".equals(params.get("wholeday")));
+			        				boolean isPublic = ("1".equals(params.get("public")));
+			        				boolean isWholeday = ("1".equals(params.get("wholeday")));
 			        				
 			        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
 			        				
@@ -187,7 +211,7 @@ public class WebServer extends NanoHTTPD {
 			        				long timestampEnd = Utils.dateToTimestamp(dateEnd, Const.DATE_FORMAT_DAY_TIME);
 	
 	
-			        				CalendarEvent event = new CalendarEvent(uid, name, timestampStart, timestampEnd, is_wholeday, is_public);
+			        				CalendarEvent event = new CalendarEvent(uid, name, timestampStart, timestampEnd, isWholeday, isPublic);
 			        				event.setOwnerId(ownerId);
 			        				event.setParentGroupId(groupIdNum);
 			        				
@@ -197,7 +221,7 @@ public class WebServer extends NanoHTTPD {
 			        					((FileStorage) app.getStorage()).saveEvents();
 			        				}
 
-			        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o utworzone!").put("type", "success").put("eventId", ""+uid).create();
+			        				return jsonResponse("message", "Zdarzenie '" + name + "' zosta³o utworzone!").put("type", "success").put("eventId", "" + uid).create();
 	        					} else {
 	        						return jsonResponse("message", "Podany event nie istnieje!").put("type", "error").create();
 	        					}
@@ -217,20 +241,20 @@ public class WebServer extends NanoHTTPD {
 				        				CalendarEvent event = app.getStorage().loadEvent(eventId);
 				        				if (event != null && event.getOwnerId() == sessionUserId) {
 				        					
-					        				String date_start = params.get("date_start");
-					        				String date_end = params.get("date_end");
-					        				boolean is_public = ("1".equals(params.get("public")));
-					        				boolean is_wholeday = ("1".equals(params.get("wholeday")));
+					        				String dateStart = params.get("date_start");
+					        				String dateEnd = params.get("date_end");
+					        				boolean isPublic = ("1".equals(params.get("public")));
+					        				boolean isWholeday = ("1".equals(params.get("wholeday")));
 					        				
-					        				final long timestampStart = Utils.dateToTimestamp(date_start, Const.DATE_FORMAT_DAY_TIME);
-					        				final long timestampEnd = Utils.dateToTimestamp(date_end, Const.DATE_FORMAT_DAY_TIME);
+					        				final long timestampStart = Utils.dateToTimestamp(dateStart, Const.DATE_FORMAT_DAY_TIME);
+					        				final long timestampEnd = Utils.dateToTimestamp(dateEnd, Const.DATE_FORMAT_DAY_TIME);
 					        				
 					        				
 					        				event.setName(name);
 					        				event.setStampStart(timestampStart);
 					        				event.setStampEnd(timestampEnd);
-					        				event.setAllDay(is_wholeday);
-					        				event.setPublic(is_public);
+					        				event.setAllDay(isWholeday);
+					        				event.setPublic(isPublic);
 					        				event.setParentGroupId(groupIdNum);
 					        				
 					        				app.getStorage().saveEvent(event);
@@ -238,7 +262,7 @@ public class WebServer extends NanoHTTPD {
 					        					((FileStorage) app.getStorage()).saveEvents();
 					        				}
 
-					        				return jsonResponse("message", "Zdarzenie '"+name+"' zosta³o zapisane!").put("type", "success").create();
+					        				return jsonResponse("message", "Zdarzenie '" + name + "' zosta³o zapisane!").put("type", "success").create();
 				        				} else {
 				        					return jsonResponse("message", "Podany event nie istnieje lub nie jesteœ w³aœcicielem!").put("type", "error").create();
 				        				}
@@ -324,7 +348,24 @@ public class WebServer extends NanoHTTPD {
 	        				}
 	        				
 	        				if (confirmed) {
-	        					String downloadLink = "";
+	        					
+	        					CalendarExporter exporter = null;
+	        					String extension = "";
+	        					
+	        					if ("ical".equals(exportType)) {
+	        						exporter = new ICalExporter(selectedEvents);
+	        						extension = ".ics";
+	        					} else {
+	        						exporter = new CSVExporter(selectedEvents);
+	        						extension = ".csv";
+	        					}
+	        					final int filenameLength = 32;
+	        					String result = exporter.export();
+	        					String filename = Utils.getRandomString(filenameLength) + "." + extension;
+	        					
+	        					String calendarFileUri = fileController.storeContent(result, filename, FileController.URI_REMOTE);
+	        					
+	        					String downloadLink = "http://localhost:" + Const.WEBSERVER_PORT + "/download" + calendarFileUri;
 	        					
 	        					return jsonResponse("message", "Confirmando").put("type", "success").put("download_link", downloadLink).create();
 	        				} else {
@@ -371,7 +412,7 @@ public class WebServer extends NanoHTTPD {
 	        			        			
 	        			List<CalendarEvent> events = app.getStorage().searchEventsBetween(tStart, tEnd, sessionUserId);
 	        			Utils.log("foundCount: " + events.size());
-	        			Type t = new TypeToken<List<CalendarEvent>>(){}.getType();
+	        			Type t = new TypeToken<List<CalendarEvent>>() { }.getType();
 	        			String json = app.getGson().toJson(events, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
 	        		}	 
@@ -383,21 +424,21 @@ public class WebServer extends NanoHTTPD {
 		        				
 		        				String color = params.get("color");
 		        				int ownerId = (userSession != null) ? userSession.getUser().getId() : 1; // dla testow
-		        				boolean is_public = ("1".equals(params.get("public")));
+		        				boolean isPublic = ("1".equals(params.get("public")));
 		        				
 		        				int uid = 0;
 		        				if (app.getStorage() instanceof FileStorage) {
 		        					uid = ((FileStorage) app.getStorage()).getHighestEventGroupId() + 1;
 		        				}
 		        				
-		        				EventGroup group = new EventGroup(uid, name, color, ownerId, is_public);
+		        				EventGroup group = new EventGroup(uid, name, color, ownerId, isPublic);
 		        				app.getStorage().saveEventGroup(group);
 		        				
 		        				if (app.getStorage() instanceof FileStorage) {
 		        					((FileStorage) app.getStorage()).saveEventGroups();
 		        				}
 		        				
-		        				return jsonResponse("message", "Grupa zdarzeñ '"+name+"' zosta³a utworzona!").put("type", "success").create();
+		        				return jsonResponse("message", "Grupa zdarzeñ '" + name + "' zosta³a utworzona!").put("type", "success").create();
 	        				} else {
 	        					return jsonResponse("message", "Nazwa zawiera niedozwolone znaki.").put("type", "error").create();
 	        				}
@@ -407,13 +448,39 @@ public class WebServer extends NanoHTTPD {
 	        		} else {
 	        			// wyœwietl listê grup u¿ytkownika      			
 	        			List<EventGroup> groups = app.getStorage().searchEventsGroups("" + sessionUserId, "ownerId");
-	        			Type t = new TypeToken<List<EventGroup>>(){}.getType();
+	        			Type t = new TypeToken<List<EventGroup>>() { }.getType();
 	        			String json = app.getGson().toJson(groups, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
 	        		}
 		        } else {
 		        	// nie ma takiego zapytania
 		        }
+        	} else if (uri.startsWith("/download")) {
+        		String toFind = "/download/";
+        		String path = uri.substring(uri.indexOf(toFind) + toFind.length());
+        		boolean matches = false;
+        		for (String prefix : allowedDownloadLocations) {
+        			if (path.startsWith(prefix)) {
+						matches = true;
+						break;
+					}
+        		}
+        		
+        		if (matches) {
+        		    FileInputStream fis = null;
+        		    try {
+        		        fis = new FileInputStream(path + fileController.getSuffix());
+        		    } catch (FileNotFoundException e) {
+        		        // TODO Auto-generated catch block
+        		        e.printStackTrace();
+        		        return jsonResponse("type", "error").put("message", "Not found").create();
+        		    }
+        		    
+        		    return newChunkedResponse(Status.OK, "application/octet-stream", fis);
+        		    
+        		} else {
+        			return jsonResponse("type", "error").put("message", "Not allowed").create();
+        		}
         	} else if (uri.startsWith("/dashboard")) {
         		String username = "user"; //userSession.getUser().getName();
         		int adminLevel = 1;
@@ -523,9 +590,9 @@ public class WebServer extends NanoHTTPD {
         			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
         			File directory = new File(location.getFile());
         			Utils.log(directory.getAbsolutePath());
-        			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
+        			File wwwDirectory = new File(directory.getAbsolutePath() + File.separator + ".." + File.separator + "www");
         			
-        			resourceURL = new File(www_directory, resourcePath).toURI().toURL();
+        			resourceURL = new File(wwwDirectory, resourcePath).toURI().toURL();
         		}
             	
         		File resourceFile = new File(resourceURL.getFile());
