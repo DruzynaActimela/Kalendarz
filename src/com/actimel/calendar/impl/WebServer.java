@@ -362,14 +362,14 @@ public class WebServer extends NanoHTTPD {
 	        					String extension = "";
 	        					
 	        					if ("ical".equals(exportType)) {
-	        						exporter = new ICalExporter(selectedEvents);
+	        						exporter = new ICalExporter();
 	        						extension = ".ics";
 	        					} else {
-	        						exporter = new CSVExporter(selectedEvents);
+	        						exporter = new CSVExporter();
 	        						extension = ".csv";
 	        					}
 	        					final int filenameLength = 32;
-	        					String result = exporter.export();
+	        					String result = exporter.export(selectedEvents);
 	        					String filename = Utils.getRandomString(filenameLength) + "." + extension;
 	        					
 	        					String calendarFileUri = fileController.storeContent(result, filename, FileController.URI_REMOTE);

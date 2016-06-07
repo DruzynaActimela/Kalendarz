@@ -16,23 +16,15 @@ import com.actimel.utils.Utils;
  *
  */
 public class CSVExporter extends CalendarExporter {
-
-	/**
-	 * Konstruktor.
-	 * @param eventsList Lista zdarzeñ do wyeksportowania
-	 */
-	public CSVExporter(final List<CalendarEvent> eventsList) {
-		super(eventsList);
-	}
 	
 
 	@Override
-	public final String export() {
+	public final String export(final List<CalendarEvent> events) {
 		String lineEnd = "\n";
 		String header = "\"ID\",\"Tytu³\",\"Data Pocz¹tkowa\",\"Data Koñcowa\",\"E-Mail W³aœciciela\",\"Kolor\"";
 		List<String> lines = new ArrayList<String>();
 		
-		for (CalendarEvent calendarEvent : getEvents()) {
+		for (CalendarEvent calendarEvent : events) {
 			User owner = CalendarApp.getInstance().getStorage().loadUser(calendarEvent.getOwnerId());
 			String ownerEmail = "";
 			if (owner != null) {

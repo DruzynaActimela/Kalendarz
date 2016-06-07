@@ -1,11 +1,13 @@
 package com.actimel.calendar;
 
 import java.io.File;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
 import com.actimel.calendar.impl.CSVExporter;
+import com.actimel.calendar.impl.CalendarCSVImporter;
 import com.actimel.calendar.impl.ICalExporter;
 import com.actimel.intfs.CalendarExporter;
 import com.actimel.models.CalendarEvent;
@@ -74,9 +76,9 @@ public final class Starter {
 		
 		List<CalendarEvent> 
 		eventsToExport = app.getStorage().searchEvents("1", "ownerId");
-		CalendarExporter exp = new ICalExporter(eventsToExport);
+		CalendarExporter exp = new ICalExporter();
 		
-		String result = exp.export();
+		String result = exp.export(eventsToExport);
 		
 		File f = new File("./calendar.ics");
 		Utils.writeToFile(f, result);
@@ -84,11 +86,16 @@ public final class Starter {
 		Utils.log("iCal Export result: \n" + result);
 		
 	
-		CalendarExporter csv = new CSVExporter(eventsToExport);
-		
-		String csvResult = csv.export();
+		CalendarExporter csv = new CSVExporter();
+		String csvResult = csv.export(eventsToExport);
 		
 		Utils.log("CSV export result: \n" + csvResult);
 		
+		CalendarCSVImporter csvImporter = new CalendarCSVImporter();
+		csvImporter.importCSV(new StringReader(csvResult));
+		
+		csvResult = csv.export(csvImporter.getEvents());
+		
+		Utils.log("CSV export from imported result: \n" + csvResult);
 	}
 }

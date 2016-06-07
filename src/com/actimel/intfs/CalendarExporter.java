@@ -1,5 +1,6 @@
 package com.actimel.intfs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -31,8 +32,8 @@ public abstract class CalendarExporter {
 	 * Konstruktor klasy.
 	 * @param eventsList Lista zdarzeñ, które maj¹ zostac wyeksportowane.
 	 */
-	protected CalendarExporter(final List<CalendarEvent> eventsList) {
-		this.events = eventsList;
+	protected CalendarExporter() {
+		events = new ArrayList<CalendarEvent>();
 	}
 	
 	/**
@@ -40,7 +41,7 @@ public abstract class CalendarExporter {
 	 * @return Reprezentacja zdarzeñ w formacie, 
 	 * który implementuje dana klasa eksportuj¹ca, jako String.
 	 */
-	public abstract String export();
+	public abstract String export(final List<CalendarEvent> events);
 	
 	/**
 	 * Funkcja umo¿liwiaj¹ca pobranie listy zdarzeñ.

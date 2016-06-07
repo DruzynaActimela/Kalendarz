@@ -34,17 +34,8 @@ import net.fortuna.ical4j.util.UidGenerator;
  */
 public class ICalExporter extends CalendarExporter {
 
-	/**
-	 * Konstruktor klasy.
-	 * @param eventsList Lista zdarzeñ do wyeksportowania.
-	 */
-	public ICalExporter(final List<CalendarEvent> eventsList) {
-		super(eventsList);
-
-	}
-
 	@Override
-	public final String export() {
+	public final String export(final List<CalendarEvent> events) {
 		Calendar calendar = new Calendar();
 		calendar.getProperties().add(
 				new ProdId("-//com.actimel.calendar//iCal4j 1.0//EN")
@@ -61,7 +52,7 @@ public class ICalExporter extends CalendarExporter {
 				
 		//SimpleDateFormat dateFormat = new SimpleDateFormat(Const.DATE_FORMAT_DAY_TIME);
 		
-		for (CalendarEvent calendarEvent : getEvents()) {
+		for (CalendarEvent calendarEvent : events) {
 			Date startDate = Utils.dateObjectFromTimestamp(calendarEvent.getStampStart());
 			Date endDate = Utils.dateObjectFromTimestamp(calendarEvent.getStampEnd());
 			
