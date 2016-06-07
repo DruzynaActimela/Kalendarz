@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.actimel.calendar.CalendarApp;
 import com.actimel.calendar.Const;
@@ -18,6 +19,7 @@ import com.actimel.calendar.FileStorage;
 import com.actimel.controllers.FileController;
 import com.actimel.controllers.SessionController;
 import com.actimel.intfs.CalendarExporter;
+import com.actimel.intfs.CalendarImporter;
 import com.actimel.models.CalendarEvent;
 import com.actimel.models.EventGroup;
 import com.actimel.models.Session;
@@ -335,6 +337,68 @@ public class WebServer extends NanoHTTPD {
 	        				} else {
 	        					return errorResponse;
 	        				}	
+	        			} else if ("import".equals(subRequestMode)) {
+	        				final boolean confirmed = "yes".equals(params.get("confirm"));
+	        				
+	        				String importType = params.get("importType");
+	        				String groupId = params.get("groupId");
+	
+	        				List<CalendarEvent> eventsFound = new ArrayList<CalendarEvent>();
+	        				File calendarFile = null;
+	        				
+	        				Integer pGroupId = Utils.parseInt(groupId, -1);
+	        				
+	        				if (files.size() > 0) {
+	        				 	
+	        				 	for (Entry<String, String> f : files.entrySet()) {
+	        				 		calendarFile = new File(f.getValue());
+	        				 		break;
+	        				 	}
+	        				 	Utils.log("Import file path: " + calendarFile.getAbsolutePath());
+	        				 	
+
+	        				 	if ("ical".equals(importType)) {
+	        				 		ICalImporter importer = new ICalImporter();
+	        				 		importer.importEvents(calendarFile);
+	        				 		eventsFound = importer.getEvents();
+	        				 	} else {
+	        				 		CSVImporter importer = new CSVImporter();
+	        				 		importer.importEvents(calendarFile);
+	        				 		eventsFound = importer.getEvents();
+	        				 	}
+	        				 	
+	        				} else {
+	        					return jsonResponse("message", "Nie za³¹czono pliku!").put("type", "error").create();
+	        				}
+	        				
+	        				if (confirmed) {
+	        					
+	        					int newHighestId = 0;
+	        					if (app.getStorage() instanceof FileStorage) {
+	        						newHighestId = ((FileStorage) app.getStorage()).getHighestEventId() + 1;
+	        					}
+	        					for (CalendarEvent cEvent : eventsFound) {
+	        						cEvent.setId(newHighestId);
+	        						cEvent.setOwnerId(sessionUserId);
+	        						if (pGroupId > 0) {
+										cEvent.setParentGroupId(pGroupId);
+									}
+	        						app.getStorage().saveEvent(cEvent);
+	        						Utils.log("Saved imported event at ID: " + newHighestId + ", parent group ID: " + pGroupId);
+	        						newHighestId++;
+	        						
+	        						
+	        					}
+	        					
+	        					if (app.getStorage() instanceof FileStorage) {
+	        						((FileStorage) app.getStorage()).saveEvents();
+	        					}
+	        					
+	        					return jsonResponse("message", "Zaimportowano <b>" + eventsFound.size() + "</b> zdarzeñ.").put("type", "success").create();
+	        				} else {
+	        					return jsonResponse("affected_events", "" + eventsFound.size()).put("type", "success").create();
+	        				}
+	        			
 	        			} else if ("export".equals(subRequestMode)) {
 	        				final boolean confirmed = "yes".equals(params.get("confirm"));
 	        				

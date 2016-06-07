@@ -30,7 +30,6 @@ public abstract class CalendarExporter {
 	
 	/**
 	 * Konstruktor klasy.
-	 * @param eventsList Lista zdarzeñ, które maj¹ zostac wyeksportowane.
 	 */
 	protected CalendarExporter() {
 		events = new ArrayList<CalendarEvent>();
@@ -38,10 +37,11 @@ public abstract class CalendarExporter {
 	
 	/**
 	 * Funkcja eksportuj¹ca zdarzenia.
+	 * @param eventsRef Lista zdarzeñ
 	 * @return Reprezentacja zdarzeñ w formacie, 
 	 * który implementuje dana klasa eksportuj¹ca, jako String.
 	 */
-	public abstract String export(final List<CalendarEvent> events);
+	public abstract String export(final List<CalendarEvent> eventsRef);
 	
 	/**
 	 * Funkcja umo¿liwiaj¹ca pobranie listy zdarzeñ.

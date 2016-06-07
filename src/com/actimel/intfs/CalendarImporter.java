@@ -7,13 +7,19 @@ import java.util.TimeZone;
 import com.actimel.calendar.Const;
 import com.actimel.models.CalendarEvent;
 
+/**
+ * Abstrakcyjna klasa, definiuj¹ca 
+ * jak maj¹ wygl¹dac klasy importuj¹ce eventy do aplikacji.
+ * @author ActimelTeam
+ *
+ */
 public abstract class CalendarImporter {
 	/**
-	 * Lista zimportowanych zdarzeñ
+	 * Lista zimportowanych zdarzeñ.
 	 * 
 	 * @uml.property name="events"
 	 */
-	protected List<CalendarEvent> events;
+	private final List<CalendarEvent> events;
 
 	/**
 	 * Domyœlna strefa czasowa.
@@ -23,14 +29,14 @@ public abstract class CalendarImporter {
 	private final TimeZone defaultTimezone = TimeZone.getTimeZone("Europe/Warsaw");
 
 	/**
-	 * Format daty w importowanym pliku
+	 * Format daty w importowanym pliku.
 	 * 
 	 * @uml.property name="dateFormat"
 	 */
-	protected String dateFormat = Const.DATE_FORMAT_DAY_TIME;
+	private String dateFormat = Const.DATE_FORMAT_DAY_TIME;
 	
 	/**
-	 * Konstruktor inicjalizuj¹cy listê zdarzeñ
+	 * Konstruktor inicjalizuj¹cy listê zdarzeñ.
 	 */
 	public CalendarImporter() {
 		events = new ArrayList<CalendarEvent>();
@@ -45,6 +51,14 @@ public abstract class CalendarImporter {
 	public final List<CalendarEvent> getEvents() {
 		return events;
 	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca dodanie zdarzenia do listy zdarzeñ przechowywanych w importerze.
+	 * @param event Zdarzenie
+	 */
+	public final void addEvent(final CalendarEvent event) {
+		events.add(event);
+	}
 
 	/**
 	 * Funkcja umo¿liwiaj¹ca pobranie domyœlnej strefy czasowej dla zdarzeñ.
@@ -57,7 +71,7 @@ public abstract class CalendarImporter {
 	}
 
 	/**
-	 * Funkcja umo¿liwiaj¹ca pobranie aktualnego formatu daty
+	 * Funkcja umo¿liwiaj¹ca pobranie aktualnego formatu daty.
 	 * 
 	 * @return Format importowanej daty jako String
 	 * @uml.property name="dateFormat"
@@ -67,13 +81,12 @@ public abstract class CalendarImporter {
 	}
 
 	/**
-	 * Funkcja umo¿liwiaj¹ca ustawienie aktualnego formatu daty
+	 * Funkcja umo¿liwiaj¹ca ustawienie aktualnego formatu daty.
 	 * 
-	 * @param dateFormat
-	 *            Format importowanej daty jako String
+	 * @param dateFormatRef Format importowanej daty jako String
 	 * @uml.property name="dateFormat"
 	 */
-	public final void setDateFormat(String dateFormat) {
-		this.dateFormat = dateFormat;
+	public final void setDateFormat(final String dateFormatRef) {
+		this.dateFormat = dateFormatRef;
 	}
 }

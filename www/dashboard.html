@@ -60,9 +60,13 @@ Dashboard
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
 					<div class='lm-divider'></div>
-					<div class='lm-option screen-trigger lm-option-bordered' data-screen='export'>
+					<div class='lm-option screen-trigger ' data-screen='export'>
 						<i class='fa fa-cloud-download'></i>Eksport
 					</div>
+					<div class='lm-option screen-trigger ' data-screen='import'>
+						<i class='fa fa-cloud-upload'></i>Import
+					</div>
+
 
 				</div>
 			</div>
@@ -234,6 +238,125 @@ Dashboard
 				</div>
 			</div>
 
+			<div class='page-screen screen-import'>
+				<div class='screen-title'>
+					Import kalendarza
+				</div>
+				<div class="alert alert-info">Wybierz typ pliku, z którego chcesz zaimportować swój kalendarz.</div>
+				<div class='export-select-type'>
+					<div class='export-type import-csv screen-trigger' data-screen='import-csv'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							CSV
+						</div>
+					</div>
+					<div class='export-type import-ical screen-trigger' data-screen='import-ical'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							iCal
+						</div>
+					</div>
+					<div class='clear'></div>
+				</div>
+			</div>
+
+			<div class='page-screen screen-import-csv group-fill-trigger' data-group-fill-container='.import-groups-select-csv' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import CSV
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-csv-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-csv'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Plik
+						</div>
+						<div class='keyval-val'>
+		                    <input type='file' id='csv-import-file'>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-csv'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+			<div class='page-screen screen-import-ical group-fill-trigger' data-group-fill-container='.import-groups-select-ical' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import CSV
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-ical-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-ical'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Plik
+						</div>
+						<div class='keyval-val'>
+		                    <input type='file' id='ical-import-file'>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-ical'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+
 		</div>
 		<div class='right-panel left'>
 			<div class='inner-panel-content'>
@@ -327,11 +450,11 @@ Dashboard
 
 
 					element.css({
-						borderColor: group.color,
+						borderColor: group ? group.color : DEFAULT_GROUP_COLOR,
 						background: "white"
 					});
 					element.find(".fc-content").css({
-						background: group.color,
+						background: group ? group.color : DEFAULT_GROUP_COLOR,
 						padding: "1px 0px"
 					});
 					element.find(".fc-time").css({

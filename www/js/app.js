@@ -9,6 +9,8 @@ var FULLCALENDAR_INTERNAL_DATE_FORMAT = "YYYY-MM-DD";
 var WINDOW_NO_CLOSE = 123551;
 var WINDOW_CLOSE = 123555;
 
+var DEFAULT_GROUP_COLOR = "gray";
+
 var LAST_RIGHTCLICKED_DATE, LAST_RIGHTCLICKED_EVENT;
 
 function parse_template(elem, vars) {
@@ -642,6 +644,19 @@ var app = {
                                 name: gr.name
                             });
                             var elem = $(html).appendTo(cont);
+                            if(screenObj.attr("data-no-check") == "1") {
+                                elem.find("input[type='checkbox']").prop("checked", false);
+                            }
+                            if(screenObj.attr("data-one-checkbox-only") == "1") {
+                                elem.find("input[type='checkbox']").change(function() {
+                                    var t = $(this);
+                                    var parent = t.parents(".page-screen");
+                                    parent.find("input[type='checkbox']").prop("checked", false);
+
+                                    t.prop("checked", true);
+                                });
+                            }
+
                         }
                     } else {
                         cont.html("Nie posiadasz żadnych grup.");
@@ -761,6 +776,117 @@ var app = {
         });
     },
 
+    iCal_doImportRequest: function() {
+        var scope = $(".wizard-ical-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var fileObj = scope.find("#ical-import-file")[0];
+
+        app._doImportRequest(fileObj, "ical", groupId, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doImportRequest(fileObj, "ical", groupId, function(resp) {
+                            console.log('iCal_doImportRequest', resp);
+                                app.showConfirmBox({
+                                    title: "Wiadomość",
+                                    body: resp.message,
+                                    hideCancel: true,
+                                    confirmText: "OK",
+                                });
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono zdarzeń w podanym pliku.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
+    CSV_doImportRequest: function() {
+        var scope = $(".wizard-csv-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var fileObj = scope.find("#csv-import-file")[0];
+
+        app._doImportRequest(fileObj, "csv", groupId, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doImportRequest(fileObj, "csv", groupId, function(resp) {
+                            console.log('CSV_doImportRequest', resp);
+                                app.showConfirmBox({
+                                    title: "Wiadomość",
+                                    body: resp.message,
+                                    hideCancel: true,
+                                    confirmText: "OK",
+                                });
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono zdarzeń w podanym pliku.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
+    _doImportRequest: function(fileObj, importType, groupId, onResponse, confirmation) {
+        
+        var formData = new FormData();
+        //var progressBar = parent.find(".db-progress-bar");
+        formData.append("import_file", fileObj.files[0]);
+        formData.append("groupId", groupId);
+        formData.append("importType", importType);
+
+        if(confirmation == 1) {
+            formData.append("confirm", "yes");
+        }
+        $.ajax({
+            url: "/api/events/import",
+            xhr: function() {
+
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    var loaded = (evt.loaded / evt.total).toFixed(2) * 100;
+                    //progressBar.css("width", loaded + "%").show();
+                }, false);
+
+                return xhr;
+            },
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(data) {
+                console.log(data);
+
+                setTimeout(function() {
+                    //parent.find(".db-progress-bar").fadeOut();
+                }, 5);
+
+                if (onResponse) onResponse(data);
+            }
+        });
+
+
+    },
+
     editEvent: function(id) {
         var events = $('#calendar').fullCalendar('clientEvents');
         if(events) {
@@ -839,6 +965,15 @@ $(document).ready(function() {
     $(".btn-export-csv").click(function() {
         app.CSV_doExportRequest();
     });
+    $(".btn-import-csv").click(function() {
+        app.CSV_doImportRequest();
+    });
+
+    $(".btn-import-ical").click(function() {
+        app.iCal_doImportRequest();
+    });
+
+
 
 
     $(".menu-action-create-event").click(function() {

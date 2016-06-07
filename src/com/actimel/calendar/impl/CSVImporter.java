@@ -23,44 +23,54 @@ public class CSVImporter extends CalendarImporter {
 	/**
 	 * Funkcja importuj¹ca zdarzenia.
 	 * 
-	 * @param csvFile
-	 *            Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
-	 * @throws FileNotFoundException
+	 * @param csvFile Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
+	 * @throws FileNotFoundException B³¹d, gdy plik nie istnieje
 	 */
-	public void importEvents(File csvFile) throws FileNotFoundException {
+	public final void importEvents(final File csvFile) throws FileNotFoundException {
 		importEvents(new FileReader(csvFile));
 	}
 
 	/**
 	 * Funkcja importuj¹ca zdarzenia.
 	 * 
-	 * @param csvFile
-	 *            Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
-	 * @throws FileNotFoundException
+	 * @param reader Obiekt readera, z którego bêd¹ czytane dane CSV
 	 */
-	public void importEvents(Reader reader) {
+	public final void importEvents(final Reader reader) {
 		CSVReader csvReader = new CSVReader(reader);
 		String[] nextLine;
+		final int six = 6;
+		final int three = 3;
 		try {
 			while ((nextLine = csvReader.readNext()) != null) {
-				if (nextLine.length != 6) {
+				if (nextLine.length != six) {
 					continue;
 				}
 				
 				try {
+					
 					int id = Integer.parseInt(nextLine[0]);
-					long start = Utils.dateToTimestamp(nextLine[2], dateFormat);
-					long end = Utils.dateToTimestamp(nextLine[3], dateFormat);
+					long start = Utils.dateToTimestamp(nextLine[2], getDateFromat());
+					long end = Utils.dateToTimestamp(nextLine[three], getDateFromat());
 
 					CalendarEvent event = new CalendarEvent(id, nextLine[1], start, end, false, true);
-					events.add(event);
+					super.addEvent(event);
 				} catch (NumberFormatException e) {
 					continue;
 				}
 			}
 		} catch (IOException e) {
 		}
-
+		
+		if (reader != null) {
+			
+		
+			try {
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	

@@ -18,29 +18,36 @@ import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
+/**
+ * Abstrakcyjna klasa, definiuj¹ca jak maj¹ wygl¹dac klasy importuj¹ce eventy z
+ * plików iCal.
+ * 
+ * @author ActimelTeam
+ *
+ */
+
 public class ICalImporter extends CalendarImporter {
 	/**
 	 * Funkcja importuj¹ca zdarzenia.
 	 * 
-	 * @param csvFile
-	 *            Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
+	 * @param iCalFile Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
 	 * @throws IOException
 	 */
-	public void importEvents(File iCalFile) {
+	public final void importEvents(final File iCalFile) {
 		try {
 			importEvents(new FileReader(iCalFile));
 		} catch (FileNotFoundException e) {
+			
 		}
 	}
 
 	/**
 	 * Funkcja importuj¹ca zdarzenia.
 	 * 
-	 * @param csvFile
-	 *            Obiekt pliku, z którego nale¿y wczytaæ zdarzenia
+	 * @param reader Obiekt readera, z którego bêd¹ czytane dane CSV
 	 * @throws IOException
 	 */
-	public void importEvents(Reader reader) {
+	public final void importEvents(final Reader reader) {
 		CalendarBuilder builder = new CalendarBuilder();
 
 		try {
@@ -55,11 +62,20 @@ public class ICalImporter extends CalendarImporter {
 					long start = event.getStartDate().getDate().getTime();
 					long end = event.getEndDate().getDate().getTime();
 					CalendarEvent cEvent = new CalendarEvent(0, event.getSummary().toString(), start, end, false, true);
-					events.add(cEvent);
+					super.addEvent(cEvent);
 				}
 			}
 		} catch (ParserException | IOException e) {
 			e.printStackTrace();
+		}
+		
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }
