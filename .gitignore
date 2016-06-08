@@ -1,4 +1,5 @@
-bin/
+bin/*
+file_storage/*
 
 *.class
 
