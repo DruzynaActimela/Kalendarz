@@ -416,7 +416,7 @@ public class FileStorage implements StorageIntf {
 			CalendarEvent evt = eg.getValue();
 			if (evt.getOwnerId() == userId) {
 				if (evt.getStampStart() >= timestampStart 
-						&& evt.getStampStart() <= timestampEnd) {
+						&& evt.getStampStart() <= timestampEnd || evt.isRecurring()) {
 					result.add(evt);
 				}
 			}

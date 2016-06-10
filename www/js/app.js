@@ -112,6 +112,51 @@ var app = {
                     calendarRef.fullCalendar("refetchEvents");
                 }
             });
+            
+            app.registerScreenShowEvent("import-uz", function(screen) {
+                app.getDepartments(function(depts) {
+                    var selectElem = screen.find(".select-wydzial");
+                    selectElem.empty();
+                    if(depts.length > 0) {
+                        selectElem.append("<option value='-1'>-- wybierz wydział --</option>");
+
+                        for(var i in depts) {
+                            var dept = depts[i];
+                            selectElem.append('<optgroup label="'+dept.nazwa+'">');
+                            for(var j in dept.kierunki) {
+                                var division = dept.kierunki[j];
+                                selectElem.append("<option value='"+division.id+"'>"+division.nazwa+"</option>");        
+                            }
+                            selectElem.append('</optgroup>');
+                        }
+                    } else {
+                        selectElem.append("<option value='-1'>Brak wydziałów!</option>");
+                    }
+                });
+                screen.find(".select-wydzial").unbind().change(function() {
+                    var t = $(this);
+
+                    var selectedDivision = t.val();
+                    console.log("select", selectedDivision);
+
+                    app.getGroups(selectedDivision, function(groups) {
+                        var selectElem = screen.find(".select-grupa");
+                        selectElem.empty();
+                        for(var j in groups) {
+                            var group = groups[j];
+                            selectElem.append("<option value='"+group.id+"'>"+group.nazwa+"</option>");        
+                        }
+
+                    });
+                });
+
+                screen.find(".bind-datepicker").datepicker({
+                    controlType: 'select',
+                    oneLine: true,
+                    dateFormat: "dd-mm-yy",
+                });
+            });
+            
 
 
             setTimeout(function() {
@@ -221,6 +266,21 @@ var app = {
             }
         });
     },
+
+    getDepartments: function(onResponse) {
+        app.doRequest("/api/uz/departments", {}, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+
+    getGroups: function(divisionId, onResponse) {
+        app.doRequest("/api/uz/groups", {
+            divId: divisionId
+        }, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+
 
     showConfirmBox: function(options) {
         var $modal = $('[data-remodal-id=modal_confirm]');
@@ -776,6 +836,51 @@ var app = {
         });
     },
 
+
+    UZ_doImportRequest: function(confirmation) {
+        var scope = $(".wizard-uz-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var uzGroupId = scope.find(".select-grupa").val();
+
+
+        var _confirmation = (confirmation == 1) ? "yes" : "";
+        app.doRequest("/api/uz/import", {
+            eventGroupId: groupId,
+            uzGroupId: uzGroupId,
+            confirm: _confirmation
+        }, "POST", function(resp) {
+            if(!confirmation) {
+
+                if(parseInt(resp.affected_events) > 0) {                
+                    app.showConfirmBox({
+                        title: "Potwierdź",
+                        body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                        confirmText: "Tak",
+                        confirmClick: function() {
+                            app.UZ_doImportRequest(1);
+                        }
+                    });
+                } else {
+                    var msg = resp.message;
+                    if(!msg) msg = "Nie znaleziono zdarzeń."; 
+                    app.showConfirmBox({
+                        title: "Błąd",
+                        body: msg,
+                        hideCancel: true,
+                        confirmText: "OK",
+                    });
+                }
+            } else {
+                app.showConfirmBox({
+                    title: "Wiadomość",
+                    body: resp.message,
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },  
     iCal_doImportRequest: function() {
         var scope = $(".wizard-ical-import");
         var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
@@ -850,15 +955,20 @@ var app = {
         
         var formData = new FormData();
         //var progressBar = parent.find(".db-progress-bar");
-        formData.append("import_file", fileObj.files[0]);
+        if(fileObj) formData.append("import_file", fileObj.files[0]);
         formData.append("groupId", groupId);
         formData.append("importType", importType);
 
         if(confirmation == 1) {
             formData.append("confirm", "yes");
         }
+
+        var endpoint = "/api/events/import";
+
+        if(importType == "uz") endpoint = "/api/uz/import";
+
         $.ajax({
-            url: "/api/events/import",
+            url: endpoint,
             xhr: function() {
 
                 var xhr = new XMLHttpRequest();
@@ -971,6 +1081,9 @@ $(document).ready(function() {
 
     $(".btn-import-ical").click(function() {
         app.iCal_doImportRequest();
+    });
+    $(".btn-import-uz").click(function() {
+        app.UZ_doImportRequest();
     });
 
 

@@ -384,5 +384,33 @@ public final class Utils {
 		final int milis = 1000;
 		return (int) (Math.abs(end - start) / milis);
 	}
+
+	/**
+	 * Metoda zwracaj¹ca aktualny timestamp w milisekundach.
+	 * @return Timestamp w milisekundach
+	 */
+	public static long timestamp() {
+		return System.currentTimeMillis();
+	}
 	
+	/**
+	 * Metoda zwracaj¹ca reprezentacjê godziny w sekundach.
+	 * @param time Godzina
+	 * @return Sekundy
+	 */
+	public static long strTimeToLong(final String time) {
+		
+		if (time == null || !time.contains(":")) {
+			return 0;
+		}
+		
+		String[] split = time.split(":");
+		int sec = 0;
+		final int minute = 60;
+		if (split.length > 1) {
+			sec += Utils.parseInt(split[0], 0) * minute;
+			sec += Utils.parseInt(split[1], 0);
+		}		
+		return sec;
+	}
 }

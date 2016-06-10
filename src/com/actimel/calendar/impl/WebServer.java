@@ -19,14 +19,17 @@ import com.actimel.calendar.FileStorage;
 import com.actimel.controllers.FileController;
 import com.actimel.controllers.SessionController;
 import com.actimel.intfs.CalendarExporter;
-import com.actimel.intfs.CalendarImporter;
 import com.actimel.models.CalendarEvent;
+import com.actimel.models.Department;
 import com.actimel.models.EventGroup;
 import com.actimel.models.Session;
 import com.actimel.models.User;
+import com.actimel.models.UzGroup;
+import com.actimel.models.UzLesson;
 import com.actimel.utils.HtmlTemplate;
 import com.actimel.utils.JsonResponseBuilder;
 import com.actimel.utils.Utils;
+import com.actimel.uz.PlanUZ;
 import com.google.gson.reflect.TypeToken;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -525,6 +528,96 @@ public class WebServer extends NanoHTTPD {
 	        			String json = app.getGson().toJson(groups, t);
 	        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
 	        		}
+	        	} else if ("uz".equals(requestMode)) {
+	        		if (subRequestMode != null) {
+	        			if ("departments".equals(subRequestMode)) {
+	        				PlanUZ api = app.getUZApi();
+	        				List<Department> depts = api.getDepartments();
+	        				
+	        				Type t = new TypeToken<List<Department>>() { }.getType();
+		        			String json = app.getGson().toJson(depts, t);
+		        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);
+	        			} else if ("groups".equals(subRequestMode)) {
+	        				Integer divId = Utils.parseInt(params.get("divId"), -1);
+	        				if (divId > 0) {
+
+		        				PlanUZ api = app.getUZApi();
+		        				List<UzGroup> depts = api.getGroupsForDepartment(divId);
+		        				
+		        				Type t = new TypeToken<List<UzGroup>>() { }.getType();
+			        			String json = app.getGson().toJson(depts, t);
+			        			return newFixedLengthResponse(Response.Status.OK, "text/json", json);	
+	        				} else {
+	        					return jsonResponse("message", "B³êdne ID grupy.").put("type", "error").create();
+	        				}
+	        			} else if ("import".equals(subRequestMode)) {
+	        				final boolean confirmed = "yes".equals(params.get("confirm"));
+	        				Integer eventGroupId = Utils.parseInt(params.get("eventGroupId"), -1);
+	        				
+	        				Integer uzGroupId = Utils.parseInt(params.get("uzGroupId"), -1);
+	        				
+	        				if (uzGroupId < 1) {
+	        					return jsonResponse("type", "error").put("message", "B³êdne ID grupy.").create();
+	        				}
+	        				
+	        				if (eventGroupId < 1) {
+	        					return jsonResponse("type", "error").put("message", "Zaznacz poprawn¹ grupê.").create();
+	        				}
+	        				
+	        				PlanUZ api = app.getUZApi();
+	        				
+	        				List<CalendarEvent> eventsFound = new ArrayList<CalendarEvent>();
+	        				
+	        				HashMap<Integer, List<UzLesson>> lessons = api.getDaysForGroup(uzGroupId);
+	        				
+	        				for (Entry<Integer, List<UzLesson>> day : lessons.entrySet()) {
+	        					for (UzLesson lesson : day.getValue()) {
+	        						long timeStart = lesson.startToLong();
+	        						long timeEnd = lesson.endToLong();
+	        						
+	        						CalendarEvent evt = new CalendarEvent(0, lesson.getName(), timeStart, timeEnd, false, true);	        						
+	        						evt.isRecurring(true);
+	        						Integer dayId = day.getKey();
+	        						evt.setRecurringDay(dayId, 1);
+	        						eventsFound.add(evt);
+	        					}
+	        				}
+	        				
+	        				if (confirmed) {
+
+
+	        					int newHighestId = 0;
+	        					if (app.getStorage() instanceof FileStorage) {
+	        						newHighestId = ((FileStorage) app.getStorage()).getHighestEventId() + 1;
+	        					}
+	        					
+	        					for (CalendarEvent cEvent : eventsFound) {
+	        						cEvent.setId(newHighestId);
+	        						cEvent.setOwnerId(sessionUserId);
+	        						if (eventGroupId > 0) {
+										cEvent.setParentGroupId(eventGroupId);
+									}
+	        						app.getStorage().saveEvent(cEvent);
+	        						Utils.log("Saved imported event at ID: " + newHighestId + ", parent group ID: " + eventGroupId);
+	        						newHighestId++;
+	        						
+	        					}
+	        					
+	        					/* zapisywanie wy³¹czone, ¿eby nie robic syfu
+	        					 * 
+	        					if (app.getStorage() instanceof FileStorage) {
+	        						((FileStorage) app.getStorage()).saveEvents();
+	        					}
+	        					*/
+	        					
+	        					return jsonResponse("message", "Zaimportowano <b>" + eventsFound.size() + "</b> zdarzeñ.").put("type", "success").create();
+	        				} else {
+	        					return jsonResponse("affected_events", "" + eventsFound.size()).put("type", "success").create();
+	        				}
+	        			} else {
+	        				// nie ma takiego zapytania
+	        			}
+	        		}	        		
 		        } else {
 		        	// nie ma takiego zapytania
 		        }

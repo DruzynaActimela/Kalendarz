@@ -9,6 +9,10 @@ import com.google.gson.annotations.SerializedName;
  *
  */
 public class CalendarEvent {
+	/**
+	 * Magiczna siódemka.
+	 */
+	private static final int SEVEN = 7;
 	
 	/**
 	 * ID zdarzenia.
@@ -60,6 +64,16 @@ public class CalendarEvent {
 	private int parentGroupId;
 	
 	/**
+	 * Zmienna okreœlaj¹ca, czy zdarzenie jest powtarzaj¹ce siê.
+	 */	
+	private boolean isRecurring = false;
+	
+	/**
+	 * zmienna definiuj¹ca w jakich dniach tygodnia zdarzenie siê powtarza.
+	 */
+	private int[] recurringDays = new int[SEVEN];
+	
+	/**
 	 * Konstruktor zdarzenia w kalendarzu.
 	 * @param eid ID zdarzenia
 	 * @param name Nazwa zdarzenia
@@ -76,6 +90,7 @@ public class CalendarEvent {
 		this.end = stampEnd;
 		this.allday = alldayRef;
 		this.isPublic = eIsPublic;
+		
 	}
 
 	/**
@@ -233,7 +248,37 @@ public class CalendarEvent {
 		return null;
 	}
 	
+	/**
+	 * Metoda umo¿liwiaj¹ca ustawienie tablicy zdarzeñ powtarzaj¹cych siê.
+	 * @param r Nowa tablica
+	 */
+	public final void setRecurringArray(final int[] r) {
+		recurringDays = r;
+	}
 	
+	/**
+	 * Metoda umo¿liwiajaca ustawienie dnia w którym zdarzenie bêdzie siê powtarzac.
+	 * @param day ID dnia
+	 * @param value 0 - nie powtarzaj, 1 - powtarzaj
+	 */
+	public final void setRecurringDay(final int day, final int value) {
+		recurringDays[day] = value;
+	}
 	
+	/**
+	 * Setter isRecurring.
+	 * @param i true/false
+	 */
+	public final void isRecurring(final boolean i) {
+		isRecurring = i;
+	}
+	
+	/**
+	 * Getter isRecurring.
+	 * @return true/false
+	 */
+	public final boolean isRecurring() {
+		return isRecurring;
+	}
 }
 

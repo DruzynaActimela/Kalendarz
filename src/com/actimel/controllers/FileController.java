@@ -46,7 +46,7 @@ public class FileController {
 			throw new Exception(store.getAbsolutePath() + " nie jest folderem!");
 			
 		}
-		
+
 	}
 	
 	/**
@@ -67,6 +67,8 @@ public class FileController {
 		}
 		return file.getAbsolutePath();
 	}
+	
+	
 	
 	/**
 	 * Metoda zwracaj¹ca suffix nazw plików.

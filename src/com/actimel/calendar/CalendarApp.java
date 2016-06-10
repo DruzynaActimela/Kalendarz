@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.actimel.calendar.impl.WebServer;
 import com.actimel.intfs.StorageIntf;
 import com.actimel.utils.Utils;
+import com.actimel.uz.PlanUZ;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -41,6 +42,12 @@ public class CalendarApp {
 	 */
 	private final StorageIntf storage;
 
+	
+	/**
+	 * Obiekt planu UZ.
+	 */
+	private final PlanUZ uzApi;
+	
 	/**
 	 * Funkcja umo¿liwiaj¹ca pobranie kontekstu aplikacji.
 	 * @return Kontekst aplikacji
@@ -56,6 +63,8 @@ public class CalendarApp {
 		CalendarApp.appContext = this;
 		
 		gson = new GsonBuilder().disableHtmlEscaping().create();
+		
+		uzApi = new PlanUZ();
 		
 		storage = new FileStorage(this, 
 								  Const.EVENTS_STORAGE_PATH, 
@@ -89,6 +98,14 @@ public class CalendarApp {
 	 */
 	public final Gson getGson() {
 		return gson;
+	}
+	
+	/**
+	 * Metoda s³u¿¹ca do pobierania obiektu PlanUZ.
+	 * @return obiekt PlanUZ
+	 */
+	public final PlanUZ getUZApi() {
+		return uzApi;
 	}
 	
 	/**

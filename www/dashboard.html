@@ -260,6 +260,15 @@ Dashboard
 							iCal
 						</div>
 					</div>
+					<div class='export-type import-uz screen-trigger' data-screen='import-uz'>
+						<div class='et-icon'>
+							<i class='fa fa-graduation-cap'></i>
+						</div>
+						<div class='et-title'>
+							Plan UZ
+						</div>
+					</div>
+
 					<div class='clear'></div>
 				</div>
 			</div>
@@ -356,6 +365,73 @@ Dashboard
 				</div>
 			</div>
 
+			<div class='page-screen screen-import-uz group-fill-trigger' data-group-fill-container='.import-groups-select-uz' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import z Planu UZ
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-uz-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-uz'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+		                    Wydział
+						</div>
+						<div class='keyval-val'>
+	                        <select class='form-control select-wydzial'>
+	                        	<option>-- wybierz wydział --</option>
+	                        </select>
+		                  
+						</div>
+						<div class='clear'></div>
+					</div>
+					
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+		                    Grupa
+						</div>
+						<div class='keyval-val'>
+	                        <select class='form-control select-grupa'>
+	                        	<option value='-1'>-- najpierw wybierz wydział --</option>
+	                        </select>
+		                   
+						</div>
+						<div class='clear'></div>
+					</div>
+
+
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-uz'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+
+
 
 		</div>
 		<div class='right-panel left'>
@@ -401,6 +477,21 @@ Dashboard
 		if(split.length > 1) newtime += ":" + split[1];
 		newtime += apm;
 		return newtime;
+	}
+
+	function intToTime(str) {
+		var minutes = parseInt(str);
+		if(minutes > 0) {
+			var hours = Math.floor(minutes / 60);
+			minutes -= hours * 60;
+
+
+			hours = (hours < 10) ? "0" + hours : hours;
+			minutes = (minutes < 10) ? "0" + minutes : minutes;
+
+			return hours + ":" + minutes;
+		}
+		return 0;
 	}
 
 	function initialize_calendar() {
@@ -552,13 +643,29 @@ Dashboard
 		                	var evt = json[i];
 		                	console.log(evt);
 
-		                	events.push({
+		                	var evtData = {
 		                		appEventData: evt,
 		                        title: evt.title,
 		                        start: moment.unix(evt.start/1000),
 		                        end: moment.unix(evt.end/1000),
 		                        allDay: evt.allday
-		                    });
+		                    };
+
+		                    if(evt.isRecurring) {
+		                    	console.log("RECURRING", evt);
+		                    	evtData.start = intToTime(evt.start);
+		                    	evtData.end = intToTime(evt.end);
+		                    	var dow = [];
+		                    	for(var dayId in evt.recurringDays) {
+		                    		var value = evt.recurringDays[dayId];
+		                    		if(value > 0) {		                    			
+		                    			dow.push(dayId);
+		                    		}
+		                    	}
+		                    	evtData.dow = dow;
+		                    }
+	                		events.push(evtData);
+
 
 		                }
 		                console.log("events: ", events);
