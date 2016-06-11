@@ -40,7 +40,7 @@ public final class Starter {
 			try {
 	            final File apps = new File(res.toURI());
 	            for (File app : apps.listFiles()) {
-	                System.out.println(app);
+	                Utils.log(app.getAbsolutePath());
 	            }
 	        } catch (URISyntaxException ex) {
 	        	ex.printStackTrace();
@@ -89,8 +89,8 @@ public final class Starter {
 		ICalImporter importer = new ICalImporter();
 		importer.importEvents(new StringReader(result));
 		
-		System.out.println("iCal export from imported result:");
-		System.out.println(exp.export(importer.getEvents()));
+		Utils.log("iCal export from imported result:");
+		Utils.log(exp.export(importer.getEvents()));
 	
 		CalendarExporter csv = new CSVExporter();
 		String csvResult = csv.export(eventsToExport);
@@ -103,5 +103,7 @@ public final class Starter {
 		csvResult = csv.export(csvImporter.getEvents());
 		
 		Utils.log("CSV export from imported result: \n" + csvResult);
+		
+		Utils.log("Stamp: " + Utils.timestamp());
 	}
 }

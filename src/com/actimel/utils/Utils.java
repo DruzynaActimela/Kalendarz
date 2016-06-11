@@ -50,7 +50,7 @@ public final class Utils {
 			}
 			msg += strings[i];
 		}
-		System.out.println(msg);
+		System.out.println(msg); // NOPMD
 	}
 
 	/**

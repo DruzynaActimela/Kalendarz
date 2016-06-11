@@ -49,12 +49,23 @@ public class SimpleCache {
 	 * @return true/false
 	 */
 	public final boolean hasEntry(final String key) {
+		 return hasEntry(key, entryLifetime);
+	}
+	
+	/**
+	 * Metoda umo¿liwiaj¹ca sprawdzenie, czy obiekt o podanym kluczu znajduje siê w tym obiekcie cache.
+	 * @param key Klucz
+	 * @param customCooldown Customowy cooldown
+	 * @return true/false
+	 */
+	public final boolean hasEntry(final String key, final int customCooldown) {
 		 if (entries.containsKey(key)) {
 			 SimpleCacheEntry sce = entries.get(key);
-			 return sce.isAlive(entryLifetime);
+			 return sce.isAlive(customCooldown);
 		 }
 		 return false;
 	}
+	
 
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie obiektu o podanym kluczu.

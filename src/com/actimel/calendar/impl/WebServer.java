@@ -327,8 +327,7 @@ public class WebServer extends NanoHTTPD {
 	        					CalendarEvent evt = app.getStorage().loadEvent(eventId);
 	        					if (evt != null) {
 	        						
-	        						if (evt.getOwnerId() == sessionUserId) {
-	        							evt = null;
+	        						if (evt.getOwnerId() == sessionUserId) {	        							
 	        							app.getStorage().deleteEvent(eventId);
 	        							return jsonResponse("message", "Zdarzenie zosta³o usuniête.").put("type", "success").create();
 	        						} else {

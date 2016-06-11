@@ -15,6 +15,7 @@ import com.actimel.models.SimpleCacheEntry;
 import com.actimel.models.UzGroup;
 import com.actimel.models.UzLesson;
 import com.actimel.utils.SimpleCache;
+import com.actimel.utils.Utils;
 import com.actimel.uz.Responses.DepartmentsResponse;
 import com.actimel.uz.Responses.UzGroupDaysResponse;
 import com.actimel.uz.Responses.UzGroupsResponse;
@@ -98,7 +99,7 @@ public class PlanUZ {
         try {
             HttpGet httpget = new HttpGet(API_ENDPOINT + "?" + params);
 
-            System.out.println("Executing request " + httpget.getRequestLine());
+            Utils.log("Executing request " + httpget.getRequestLine());
             /*
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
@@ -118,8 +119,8 @@ public class PlanUZ {
             */
             HttpResponse response = httpclient.execute(httpget);
             String responseBody = EntityUtils.toString(response.getEntity());
-            System.out.println("----------------------------------------");
-            System.out.println(responseBody);
+            Utils.log("----------------------------------------");
+            Utils.log(responseBody);
             
             cache.store(params, responseBody);
 

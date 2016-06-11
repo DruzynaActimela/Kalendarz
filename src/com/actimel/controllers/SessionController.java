@@ -70,6 +70,7 @@ public class SessionController {
 	public final boolean destroySession(final String key) {
 		if (sessions.containsKey(key)) {
 			sessions.remove(key);
+			return true;
 		}
 		return false;
 	}

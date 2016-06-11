@@ -1,6 +1,7 @@
 package com.actimel.controllers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import com.actimel.utils.Utils;
 
@@ -37,13 +38,13 @@ public class FileController {
 	 * Konstruktor przyjmuj¹cy œcie¿kê foldera, 
 	 * w którym bêd¹ przechowywane pliki.
 	 * @param storePath Œcie¿ka foldera
-	 * @throws Exception 
+	 * @throws FileNotFoundException 
 	 */
-	public FileController(final String storePath) throws Exception {
+	public FileController(final String storePath) throws FileNotFoundException {
 		store = new File(storePath);
 		store.mkdirs();
 		if (!store.isDirectory()) {
-			throw new Exception(store.getAbsolutePath() + " nie jest folderem!");
+			throw new FileNotFoundException(store.getAbsolutePath() + " nie jest folderem!");
 			
 		}
 
