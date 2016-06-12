@@ -2,9 +2,6 @@ package com.actimel.tests;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,23 +30,32 @@ public class SimpleCacheTest {
 	 */
 	private static final int COOLDOWN = 3600;
 	
+	/**
+	 * Przygotowanie.
+	 * @throws Exception wyj¹tek
+	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		entry = new SimpleCacheEntry("klucz", "wartosc");
 		cache = new SimpleCache(COOLDOWN);
 	}
 
-
+	/**
+	 * Test obiektu.
+	 */
 	@Test
-	public void testEntry() {
+	public final void testEntry() {
 		assertNotNull(entry);
 		assertEquals(entry.getKey(), "klucz");
 		assertEquals(entry.getVal(), "wartosc");
 		
 	}
 	
+	/**
+	 * Test cache.
+	 */
 	@Test
-	public void testCache() {
+	public final void testCache() {
 		assertNotNull(cache);
 		
 		cache.store("dane", "tekstowe");

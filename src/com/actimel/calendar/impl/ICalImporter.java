@@ -61,7 +61,8 @@ public class ICalImporter extends CalendarImporter {
 					VEvent event = (VEvent) component;
 					long start = event.getStartDate().getDate().getTime();
 					long end = event.getEndDate().getDate().getTime();
-					CalendarEvent cEvent = new CalendarEvent(0, event.getSummary().toString(), start, end, false, true);
+
+					CalendarEvent cEvent = new CalendarEvent(0, event.getSummary().getValue(), start, end, false, true);
 					super.addEvent(cEvent);
 				}
 			}

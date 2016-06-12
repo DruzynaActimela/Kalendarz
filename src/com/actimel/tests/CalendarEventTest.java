@@ -12,6 +12,11 @@ import org.junit.Test;
 import com.actimel.calendar.CalendarApp;
 import com.actimel.models.CalendarEvent;
 
+/**
+ * Test klasy CalendarEvent.
+ * @author ActimelTeam
+ *
+ */
 public class CalendarEventTest {
 
 	/**
@@ -42,6 +47,10 @@ public class CalendarEventTest {
 	
 	
 	
+	/**
+	 * Przygotowanie do testu.
+	 * @throws Exception wyj¹tek.
+	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		appContext = new CalendarApp();
@@ -50,27 +59,20 @@ public class CalendarEventTest {
 		evt = new CalendarEvent(TEST_EVENT_ID, "Testowy event", TEST_EVENT_START, TEST_EVENT_END, true, true);
 	}
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	
+	/**
+	 * Test obiektu.
+	 */
 	@Test
-	public void testCalendarEvent() {
+	public final void testCalendarEvent() {
 		assertNotNull(evt);
 		
 	}
 	
+	/**
+	 * Test getterów.
+	 */
 	@Test
-	public void testCalendarEventGetters() {
+	public final void testCalendarEventGetters() {
 		assertEquals(evt.getName(), "Testowy event");		
 		assertEquals(evt.getId(), TEST_EVENT_ID);
 		assertEquals(evt.getStampStart(), TEST_EVENT_START);
