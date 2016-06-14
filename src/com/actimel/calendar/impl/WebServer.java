@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -159,6 +160,7 @@ public class WebServer extends NanoHTTPD {
 			String currentRoute = (uriSplit.length > 1) ? uriSplit[1] :  uriSplit[0];
 			
 			Utils.log("currentRoute: " + currentRoute);
+
 			//Utils.log(httpSession.getHeaders().toString());
 			String cookieSessionKey = httpSession.getCookies().read(Const.COOKIE_SESSION_KEY);
 			Session userSession = null;
@@ -169,8 +171,10 @@ public class WebServer extends NanoHTTPD {
 			final int sessionUserId = (userSession != null) ? userSession.getUserId() : 1;	
 			
 			if (!allowedRoutesWithoutLogin.contains(currentRoute) && userSession == null && !excludeFoldersFromLoginCheck.contains(currentRoute)) {
-				// wy³¹czone na czas pisania
-				//return doRedirect("login#message:not-authorized");
+				if ("api".equals(currentRoute)) {
+					return jsonResponse("message", "Nie jesteœ zalogowany!").put("type", "error").create();
+				}
+				return doRedirect("login#message:not-authorized");
 			}
 
         	if (uri.startsWith("/api")) {
@@ -447,7 +451,7 @@ public class WebServer extends NanoHTTPD {
 	        					return jsonResponse("affected_events", "" + selectedEvents.size()).put("type", "success").create();
 	        				}
 	        			} else {
-	        				// nie ma takiego zapytania dla eventów
+	        				return jsonResponse("message", "Nie ma takiej opcji.").put("type", "error").create();
 	        			}
 	        		} else {
 	        			// display events
@@ -518,7 +522,7 @@ public class WebServer extends NanoHTTPD {
 	        					return jsonResponse("message", "Nazwa zawiera niedozwolone znaki.").put("type", "error").create();
 	        				}
 	        			} else {
-	        				// nie ma takiego zapytania dla grup
+	        				return jsonResponse("message", "Nie ma takiej opcji.").put("type", "error").create();
 	        			}
 	        		} else {
 	        			// wyœwietl listê grup u¿ytkownika      			
@@ -614,11 +618,11 @@ public class WebServer extends NanoHTTPD {
 	        					return jsonResponse("affected_events", "" + eventsFound.size()).put("type", "success").create();
 	        				}
 	        			} else {
-	        				// nie ma takiego zapytania
+	        				return jsonResponse("message", "Nie ma takiej opcji.").put("type", "error").create();
 	        			}
 	        		}	        		
 		        } else {
-		        	// nie ma takiego zapytania
+		        	return jsonResponse("message", "Nie ma takiej opcji.").put("type", "error").create();
 		        }
         	} else if (uri.startsWith("/download")) {
         		String toFind = "/download/";
@@ -647,7 +651,7 @@ public class WebServer extends NanoHTTPD {
         			return jsonResponse("type", "error").put("message", "Not allowed").create();
         		}
         	} else if (uri.startsWith("/dashboard")) {
-        		String username = "user"; //userSession.getUser().getName();
+        		String username = userSession.getUser().getName();
         		int adminLevel = 1;
         		HtmlTemplate dashboardTemplate = HtmlTemplate.loadFromResource("dashboard.html@" + username); // mo¿liwoœæ cache'owania dla poszczegolnych uzytkownikow
         		dashboardTemplate.putYieldVar("current_username", username);
@@ -656,6 +660,19 @@ public class WebServer extends NanoHTTPD {
         		}
         		
     			return newFixedLengthResponse(dashboardTemplate.render());
+        	} else if (uri.startsWith("/logout")) {
+        		if (userSession != null) {
+        			String key = userSession.getKey();
+        			//boolean destroyResult = sessionController.destroySession(key);
+        			//Utils.log("Destroy result : " + destroyResult);
+        			httpSession.getCookies().set(Const.COOKIE_SESSION_KEY, "logout", Const.COOKIE_SESSION_LIFETIME);
+        			//boolean exists = (sessionController.getSessionByKey(key) != null);
+
+        			return doRedirect("login#message:logout");
+        		} else {
+        			return jsonResponse("type", "error").put("message", "Nie jesteœ zalogowany!").create();
+        		}
+        		
         	} else if (uri.startsWith("/login")) {
         		
         		if (userSession != null) {

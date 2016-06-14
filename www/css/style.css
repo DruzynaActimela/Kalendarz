@@ -862,6 +862,7 @@ body {
     display: table-cell;
 }
 .context-menu {
+    display: none;
     border: 1px solid #bfbfbf;
     border-radius: 3px;
     background: white;

@@ -43,6 +43,7 @@ public final class Utils {
 	 * @param strings Lista elementów, które maj¹ zostac wyswietlone
 	 */
 	public static void log(final String ... strings) {
+
 		String msg = "";
 		for (int i = 0; i < strings.length; i++) {
 			if (msg.length() > 0) {

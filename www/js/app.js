@@ -23,15 +23,26 @@ function parse_template(elem, vars) {
     return html;
 }
 
+function in_array(arr, val) {
+    for(var i in arr) {
+        if(arr[i] == val) return true;
+    }
+    return false;
+}
+
 var app = {
     screenShowEvents: [],
     locationArgs: [],
     rebuildArgs: function() {
+        var blacklist = ["message"];
+
         var args = "";
         for(var key in app.locationArgs) {
             var val = app.locationArgs[key];
-            if(args.length > 0) args += "|";
-            args += key + ":" + encodeURIComponent(val);
+            if(!in_array(blacklist, key)) {
+                if(args.length > 0) args += "|";
+                args += key + ":" + encodeURIComponent(val);
+            }
 
         }
         location.hash = args;
@@ -156,11 +167,9 @@ var app = {
                     dateFormat: "dd-mm-yy",
                 });
             });
-            
-
 
             setTimeout(function() {
-                initialize_calendar();
+                if(typeof initialize_calendar == "function") initialize_calendar();
                 app.updateUI();
 
 
