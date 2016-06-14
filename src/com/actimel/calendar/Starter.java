@@ -48,18 +48,8 @@ public final class Starter {
 		} else {
 			Utils.log("Something went wrong");
 		}
-	
-		HtmlTemplate 
-		index = HtmlTemplate.loadFromResource("dashboard.html", false);
-		Utils.log("-- render -- ");
-		index.putYieldVar("current_username", "test");
-		//index.putYieldVar("zmienna", "wartosc zmiennej");
-		String renderedTemplate = index.render();
-		
-		Utils.log(renderedTemplate);
-		
-		
-		
+
+
 		CalendarApp app = null;
 		
 		try {
@@ -71,6 +61,18 @@ public final class Starter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		/*
+		HtmlTemplate 
+		index = HtmlTemplate.loadFromResource("dashboard.html", false);
+		Utils.log("-- render -- ");
+		index.putYieldVar("current_username", "test");
+		//index.putYieldVar("zmienna", "wartosc zmiennej");
+		String renderedTemplate = index.render();
+		
+		Utils.log(renderedTemplate);
+		
 		Utils.log("date: " + Utils.dateToTimestamp("16-04-2016", Const.DATE_FORMAT_DAY));
 		Utils.log("date with time: " + Utils.dateToTimestamp("16-04-2016 14:30", Const.DATE_FORMAT_DAY_TIME));
 		
@@ -105,5 +107,7 @@ public final class Starter {
 		Utils.log("CSV export from imported result: \n" + csvResult);
 		
 		Utils.log("Stamp: " + Utils.timestamp());
+		
+		*/
 	}
 }
