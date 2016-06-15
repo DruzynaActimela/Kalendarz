@@ -131,8 +131,13 @@ public class WebServer extends NanoHTTPD {
      * @return Instacja odpowiedzi NanoHTTPD z nag³ówkiem przekierowania
      */
     private Response doRedirect(final String uri) {
+    	
+    	String hostname = Const.HOSTNAME + ":" + Const.WEBSERVER_PORT;
+    	String redirectTo = hostname + "/" + uri;
+    	redirectTo = "http://" + redirectTo.replaceAll("//", "/");
+    	Utils.log(redirectTo);
     	NanoHTTPD.Response res = newFixedLengthResponse(Status.REDIRECT, "text/plain", "");
-		res.addHeader("Location", uri);
+		res.addHeader("Location", redirectTo);
 		return res;
     }
 
@@ -157,7 +162,9 @@ public class WebServer extends NanoHTTPD {
 			boolean whitelistEnabled = true;
 			
 			String[] uriSplit = uri.split("/");
-			String currentRoute = (uriSplit.length > 1) ? uriSplit[1] :  uriSplit[0];
+			int slashIdx = uri.indexOf("/");
+		
+			String currentRoute = (uriSplit.length > 1) ? uriSplit[1] :  uri.substring(slashIdx);
 			
 			Utils.log("currentRoute: " + currentRoute);
 
@@ -663,7 +670,7 @@ public class WebServer extends NanoHTTPD {
         	} else if (uri.startsWith("/logout")) {
         		if (userSession != null) {
         			String key = userSession.getKey();
-        			//boolean destroyResult = sessionController.destroySession(key);
+        			sessionController.destroySession(key);
         			//Utils.log("Destroy result : " + destroyResult);
         			httpSession.getCookies().set(Const.COOKIE_SESSION_KEY, "logout", Const.COOKIE_SESSION_LIFETIME);
         			//boolean exists = (sessionController.getSessionByKey(key) != null);
@@ -748,7 +755,9 @@ public class WebServer extends NanoHTTPD {
     		} else {
         		
         		String resourcePath = (wwwRootDir + uri).trim();
-
+        		
+        		
+        		
         		
             	resourcePath = resourcePath.replaceAll("\\|\\/", filePathSeparator);
             	resourcePath = resourcePath.substring(1);
@@ -765,12 +774,14 @@ public class WebServer extends NanoHTTPD {
             	String mime = (mimes.containsKey(ext) ? mimes.get(ext) : defaultMime);
 
 
-            	//Utils.log("resource_path: " + resource_path);
+            	Utils.log("resource_path: " + resourcePath);
+            	
             	
             	URL resourceURL = getClass().getClassLoader().getResource(resourcePath);
         		if (Const.LOAD_FROM_DISK) {
         			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
-        			File directory = new File(location.getFile());
+        			
+        			File directory = new File(Utils.urlDecode(location.getFile()));
         			Utils.log(directory.getAbsolutePath());
         			File wwwDirectory = new File(directory.getAbsolutePath() + File.separator + ".." + File.separator + "www");
         			

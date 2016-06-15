@@ -100,7 +100,7 @@ public class HtmlTemplate {
 			int pos = resourceName.indexOf('@');
 			uniqCacheKey = resourceName.substring(pos + 1);
 			resourceName = resourceName.substring(0, pos);
-			Utils.log("Got uniqueCacheKey: " + uniqCacheKey);
+			doLog("Got uniqueCacheKey: " + uniqCacheKey);
 		}
 		return loadFromResource(resourceName, true, uniqCacheKey);
 	}
@@ -137,15 +137,18 @@ public class HtmlTemplate {
 		HtmlTemplate inst = null; 
 		if (Const.LOAD_FROM_DISK) {
 			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
-			File directory = new File(location.getFile());
-			Utils.log(directory.getAbsolutePath());
+			String url = Utils.urlDecode(location.getFile());
+			doLog(url);
+			
+			File directory = new File(url);
+			doLog(directory.getAbsolutePath());
 			File wwwDirectory = new File(directory.getAbsolutePath() + File.separator + ".." + File.separator + "www");
 			
 			inst = new HtmlTemplate(new File(wwwDirectory, resName));
 		} else {
 			inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
 		}
-		Utils.log("Putting " + resName + " at: " + cacheKey);
+		doLog("Putting " + resName + " at: " + cacheKey);
 		templateCache.put(cacheKey, inst);
 		return inst;
 		
@@ -217,12 +220,12 @@ public class HtmlTemplate {
 		for (String line : lines) {
 			
 			int lineIndex = rawContent.indexOf(line);
-			Utils.log("[" + template.getName() + "] " + line);
+			doLog("[" + template.getName() + "] " + line);
 			Matcher matcher = tVarRegex.matcher(line);
 			
 			if (line.matches("(.*)" + tVarRegex.pattern() + "(.*)") && !isExcludedLine(line, excludedLines)) {
 				String newLine = "";
-				Utils.log("--while begin--");
+				doLog("--while begin--");
 				
 				while (matcher.find()) {
 					int matchCount = 0;
@@ -230,11 +233,11 @@ public class HtmlTemplate {
 					
 					for (int m = 0; m < matcher.groupCount(); m++) {
 						if (matcher.group(m) != null) {
-							Utils.log(m + ". " + matcher.group(m));
+							doLog(m + ". " + matcher.group(m));
 							matchCount = m + 1;
 						}
 					}
-					Utils.log("Match count: " + matchCount);
+					doLog("Match count: " + matchCount);
 					
 					String actionName = matcher.group(1);
 					String firstValue = null;
@@ -255,13 +258,13 @@ public class HtmlTemplate {
 						}
 					}
 					
-					Utils.log(actionName + ", " + firstValue + ", " + secondValue);
+					doLog(actionName + ", " + firstValue + ", " + secondValue);
 					
 					if ("extends".equals(actionName) && masterTemplate == null) {
 						masterTemplate = HtmlTemplate.loadFromResource(firstValue, false);
 						masterTemplate.putYieldVars(variablesToReplace);
 						masterTemplate.parseTemplate();
-						Utils.log("Got master template: " + firstValue);
+						doLog("Got master template: " + firstValue);
 					}
 					
 					if ("yield".equals(actionName)) {
@@ -270,7 +273,7 @@ public class HtmlTemplate {
 						StringBuffer strbuf = new StringBuffer(line);
 						String replacement = yieldVarPrefix + firstValue + yieldVarSuffix;
 						strbuf = strbuf.replace(startPos, endPos, replacement);
-						Utils.log("REPLACING [" + line.substring(startPos, endPos) + "] to [" + replacement + "]");
+						doLog("REPLACING [" + line.substring(startPos, endPos) + "] to [" + replacement + "]");
 						newLine += strbuf.toString();
 						if (!variablesToReplace.containsKey(firstValue)) {
 							String defaultVal = (secondValue != null) ? secondValue : "";
@@ -289,7 +292,7 @@ public class HtmlTemplate {
 						int stopPosition = rawContent.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
-						Utils.log("znaleziony isset: (match offset: " + sectionOffset + ") " + tmpsVal);
+						doLog("znaleziony isset: (match offset: " + sectionOffset + ") " + tmpsVal);
 						String ifExists = "", ifNotExists = "";
 												
 						if (tmpsVal.contains(elsePhrase)) {
@@ -301,8 +304,8 @@ public class HtmlTemplate {
 						}	
 						List<String> excluded = (Arrays.asList(tmpsVal.split(newline)));
 					
-						Utils.log("IF EXISTS" + ifExists);
-						Utils.log("IF NOT EXISTS" + ifNotExists);
+						doLog("IF EXISTS" + ifExists);
+						doLog("IF NOT EXISTS" + ifNotExists);
 						
 						if (variablesToReplace.containsKey(firstValue)) {
 							newLine += replaceVars(ifExists, variablesToReplace).trim();
@@ -321,9 +324,9 @@ public class HtmlTemplate {
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
 						List<String> excluded = (Arrays.asList(tmpsVal.split(newline)));
-						Utils.log("Parsing section... (match offset: " + sectionOffset + ")");
+						doLog("Parsing section... (match offset: " + sectionOffset + ")");
 						String parsedSection = parse(tmpsVal);
-						Utils.log("PARSED SECTION" + parsedSection);
+						doLog("PARSED SECTION" + parsedSection);
 						sectionValue = replaceVars(parsedSection, variablesToReplace);						
 						excludedLines.addAll(excluded);
 
@@ -331,7 +334,7 @@ public class HtmlTemplate {
 						sectionValue = secondValue;
 					}
 					if (sectionValue.length() > 0) {
-						Utils.log("section of the content is: [" + sectionValue + "]");
+						doLog("section of the content is: [" + sectionValue + "]");
 					}
 					
 					
@@ -341,7 +344,7 @@ public class HtmlTemplate {
 						}						
 					}
 				}
-				Utils.log("--while end--");
+				doLog("--while end--");
 				builder.append(newLine + "\n");
 			} else {
 				if (!isExcludedLine(line, excludedLines)) {
@@ -352,9 +355,9 @@ public class HtmlTemplate {
 
 		}
 		
-		Utils.log("-- post parse -- ");
+		doLog("-- post parse -- ");
 		
-		Utils.log(builder.toString());
+		doLog(builder.toString());
 		
 		//content = builder.toString();
 		return builder.toString();
@@ -368,9 +371,9 @@ public class HtmlTemplate {
 		if (!parsed) {
 			parseTemplate();
 		}
-		Utils.log("render");
+		doLog("render");
 		
-		Utils.log("RENDER IN " + template.getName());
+		doLog("RENDER IN " + template.getName());
 		return recursiveRender(content, variablesToReplace);
 	}
 	
@@ -386,7 +389,7 @@ public class HtmlTemplate {
 		for (Entry<String, String> entry : vars.entrySet()) {
 			String variableName = entry.getKey();
 			String variableValue = entry.getValue();
-			Utils.log(variableName + "=>" + variableValue);
+			doLog(variableName + "=>" + variableValue);
 			
 			String yieldVar = yieldVarPrefix + variableName + yieldVarSuffix;
 			
@@ -425,5 +428,14 @@ public class HtmlTemplate {
 	 */
 	private void setTemplateContent(final String c) {
 		content = c;
+	}
+	
+	
+	/**
+	 * Wewnêtrzna funkcja gdzie mo¿na wy³¹czaæ logowanie.
+	 * @param strs Lista zmiennych do wyswietlenia.
+	 */
+	private final static void doLog(String ... strs) {
+		//Utils.log(strs);
 	}
 }

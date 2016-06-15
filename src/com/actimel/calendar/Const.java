@@ -6,6 +6,11 @@ package com.actimel.calendar;
 
 public final class Const {
 	/**
+	 * Hostname serwera WWW.
+	 */
+	public static final String HOSTNAME = "127.0.0.1";
+	
+	/**
 	 * Port serwera WWW.
 	 */
 	public static final int WEBSERVER_PORT = 9090;

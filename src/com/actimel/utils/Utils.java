@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -413,5 +414,20 @@ public final class Utils {
 			sec += Utils.parseInt(split[1], 0);
 		}		
 		return sec;
+	}
+	
+	/**
+	 * Metoda konwertuj¹ca zakodowane urle na normalne.
+	 * @param str Zakodowany URL
+	 * @return URL
+	 */
+	public static String urlDecode(final String str) {
+		try {
+			return java.net.URLDecoder.decode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return str;
 	}
 }
