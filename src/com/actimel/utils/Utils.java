@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -43,6 +44,7 @@ public final class Utils {
 	 * @param strings Lista elementów, które maj¹ zostac wyswietlone
 	 */
 	public static void log(final String ... strings) {
+
 		String msg = "";
 		for (int i = 0; i < strings.length; i++) {
 			if (msg.length() > 0) {
@@ -50,7 +52,7 @@ public final class Utils {
 			}
 			msg += strings[i];
 		}
-		System.out.println(msg);
+		System.out.println(msg); // NOPMD
 	}
 
 	/**
@@ -285,6 +287,31 @@ public final class Utils {
 		return date.getTime();
 		
 	}
+
+	/**
+	 * Funkcja umo¿liwiaj¹ca przedstawienie timestampa jako daty.
+	 * @param timestampMilis Timestamp w milisekundach
+	 * @param format Format daty
+	 * @return Data jako String
+	 */
+	public static String 
+	dateFromTimestamp(final Long timestampMilis, final String format) {
+		
+		Date date = new Date(timestampMilis);
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		return dateFormat.format(date);
+
+	}
+	
+	/**
+	 * Funkcja umo¿liwiaj¹ca przedstawienie timestampa jako daty.
+	 * @param timestampMilis Timestamp w milisekundach
+	 * @return Data jako obiekt Date
+	 */
+	public static Date 
+	dateObjectFromTimestamp(final Long timestampMilis) {
+		return new Date(timestampMilis);
+	}
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca przekonwertowanie ci¹gu znaków na Integer.
@@ -328,5 +355,79 @@ public final class Utils {
 		}
 	}
 	
+	/**
+	 * Funkcja umo¿liwiaj¹ca obliczenie odstêpu czasu miêdzy dwoma datami.
+	 * @param startDate Data pocz¹tkowa
+	 * @param endDate Data koñcowa
+	 * @param dateFormat Format dat
+	 * @return Pozytywny odstêp czasowy 
+	 * miêdzy dwoma datami wyra¿ony w sekundach.
+	 */
+	public static long 
+	calculateDuration(final String startDate, 
+			final String endDate, final String dateFormat) {
+		long start = Utils.dateToTimestamp(startDate, dateFormat);
+		long end = Utils.dateToTimestamp(endDate, dateFormat);
+		final int milis = 1000;
+		return (Math.abs(end - start) / milis);
+	}
 	
+	/**
+	 * Funkcja umo¿liwiaj¹ca obliczenie odstêpu czasu miêdzy dwoma datami.
+	 * @param startDate Data pocz¹tkowa
+	 * @param endDate Data koñcowa
+	 * @return Pozytywny odstêp czasowy 
+	 * miêdzy dwoma datami wyra¿ony w sekundach.
+	 */
+	public static int 
+	calculateDuration(final Date startDate, final Date endDate) {
+		long start = startDate.getTime();
+		long end = endDate.getTime();
+		final int milis = 1000;
+		return (int) (Math.abs(end - start) / milis);
+	}
+
+	/**
+	 * Metoda zwracaj¹ca aktualny timestamp w milisekundach.
+	 * @return Timestamp w milisekundach
+	 */
+	public static long timestamp() {
+		return System.currentTimeMillis();
+	}
+	
+	/**
+	 * Metoda zwracaj¹ca reprezentacjê godziny w sekundach.
+	 * @param time Godzina
+	 * @return Sekundy
+	 */
+	public static long strTimeToLong(final String time) {
+		
+		if (time == null || !time.contains(":")) {
+			return 0;
+		}
+		
+		String[] split = time.split(":");
+		int sec = 0;
+		final int minute = 60;
+		if (split.length > 1) {
+			sec += Utils.parseInt(split[0], 0) * minute;
+			sec += Utils.parseInt(split[1], 0);
+		}		
+		return sec;
+	}
+	
+	/**
+	 * Metoda konwertuj¹ca zakodowane urle na normalne.
+	 * @param str Zakodowany URL
+	 * @return URL
+	 */
+	public static String urlDecode(final String str) {
+		try {
+			return java.net.URLDecoder.decode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return str;
+	}
 }

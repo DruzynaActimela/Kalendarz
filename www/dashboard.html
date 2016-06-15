@@ -60,9 +60,13 @@ Dashboard
 						<i class='fa fa-cogs'></i>Ustawienia
 					</div>
 					<div class='lm-divider'></div>
-					<div class='lm-option screen-trigger lm-option-bordered' data-screen='export'>
+					<div class='lm-option screen-trigger ' data-screen='export'>
 						<i class='fa fa-cloud-download'></i>Eksport
 					</div>
+					<div class='lm-option screen-trigger ' data-screen='import'>
+						<i class='fa fa-cloud-upload'></i>Import
+					</div>
+
 
 				</div>
 			</div>
@@ -112,7 +116,7 @@ Dashboard
 				</div>
 			</div>
 
-			<div class='page-screen screen-export-csv'>
+			<div class='page-screen screen-export-csv group-fill-trigger' data-group-fill-container='.export-groups-select-csv'>
 				<div class='screen-title with-go-back'>
 					<div class='screen-go-back screen-trigger' data-screen='export'>
 						<i class='fa fa-chevron-left'></i><span>Wróć</span>
@@ -122,7 +126,55 @@ Dashboard
 					</div>
 				</div>
 
-				asd
+				<div class='export-wizard wizard-csv'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupy
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select export-groups-select-csv'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data początkowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-start" placeholder="Data początkowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Data końcowa
+						</div>
+						<div class='keyval-val'>
+		                    <div class="input-group">
+		                        <input type="text" class="form-control bind-datepicker  export-date-end" placeholder="Data końcowa">
+		                        <div class="input-group-addon"><i class='fa fa-calendar'></i></div>
+		                    </div>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-export-csv'>
+						<i class='fa fa-check'></i>
+						Eksportuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
 			</div>
 
 			<div class='page-screen screen-export-ical group-fill-trigger' data-group-fill-container='.export-groups-select-ical'>
@@ -186,6 +238,201 @@ Dashboard
 				</div>
 			</div>
 
+			<div class='page-screen screen-import'>
+				<div class='screen-title'>
+					Import kalendarza
+				</div>
+				<div class="alert alert-info">Wybierz typ pliku, z którego chcesz zaimportować swój kalendarz.</div>
+				<div class='export-select-type'>
+					<div class='export-type import-csv screen-trigger' data-screen='import-csv'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							CSV
+						</div>
+					</div>
+					<div class='export-type import-ical screen-trigger' data-screen='import-ical'>
+						<div class='et-icon'>
+							<i class='fa fa-file'></i>
+						</div>
+						<div class='et-title'>
+							iCal
+						</div>
+					</div>
+					<div class='export-type import-uz screen-trigger' data-screen='import-uz'>
+						<div class='et-icon'>
+							<i class='fa fa-graduation-cap'></i>
+						</div>
+						<div class='et-title'>
+							Plan UZ
+						</div>
+					</div>
+
+					<div class='clear'></div>
+				</div>
+			</div>
+
+			<div class='page-screen screen-import-csv group-fill-trigger' data-group-fill-container='.import-groups-select-csv' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import CSV
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-csv-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-csv'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Plik
+						</div>
+						<div class='keyval-val'>
+		                    <input type='file' id='csv-import-file'>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-csv'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+			<div class='page-screen screen-import-ical group-fill-trigger' data-group-fill-container='.import-groups-select-ical' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import CSV
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-ical-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-ical'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Plik
+						</div>
+						<div class='keyval-val'>
+		                    <input type='file' id='ical-import-file'>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-ical'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+			<div class='page-screen screen-import-uz group-fill-trigger' data-group-fill-container='.import-groups-select-uz' data-no-check='1' data-one-checkbox-only='1'>
+				<div class='screen-title with-go-back'>
+					<div class='screen-go-back screen-trigger' data-screen='import'>
+						<i class='fa fa-chevron-left'></i><span>Wróć</span>
+					</div>
+					<div class='screen-title-label'>
+						Import z Planu UZ
+					</div>
+				</div>
+
+				<div class='export-wizard wizard-uz-import'>
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+							Grupa
+						</div>
+						<div class='keyval-val'>
+							<div class='export-groups-select import-groups-select import-groups-select-uz'>
+
+							</div>
+						</div>
+						<div class='clear'></div>
+					</div>
+
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+		                    Wydział
+						</div>
+						<div class='keyval-val'>
+	                        <select class='form-control select-wydzial'>
+	                        	<option>-- wybierz wydział --</option>
+	                        </select>
+		                  
+						</div>
+						<div class='clear'></div>
+					</div>
+					
+					<div class='keyval-holder'>
+						<div class='keyval-key'>
+		                    Grupa
+						</div>
+						<div class='keyval-val'>
+	                        <select class='form-control select-grupa'>
+	                        	<option value='-1'>-- najpierw wybierz wydział --</option>
+	                        </select>
+		                   
+						</div>
+						<div class='clear'></div>
+					</div>
+
+
+
+				</div>
+				<div class='bottom-buttons'>
+					<div class='app-btn btn-green-rounded btn-import-uz'>
+						<i class='fa fa-check'></i>
+						Importuj
+					</div>
+					<div class='app-btn btn-red-rounded'>
+						<i class='fa fa-times'></i>
+						Anuluj
+					</div>
+
+				</div>
+			</div>
+
+
+
+
 		</div>
 		<div class='right-panel left'>
 			<div class='inner-panel-content'>
@@ -232,6 +479,21 @@ Dashboard
 		return newtime;
 	}
 
+	function intToTime(str) {
+		var minutes = parseInt(str);
+		if(minutes > 0) {
+			var hours = Math.floor(minutes / 60);
+			minutes -= hours * 60;
+
+
+			hours = (hours < 10) ? "0" + hours : hours;
+			minutes = (minutes < 10) ? "0" + minutes : minutes;
+
+			return hours + ":" + minutes;
+		}
+		return 0;
+	}
+
 	function initialize_calendar() {
 		calendarRef = $('#calendar').fullCalendar({
 			customButtons: {
@@ -273,17 +535,17 @@ Dashboard
 				if(appEventData) {
 					var currentView = $('#calendar').fullCalendar('getView');
 
-					var groupId = appEventData.parent_group_id;
+					var groupId = appEventData.parentGroupId;
 					var group = app.getEventGroup(groupId);
 
 
 
 					element.css({
-						borderColor: group.color,
+						borderColor: group ? group.color : DEFAULT_GROUP_COLOR,
 						background: "white"
 					});
 					element.find(".fc-content").css({
-						background: group.color,
+						background: group ? group.color : DEFAULT_GROUP_COLOR,
 						padding: "1px 0px"
 					});
 					element.find(".fc-time").css({
@@ -381,13 +643,29 @@ Dashboard
 		                	var evt = json[i];
 		                	console.log(evt);
 
-		                	events.push({
+		                	var evtData = {
 		                		appEventData: evt,
 		                        title: evt.title,
 		                        start: moment.unix(evt.start/1000),
 		                        end: moment.unix(evt.end/1000),
 		                        allDay: evt.allday
-		                    });
+		                    };
+
+		                    if(evt.isRecurring) {
+		                    	console.log("RECURRING", evt);
+		                    	evtData.start = intToTime(evt.start);
+		                    	evtData.end = intToTime(evt.end);
+		                    	var dow = [];
+		                    	for(var dayId in evt.recurringDays) {
+		                    		var value = evt.recurringDays[dayId];
+		                    		if(value > 0) {		                    			
+		                    			dow.push(dayId);
+		                    		}
+		                    	}
+		                    	evtData.dow = dow;
+		                    }
+	                		events.push(evtData);
+
 
 		                }
 		                console.log("events: ", events);

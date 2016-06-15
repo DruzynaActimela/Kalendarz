@@ -6,11 +6,14 @@ package com.actimel.models;
 public class Session {
 	/**
 	 * Obiekt u퓓tkownika sesji.
+	 * @uml.property  name="user"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private User user;
 	
 	/**
 	 * Klucz sesji.
+	 * @uml.property  name="key"
 	 */
 	private String key;	
 	
@@ -27,7 +30,8 @@ public class Session {
 	
 	/**
 	 * Getter u퓓tkownika danej sesji.
-	 * @return Obiekt u퓓tkownika
+	 * @return  Obiekt u퓓tkownika
+	 * @uml.property  name="user"
 	 */
 	public final User getUser() {
 		return user;
@@ -35,7 +39,8 @@ public class Session {
 
 	/**
 	 * Getter klucza sesji.
-	 * @return Klucz sesji
+	 * @return  Klucz sesji
+	 * @uml.property  name="key"
 	 */
 	public final String getKey() {
 		return key;

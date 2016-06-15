@@ -24,58 +24,78 @@ public class FileStorage implements StorageIntf {
 	
 	/**
 	 * Referencja do pliku ze zdarzeniami.
+	 * @uml.property  name="eventsStorageFile"
 	 */
 	private File eventsStorageFile;
 	
 	/**
 	 * Referencja do pliku z uzytkownikami.
+	 * @uml.property  name="usersStorageFile"
 	 */
 	private File usersStorageFile;
 	
 	/**
-	 * Referencja do pliku z grupami zdarze≈Ñ.
+	 * Referencja do pliku z grupami zdarzeÒ.
+	 * @uml.property  name="eventsGroupsStorageFile"
 	 */
 	private File eventsGroupsStorageFile;
 	
 	/**
-	 * Najwy≈ºsze ID u≈ºytkownika.
+	 * Najwyøsze ID uøytkownika.
+	 * @uml.property  name="highestUserId"
 	 */
 	private int highestUserId = 0;
 	
 	/**
 	 * Najwyzsze ID zdarzenia.
+	 * @uml.property  name="highestEventId"
 	 */
 	private int highestEventId = 0;
 	
 	/**
-	 * Najwy≈ºsze ID grupy zdarze≈Ñ.
+	 * Najwyøsze ID grupy zdarzeÒ.
+	 * @uml.property  name="highestEventGroupId"
 	 */
 	private int highestEventGroupId = 0;
 	
 	/**
 	 * Referencja do instancji aplikacji kalendarza.
+	 * @uml.property  name="app"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private CalendarApp app;
 	
 	/**
-	 * Cache u≈ºytkownik√≥w w systemie.
+	 * Cache uøytkownikÛw w systemie.
+	 * @uml.property  name="cachedUsers"
+	 * @uml.associationEnd  qualifier="getName:java.lang.String com.actimel.models.User"
 	 */
 	private HashMap<String, User> cachedUsers = new HashMap<String, User>();
 	
 	/**
-	 * Cache zdarze≈Ñ w systemie.
+	 * Cache zdarzeÒ w systemie.
+	 * @uml.property  name="cachedEvents"
+	 * @uml.associationEnd  qualifier="valueOf:java.lang.Integer com.actimel.models.CalendarEvent"
 	 */
 	private HashMap<Integer, CalendarEvent> 
 	cachedEvents = new HashMap<Integer, CalendarEvent>();
 	
 	/**
-	 * Cache grup zdarze≈Ñ w systemie.
+	 * Cache grup zdarzeÒ w systemie.
+	 * @uml.property  name="cachedEventGroups"
+	 * @uml.associationEnd  qualifier="valueOf:java.lang.Integer com.actimel.models.EventGroup"
 	 */
 	private HashMap<Integer, EventGroup> 
 	cachedEventGroups = new HashMap<Integer, EventGroup>();
 	
 	
-	
+	/**
+	 * Konstruktor implementacji przechowywania danych aplikacji w plikach.
+	 * @param appInstance Instancja aplikacji
+	 * @param eventsPath åcieøka do pliku ze zdarzeniami
+	 * @param eventsGroupsPath åcieøka do pliku z grupami zdarzeÒ
+	 * @param usersPath åcieøka do pliku z uøytkownikami
+	 */
 	public FileStorage(final CalendarApp appInstance, final String eventsPath, final String eventsGroupsPath, final String usersPath) {
 		this.app = appInstance;
 		
@@ -101,7 +121,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie zdarze≈Ñ do cache.
+	 * Metoda odpowiedzialna za za≥adowanie zdarzeÒ do cache.
 	 */
 	public final void preloadEvents() {
 		Type t = new TypeToken<HashMap<Integer, CalendarEvent>>() { }.getType();
@@ -120,24 +140,27 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID u≈ºytkownika.
-	 * @return Najwy≈ºsze ID u≈ºytkownika
+	 * Getter najwyøszego ID uøytkownika.
+	 * @return  Najwyøsze ID uøytkownika
+	 * @uml.property  name="highestUserId"
 	 */
 	public final int getHighestUserId() {
 		return highestUserId;
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID zdarzenia.
-	 * @return Najwy≈ºsze ID zdarzenia
+	 * Getter najwyøszego ID zdarzenia.
+	 * @return  Najwyøsze ID zdarzenia
+	 * @uml.property  name="highestEventId"
 	 */
 	public final int getHighestEventId() {
 		return highestEventId;
 	}
 	
 	/**
-	 * Getter najwy≈ºszego ID grupy zdarze≈Ñ.
-	 * @return Najwy≈ºsze ID grupy zdarze≈Ñ
+	 * Getter najwyøszego ID grupy zdarzeÒ.
+	 * @return  Najwyøsze ID grupy zdarzeÒ
+	 * @uml.property  name="highestEventGroupId"
 	 */
 	public final int getHighestEventGroupId() {
 		return highestEventGroupId;
@@ -145,7 +168,7 @@ public class FileStorage implements StorageIntf {
 	
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie u≈ºytkownik√≥w do cache.
+	 * Metoda odpowiedzialna za za≥adowanie uøytkownikÛw do cache.
 	 */
 	public final void preloadUsers() {
 		Type t = new TypeToken<HashMap<String, User>>() { }.getType();
@@ -169,12 +192,23 @@ public class FileStorage implements StorageIntf {
 		return loadUser(username, false);
 	}
 	
+	@Override
+	public final User loadUser(final int userId) {
+		for (Entry<String, User> user : cachedUsers.entrySet()) {
+			if (user.getValue().getId() == userId) {
+				return user.getValue();
+			}
+		}
+		return null;
+	}
+	
+	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie u≈ºytkownika, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
-	 * @param username Nazwa u≈ºytkownika
-	 * @param noCache Czy pominƒÖc cache?
-	 * @return Obiekt u≈ºytkownika
+	 * Metoda odpowiedzialna za za≥adowanie uøytkownika, 
+	 * z moøliwoúciπ pominiƒôcia cache.
+	 * @param username Nazwa uøytkownika
+	 * @param noCache Czy pominπc cache?
+	 * @return Obiekt uøytkownika
 	 */
 	public final User loadUser(final String username, final boolean noCache) {
 		if (noCache) {
@@ -195,7 +229,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za zapisanie wszystkich u≈ºytkownik√≥w.
+	 * Metoda odpowiedzialna za zapisanie wszystkich uøytkownikÛw.
 	 */
 	public final void saveUsers() {
 		Type t = new TypeToken<HashMap<String, User>>() { }.getType();
@@ -212,8 +246,8 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie zdarzenia, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
+	 * Metoda odpowiedzialna za za≥adowanie zdarzenia, 
+	 * z moøliwoúciπ pominiƒôcia cache.
 	 * @param eventId ID zdarzenia
 	 * @param noCache Czy pominac cache?
 	 * @return Obiekt zdarzenia
@@ -247,7 +281,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za zapisanie zdarze≈Ñ.
+	 * Metoda odpowiedzialna za zapisanie zdarzeÒ.
 	 */
 	public final void saveEvents() {
 		Type t = new TypeToken<HashMap<Integer, CalendarEvent>>() { }.getType();
@@ -288,11 +322,11 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie grupy zdarze≈Ñ, 
-	 * z mo≈ºliwo≈õciƒÖ pominiƒôcia cache.
-	 * @param eventGroupId ID grupy zdarze≈Ñ
+	 * Metoda odpowiedzialna za za≥adowanie grupy zdarzeÒ, 
+	 * z moøliwoúciπ pominiƒôcia cache.
+	 * @param eventGroupId ID grupy zdarzeÒ
 	 * @param noCache Czy pominac cache?
-	 * @return Obiekt grupy zdarze≈Ñ
+	 * @return Obiekt grupy zdarzeÒ
 	 */
 	public final EventGroup 
 	loadEventGroup(final int eventGroupId, final boolean noCache) {
@@ -307,7 +341,7 @@ public class FileStorage implements StorageIntf {
 	}
 	
 	/**
-	 * Metoda odpowiedzialna za za≈Çadowanie grup event√≥w do cache.
+	 * Metoda odpowiedzialna za za≥adowanie grup eventÛw do cache.
 	 */
 	public final  void preloadEventGroups() {
 		Type t = new TypeToken<HashMap<Integer, EventGroup>>() { }.getType();
@@ -358,7 +392,7 @@ public class FileStorage implements StorageIntf {
 	}
 
 	/**
-	 * Metoda odpowiedzialna za zapisanie grup zdarze≈Ñ.
+	 * Metoda odpowiedzialna za zapisanie grup zdarzeÒ.
 	 */
 	public final void saveEventGroups() {
 		Type t = new TypeToken<HashMap<Integer, EventGroup>>() { }.getType();
@@ -370,17 +404,19 @@ public class FileStorage implements StorageIntf {
 	
 	@Override
 	public final List<CalendarEvent> 
-	searchEventsBetween(final long timestamp_start, final long timestamp_end, final int user_id) {
+	searchEventsBetween(final long timestampStart, final long timestampEnd, final int userId) {
 		List<CalendarEvent> result = new ArrayList<CalendarEvent>();
-		if (timestamp_start == 0 || timestamp_end == 0) {
+		if (timestampStart == 0 || timestampEnd == 0) {
 			return result;
 		}
 		
+		Utils.log("Searching...");
+		
 		for (Entry<Integer, CalendarEvent> eg : cachedEvents.entrySet()) {
 			CalendarEvent evt = eg.getValue();
-			if (evt.getOwnerId() == user_id) {
-				if (evt.getStampStart() >= timestamp_start 
-						&& evt.getStampStart() <= timestamp_end) {
+			if (evt.getOwnerId() == userId) {
+				if (evt.getStampStart() >= timestampStart 
+						&& evt.getStampStart() <= timestampEnd || evt.isRecurring()) {
 					result.add(evt);
 				}
 			}

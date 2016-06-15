@@ -6,6 +6,11 @@ package com.actimel.calendar;
 
 public final class Const {
 	/**
+	 * Hostname serwera WWW.
+	 */
+	public static final String HOSTNAME = "127.0.0.1";
+	
+	/**
 	 * Port serwera WWW.
 	 */
 	public static final int WEBSERVER_PORT = 9090;
@@ -29,6 +34,11 @@ public final class Const {
 	 */
 	public static final String USERS_STORAGE_PATH = "users-storage.json";
 
+	/**
+	 * Lokalizacja foldera, w który przechowywane bêd¹ pliki.
+	 */
+	public static final String FILE_STORE_FOLDER = "./file_storage";
+	
 	/**
 	 * Nazwa ciastka z kluczem sesji.
 	 */

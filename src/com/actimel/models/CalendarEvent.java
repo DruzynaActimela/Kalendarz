@@ -1,5 +1,6 @@
 package com.actimel.models;
 
+import com.actimel.calendar.CalendarApp;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -8,70 +9,94 @@ import com.google.gson.annotations.SerializedName;
  *
  */
 public class CalendarEvent {
+	/**
+	 * Magiczna siódemka.
+	 */
+	private static final int SEVEN = 7;
 	
 	/**
 	 * ID zdarzenia.
+	 * @uml.property  name="id"
 	 */
 	@SerializedName("_id")
 	private int id;
 	
 	/**
 	 * Tytu³ zdarzenia.
+	 * @uml.property  name="title"
 	 */
 	private String title;
 	
 	/**
 	 * Timestamp rozpoczêcia zdarzenia.
+	 * @uml.property  name="start"
 	 */
 	private long start;
 	
 	/**
 	 * Timestamp zakoñczenia zdarzenia.
+	 * @uml.property  name="end"
 	 */
 	private long end;
 	
 	/**
 	 * Wartoœc okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
+	 * @uml.property  name="allday"
 	 */
 	private boolean allday;
 	
 	/**
 	 * Wartosc okreœlaj¹ca, czy zdarzenie jest publiczne.
+	 * @uml.property  name="isPublic"
 	 */
 	private boolean isPublic;
 	
 	/**
 	 * Zmienna przechowuj¹ca ID w³aœciciela zdarzenia.
+	 * @uml.property  name="ownerId"
 	 */
 	private int ownerId;
 	
 	/**
 	 * Zmienna przechowuj¹ca ID grupy, w której znajduje siê zdarzenie.
+	 * @uml.property  name="parentGroupId"
 	 */
 	private int parentGroupId;
 	
 	/**
-	 * Konstruktor zdarzenia w kalendarzu.
-	 * @param id ID zdarzenia
-	 * @param name Nazwa zdarzenia
-	 * @param stamp_start Timestamp rozpoczêcia zdarzenia 
-	 * wyra¿ony w milisekundach
-	 * @param stamp_end Timestamp zakoñczenia zdarzenia wyra¿ony w milisekundach
-	 * @param allday Zmienna okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
-	 * @param is_public Zmienna okreœlaj¹ca, czy zdarzenie jest publiczne.
+	 * Zmienna okreœlaj¹ca, czy zdarzenie jest powtarzaj¹ce siê.
+	 */	
+	private boolean isRecurring = false;
+	
+	/**
+	 * zmienna definiuj¹ca w jakich dniach tygodnia zdarzenie siê powtarza.
 	 */
-	public CalendarEvent(final int id, final String name, final long stamp_start, final long stamp_end, final boolean allday, final boolean is_public) {
-		this.id = id;
+	private int[] recurringDays = new int[SEVEN];
+	
+	/**
+	 * Konstruktor zdarzenia w kalendarzu.
+	 * @param eid ID zdarzenia
+	 * @param name Nazwa zdarzenia
+	 * @param stampStart Timestamp rozpoczêcia zdarzenia 
+	 * wyra¿ony w milisekundach
+	 * @param stampEnd Timestamp zakoñczenia zdarzenia wyra¿ony w milisekundach
+	 * @param alldayRef Zmienna okreœlaj¹ca, czy zdarzenie jest ca³odniowe.
+	 * @param eIsPublic Zmienna okreœlaj¹ca, czy zdarzenie jest publiczne.
+	 */
+	public CalendarEvent(final int eid, final String name, final long stampStart, final long stampEnd, final boolean alldayRef, final boolean eIsPublic) {
+		this.id = eid;
 		this.title = name;
-		this.start = stamp_start;
-		this.end = stamp_end;
-		this.allday = allday;
-		this.isPublic = is_public;
+		this.start = stampStart;
+		this.end = stampEnd;
+		this.allday = alldayRef;
+		this.isPublic = eIsPublic;
+		
 	}
 
 	/**
 	 * Getter ID zdarzenia.
-	 * @return ID zdarzenia
+	 * @return  ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final int getId() {
 		return id;
@@ -79,7 +104,8 @@ public class CalendarEvent {
 
 	/**
 	 * Setter ID zdarzenia.
-	 * @param newId Nowe ID zdarzenia
+	 * @param newId  Nowe ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final void setId(final int newId) {
 		this.id = newId;
@@ -150,7 +176,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Getter w³aœciwoœci: isPublic.
-	 * @return Czy zdarzenie jest publiczne
+	 * @return  Czy zdarzenie jest publiczne
+	 * @uml.property  name="isPublic"
 	 */
 	public final boolean isPublic() {
 		return isPublic;
@@ -165,7 +192,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca ustawienie w³aœciciela zdarzenia.
-	 * @param nid ID nowego w³aœciciela
+	 * @param nid  ID nowego w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final void setOwnerId(final int nid) {
 		ownerId = nid;
@@ -173,7 +201,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie ID w³aœciciela.
-	 * @return ID w³aœciciela
+	 * @return  ID w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final int getOwnerId() {
 		return ownerId;
@@ -181,7 +210,8 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca ustawienie grupy zdarzenia.
-	 * @param nid ID nowej grupy
+	 * @param nid  ID nowej grupy
+	 * @uml.property  name="parentGroupId"
 	 */
 	public final void setParentGroupId(final int nid) {
 		parentGroupId = nid;
@@ -189,38 +219,66 @@ public class CalendarEvent {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie ID grupy zdarzenia.
-	 * @return ID grupy
+	 * @return  ID grupy
+	 * @uml.property  name="parentGroupId"
 	 */
 	public final int getParentGroupId() {
 		return parentGroupId;
 	}
 	
+	/**
+	 * Metoda sprawdzaj¹ca, czy zdarzenie posiada grupê.
+	 * @return Wartosc true/false odpowiadaj¹ca stanowi posiadania grupy
+	 */
+	public final boolean hasEventGroup() {
+		return parentGroupId > 0;
+	}
 	
+	/**
+	 * Funkcja umo¿liwiaj¹ca pobranie instancji grupy zdarzenia.
+	 * @return Instancja grupy zdarzenia
+	 */
+	public final EventGroup getEventGroup() {
+		if (hasEventGroup()) {
+			return 
+			CalendarApp.getInstance()
+			.getStorage()
+			.loadEventGroup(parentGroupId);
+		}
+		return null;
+	}
 	
+	/**
+	 * Metoda umo¿liwiaj¹ca ustawienie tablicy zdarzeñ powtarzaj¹cych siê.
+	 * @param r Nowa tablica
+	 */
+	public final void setRecurringArray(final int[] r) {
+		recurringDays = r;
+	}
+	
+	/**
+	 * Metoda umo¿liwiajaca ustawienie dnia w którym zdarzenie bêdzie siê powtarzac.
+	 * @param day ID dnia
+	 * @param value 0 - nie powtarzaj, 1 - powtarzaj
+	 */
+	public final void setRecurringDay(final int day, final int value) {
+		recurringDays[day] = value;
+	}
+	
+	/**
+	 * Setter isRecurring.
+	 * @param i true/false
+	 */
+	public final void isRecurring(final boolean i) {
+		isRecurring = i;
+	}
+	
+	/**
+	 * Getter isRecurring.
+	 * @return true/false
+	 */
+	public final boolean isRecurring() {
+		return isRecurring;
+	}
 }
 
-/*
-		
-		java.util.Calendar cal = java.util.Calendar.getInstance();
-		cal.set(java.util.Calendar.MONTH, java.util.Calendar.DECEMBER);
-		VEvent e = new VEvent();
-		
- * 
- * 
- * 
- * java.util.Calendar cal = java.util.Calendar.getInstance();
-cal.set(java.util.Calendar.MONTH, java.util.Calendar.DECEMBER);
-cal.set(java.util.Calendar.DAY_OF_MONTH, 25);
-
-VEvent christmas = new VEvent(new Date(cal.getTime()), "Christmas Day");
-// initialise as an all-day event..
-christmas.getProperties().getProperty(Property.DTSTART).getParameters().add(Value.DATE);
-            
-Output:
-
-BEGIN:VEVENT
-DTSTAMP:20050222T044240Z
-DTSTART;VALUE=DATE:20051225
-SUMMARY:Christmas Day
-END:VEVENT
- */

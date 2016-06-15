@@ -9,6 +9,8 @@ var FULLCALENDAR_INTERNAL_DATE_FORMAT = "YYYY-MM-DD";
 var WINDOW_NO_CLOSE = 123551;
 var WINDOW_CLOSE = 123555;
 
+var DEFAULT_GROUP_COLOR = "gray";
+
 var LAST_RIGHTCLICKED_DATE, LAST_RIGHTCLICKED_EVENT;
 
 function parse_template(elem, vars) {
@@ -21,15 +23,26 @@ function parse_template(elem, vars) {
     return html;
 }
 
+function in_array(arr, val) {
+    for(var i in arr) {
+        if(arr[i] == val) return true;
+    }
+    return false;
+}
+
 var app = {
     screenShowEvents: [],
     locationArgs: [],
     rebuildArgs: function() {
+        var blacklist = ["message"];
+
         var args = "";
         for(var key in app.locationArgs) {
             var val = app.locationArgs[key];
-            if(args.length > 0) args += "|";
-            args += key + ":" + encodeURIComponent(val);
+            if(!in_array(blacklist, key)) {
+                if(args.length > 0) args += "|";
+                args += key + ":" + encodeURIComponent(val);
+            }
 
         }
         location.hash = args;
@@ -58,10 +71,18 @@ var app = {
 
     },
     registerScreenShowEvent: function(screenName, func) {
-        if(app.screenShowEvents[screenName] == undefined) {
-            app.screenShowEvents[screenName] = [];
+        var screenNames = [screenName];
+        if(screenName.indexOf(",") > -1) {
+            screenNames = screenName.split(",");
+
         }
-        app.screenShowEvents[screenName].push(func);
+        for(var i in screenNames) {
+            var name = screenNames[i].trim();
+            if(app.screenShowEvents[name] == undefined) {
+                app.screenShowEvents[name] = [];
+            }
+            app.screenShowEvents[name].push(func);   
+        }
     },
     executeScreenShowEvents: function(screenName) {
         if(app.screenShowEvents[screenName] != undefined) {
@@ -84,34 +105,80 @@ var app = {
 
 	init: function() {
         app.parseArgs();
-		app.displayUserGroups();
-        app.updateUI();
+        app.getUserGroups(function() {
+            app.displayUserGroups();
+            app.updateUI();
 
-        app.registerScreenShowEvent("export-ical", function(screen) {
-            screen.find(".bind-datepicker").datetimepicker({
-                controlType: 'select',
-                oneLine: true,
-                dateFormat: "dd-mm-yy",
-                timeFormat:  "HH:mm",
-                firstDay: 1
+            app.registerScreenShowEvent("export-ical,export-csv", function(screen) {
+                screen.find(".bind-datepicker").datetimepicker({
+                    controlType: 'select',
+                    oneLine: true,
+                    dateFormat: "dd-mm-yy",
+                    timeFormat:  "HH:mm",
+                    firstDay: 1
+                });
             });
+            app.registerScreenShowEvent("calendar", function(screen) {
+                if(calendarRef) {
+                    calendarRef.fullCalendar("refetchEvents");
+                }
+            });
+            
+            app.registerScreenShowEvent("import-uz", function(screen) {
+                app.getDepartments(function(depts) {
+                    var selectElem = screen.find(".select-wydzial");
+                    selectElem.empty();
+                    if(depts.length > 0) {
+                        selectElem.append("<option value='-1'>-- wybierz wydział --</option>");
+
+                        for(var i in depts) {
+                            var dept = depts[i];
+                            selectElem.append('<optgroup label="'+dept.nazwa+'">');
+                            for(var j in dept.kierunki) {
+                                var division = dept.kierunki[j];
+                                selectElem.append("<option value='"+division.id+"'>"+division.nazwa+"</option>");        
+                            }
+                            selectElem.append('</optgroup>');
+                        }
+                    } else {
+                        selectElem.append("<option value='-1'>Brak wydziałów!</option>");
+                    }
+                });
+                screen.find(".select-wydzial").unbind().change(function() {
+                    var t = $(this);
+
+                    var selectedDivision = t.val();
+                    console.log("select", selectedDivision);
+
+                    app.getGroups(selectedDivision, function(groups) {
+                        var selectElem = screen.find(".select-grupa");
+                        selectElem.empty();
+                        for(var j in groups) {
+                            var group = groups[j];
+                            selectElem.append("<option value='"+group.id+"'>"+group.nazwa+"</option>");        
+                        }
+
+                    });
+                });
+
+                screen.find(".bind-datepicker").datepicker({
+                    controlType: 'select',
+                    oneLine: true,
+                    dateFormat: "dd-mm-yy",
+                });
+            });
+
+            setTimeout(function() {
+                if(typeof initialize_calendar == "function") initialize_calendar();
+                app.updateUI();
+
+
+                if(app.hasArg("screen")) {
+                    app.setCurrentScreen(app.getArg("screen"));
+                }
+            }, 1);
         });
-        app.registerScreenShowEvent("calendar", function(screen) {
-            if(calendarRef) {
-                calendarRef.fullCalendar("refetchEvents");
-            }
-        });
 
-
-        setTimeout(function() {
-            initialize_calendar();
-    		app.updateUI();
-
-
-            if(app.hasArg("screen")) {
-                app.setCurrentScreen(app.getArg("screen"));
-            }
-        }, 1);
 	},
 	updateUI: function() {
         var content = $(".center-content");
@@ -208,6 +275,21 @@ var app = {
             }
         });
     },
+
+    getDepartments: function(onResponse) {
+        app.doRequest("/api/uz/departments", {}, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+
+    getGroups: function(divisionId, onResponse) {
+        app.doRequest("/api/uz/groups", {
+            divId: divisionId
+        }, "POST", function(resp) {
+            if(onResponse) onResponse(resp);
+        });
+    },
+
 
     showConfirmBox: function(options) {
         var $modal = $('[data-remodal-id=modal_confirm]');
@@ -631,6 +713,19 @@ var app = {
                                 name: gr.name
                             });
                             var elem = $(html).appendTo(cont);
+                            if(screenObj.attr("data-no-check") == "1") {
+                                elem.find("input[type='checkbox']").prop("checked", false);
+                            }
+                            if(screenObj.attr("data-one-checkbox-only") == "1") {
+                                elem.find("input[type='checkbox']").change(function() {
+                                    var t = $(this);
+                                    var parent = t.parents(".page-screen");
+                                    parent.find("input[type='checkbox']").prop("checked", false);
+
+                                    t.prop("checked", true);
+                                });
+                            }
+
                         }
                     } else {
                         cont.html("Nie posiadasz żadnych grup.");
@@ -680,6 +775,48 @@ var app = {
                     confirmClick: function() {
                         app._doExportRequest("ical", groupIds, start, end, function(resp) {
                             console.log('_doExportRequest', resp);
+                            if(resp.download_link) {
+                                window.location.href = resp.download_link;
+                            }
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono eventów dla podanych kryteriów.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+    CSV_doExportRequest: function() {
+        var scope = $(".wizard-csv");
+        var groupIds = "";
+        scope.find(".egs-holder").each(function() {
+            var t = $(this);
+            if(t.find(".export-group-id").is(":checked")) {
+                if(groupIds.length > 0) groupIds += ",";
+                groupIds += t.attr("data-group-id");
+            }
+        });
+
+        var start = scope.find(".export-date-start").val();
+        var end = scope.find(".export-date-end").val();
+
+        app._doExportRequest("csv", groupIds, start, end, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów pasujących do podanych kryteriów.<br>Czy chcesz je wyeksportować?",                
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doExportRequest("csv", groupIds, start, end, function(resp) {
+                            console.log('_doExportRequest', resp);
+                            if(resp.download_link) {
+                                window.location.href = resp.download_link;
+                            }
                         }, 1);
                     }
                 });
@@ -694,6 +831,7 @@ var app = {
         });
     },
 
+
     _doExportRequest: function(exportType, groupIds, start, end, onResponse, confirmation) {
         var _confirmation = (confirmation == 1) ? "yes" : "";
         app.doRequest("/api/events/export", {
@@ -705,6 +843,167 @@ var app = {
         }, "POST", function(resp) {
             if(onResponse) onResponse(resp);
         });
+    },
+
+
+    UZ_doImportRequest: function(confirmation) {
+        var scope = $(".wizard-uz-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var uzGroupId = scope.find(".select-grupa").val();
+
+
+        var _confirmation = (confirmation == 1) ? "yes" : "";
+        app.doRequest("/api/uz/import", {
+            eventGroupId: groupId,
+            uzGroupId: uzGroupId,
+            confirm: _confirmation
+        }, "POST", function(resp) {
+            if(!confirmation) {
+
+                if(parseInt(resp.affected_events) > 0) {                
+                    app.showConfirmBox({
+                        title: "Potwierdź",
+                        body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                        confirmText: "Tak",
+                        confirmClick: function() {
+                            app.UZ_doImportRequest(1);
+                        }
+                    });
+                } else {
+                    var msg = resp.message;
+                    if(!msg) msg = "Nie znaleziono zdarzeń."; 
+                    app.showConfirmBox({
+                        title: "Błąd",
+                        body: msg,
+                        hideCancel: true,
+                        confirmText: "OK",
+                    });
+                }
+            } else {
+                app.showConfirmBox({
+                    title: "Wiadomość",
+                    body: resp.message,
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },  
+    iCal_doImportRequest: function() {
+        var scope = $(".wizard-ical-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var fileObj = scope.find("#ical-import-file")[0];
+
+        app._doImportRequest(fileObj, "ical", groupId, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doImportRequest(fileObj, "ical", groupId, function(resp) {
+                            console.log('iCal_doImportRequest', resp);
+                                app.showConfirmBox({
+                                    title: "Wiadomość",
+                                    body: resp.message,
+                                    hideCancel: true,
+                                    confirmText: "OK",
+                                });
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono zdarzeń w podanym pliku.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
+    CSV_doImportRequest: function() {
+        var scope = $(".wizard-csv-import");
+        var groupId = (scope.find(".export-group-id:checked").length > 0) ? scope.find(".export-group-id:checked").first().attr("data-group-id") : -1;
+
+        var fileObj = scope.find("#csv-import-file")[0];
+
+        app._doImportRequest(fileObj, "csv", groupId, function(resp) {
+            if(parseInt(resp.affected_events) > 0) {                
+                app.showConfirmBox({
+                    title: "Potwierdź",
+                    body: "Znaleziono <b>"+resp.affected_events+"</b> eventów.<br>Czy chcesz je zaimportować?",
+                    confirmText: "Tak",
+                    confirmClick: function() {
+                        app._doImportRequest(fileObj, "csv", groupId, function(resp) {
+                            console.log('CSV_doImportRequest', resp);
+                                app.showConfirmBox({
+                                    title: "Wiadomość",
+                                    body: resp.message,
+                                    hideCancel: true,
+                                    confirmText: "OK",
+                                });
+                        }, 1);
+                    }
+                });
+            } else {
+                app.showConfirmBox({
+                    title: "Błąd",
+                    body: "Nie znaleziono zdarzeń w podanym pliku.",                
+                    hideCancel: true,
+                    confirmText: "OK",
+                });
+            }
+        });
+    },
+
+    _doImportRequest: function(fileObj, importType, groupId, onResponse, confirmation) {
+        
+        var formData = new FormData();
+        //var progressBar = parent.find(".db-progress-bar");
+        if(fileObj) formData.append("import_file", fileObj.files[0]);
+        formData.append("groupId", groupId);
+        formData.append("importType", importType);
+
+        if(confirmation == 1) {
+            formData.append("confirm", "yes");
+        }
+
+        var endpoint = "/api/events/import";
+
+        if(importType == "uz") endpoint = "/api/uz/import";
+
+        $.ajax({
+            url: endpoint,
+            xhr: function() {
+
+                var xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    var loaded = (evt.loaded / evt.total).toFixed(2) * 100;
+                    //progressBar.css("width", loaded + "%").show();
+                }, false);
+
+                return xhr;
+            },
+            type: 'post',
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: function(data) {
+                console.log(data);
+
+                setTimeout(function() {
+                    //parent.find(".db-progress-bar").fadeOut();
+                }, 5);
+
+                if (onResponse) onResponse(data);
+            }
+        });
+
+
     },
 
     editEvent: function(id) {
@@ -782,6 +1081,23 @@ $(document).ready(function() {
     $(".btn-export-ical").click(function() {
         app.iCal_doExportRequest();
     });
+    $(".btn-export-csv").click(function() {
+        app.CSV_doExportRequest();
+    });
+    $(".btn-import-csv").click(function() {
+        app.CSV_doImportRequest();
+    });
+
+    $(".btn-import-ical").click(function() {
+        app.iCal_doImportRequest();
+    });
+    $(".btn-import-uz").click(function() {
+        app.UZ_doImportRequest();
+    });
+
+
+
+
     $(".menu-action-create-event").click(function() {
 
         app.showCreateEventWindow(LAST_RIGHTCLICKED_DATE);

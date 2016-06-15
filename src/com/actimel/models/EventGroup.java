@@ -9,49 +9,55 @@ public class EventGroup {
 	
 	/**
 	 * ID grupy.
+	 * @uml.property  name="id"
 	 */
 	private int id;
 	
 	/**
 	 * Nazwa grupy.
+	 * @uml.property  name="name"
 	 */
 	private String name;
 	
 	/**
 	 * Kolor grupy.
+	 * @uml.property  name="color"
 	 */
 	private String color;
 	
 	/**
 	 * W³aœciciel grupy.
+	 * @uml.property  name="ownerId"
 	 */
 	private int ownerId; // user
 	
 	/**
 	 * Zmienna okreœlaj¹ca, czy grupa jest publiczna.
+	 * @uml.property  name="isPublic"
 	 */
 	private boolean isPublic;
 	
 	/**
 	 * Konstrutor grupy zdarzeñ.
-	 * @param id ID grupy zdarzeñ
-	 * @param name Nazwa
-	 * @param color Kolor
-	 * @param owner_id ID w³aœciciela
-	 * @param is_public Zmienna okreœlaj¹ca, czy grupa zdarzeñ jest publiczna
+	 * @param gid ID grupy zdarzeñ
+	 * @param gname Nazwa
+	 * @param gcolor Kolor
+	 * @param gOwnerId ID w³aœciciela
+	 * @param gIsPublic Zmienna okreœlaj¹ca, czy grupa zdarzeñ jest publiczna
 	 */
-	public EventGroup(final int id, final String name, final String color, final int owner_id, final boolean is_public) {
+	public EventGroup(final int gid, final String gname, final String gcolor, final int gOwnerId, final boolean gIsPublic) {
 		super();
-		this.id = id;
-		this.name = name;
-		this.color = color;
-		this.ownerId = owner_id;
-		this.isPublic = is_public;
+		this.id = gid;
+		this.name = gname;
+		this.color = gcolor;
+		this.ownerId = gOwnerId;
+		this.isPublic = gIsPublic;
 	}
 
 	/**
 	 * Getter ID zdarzenia.
-	 * @return ID zdarzenia
+	 * @return  ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final int getId() {
 		return id;
@@ -59,7 +65,8 @@ public class EventGroup {
 
 	/**
 	 * Setter ID zdarzenia.
-	 * @param newId Nowe ID zdarzenia
+	 * @param newId  Nowe ID zdarzenia
+	 * @uml.property  name="id"
 	 */
 	public final void setId(final int newId) {
 		this.id = newId;
@@ -67,7 +74,8 @@ public class EventGroup {
 
 	/**
 	 * Getter nazwy grupy zdarzeñ.
-	 * @return Nazwa grupy
+	 * @return  Nazwa grupy
+	 * @uml.property  name="name"
 	 */
 	public final String getName() {
 		return name;
@@ -75,7 +83,8 @@ public class EventGroup {
 
 	/**
 	 * Setter nazwy.
-	 * @param nname Nowa nazwa
+	 * @param nname  Nowa nazwa
+	 * @uml.property  name="name"
 	 */
 	public final void setName(final String nname) {
 		this.name = nname;
@@ -83,7 +92,8 @@ public class EventGroup {
 	
 	/**
 	 * Getter koloru grupy.
-	 * @return reprezentacja HEX koloru
+	 * @return  reprezentacja HEX koloru
+	 * @uml.property  name="color"
 	 */
 	public final String getColor() {
 		return color;
@@ -91,7 +101,8 @@ public class EventGroup {
 
 	/**
 	 * Setter koloru grupy.
-	 * @param ccolor Nowy kolor jako wartosc HEX, np. 000000 lub FFFFFF
+	 * @param ccolor  Nowy kolor jako wartosc HEX, np. 000000 lub FFFFFF
+	 * @uml.property  name="color"
 	 */
 	public final void setColor(final String ccolor) {
 		this.color = ccolor;
@@ -99,7 +110,8 @@ public class EventGroup {
 
 	/**
 	 * Metoda umo¿liwiaj¹ca ustawienie w³aœciciela.
-	 * @param nid ID nowego w³aœciciela
+	 * @param nid  ID nowego w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final void setOwnerId(final int nid) {
 		ownerId = nid;
@@ -107,7 +119,8 @@ public class EventGroup {
 	
 	/**
 	 * Metoda umo¿liwiaj¹ca pobranie ID w³aœciciela.
-	 * @return ID w³aœciciela
+	 * @return  ID w³aœciciela
+	 * @uml.property  name="ownerId"
 	 */
 	public final int getOwnerId() {
 		return ownerId;
@@ -115,7 +128,8 @@ public class EventGroup {
 
 	/**
 	 * Getter w³aœciwoœci: isPublic.
-	 * @return Czy grupa zdarzeñ jest publiczna
+	 * @return  Czy grupa zdarzeñ jest publiczna
+	 * @uml.property  name="isPublic"
 	 */
 	public final boolean isPublic() {
 		return isPublic;

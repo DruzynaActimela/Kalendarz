@@ -18,10 +18,12 @@ public class SessionController {
 	/**
 	 * Sól sesji, u¿ywana do tworzenia kluczy sesji.
 	 */
-	private final String SESSION_SALT = 
+	private static final String SESSION_SALT = 
 			"a8b8c9d9ce0a9c8f8c9088ff9a9d908f9c7a6a9c08f79ca909c8f7f6a8fb9abc9088a7";
 	/**
 	 * Lista aktywnych sesji.
+	 * @uml.property  name="sessions"
+	 * @uml.associationEnd  qualifier="key:java.lang.String com.actimel.models.Session"
 	 */
 	private HashMap<String, Session> sessions = new HashMap<String, Session>();
 	
@@ -68,6 +70,7 @@ public class SessionController {
 	public final boolean destroySession(final String key) {
 		if (sessions.containsKey(key)) {
 			sessions.remove(key);
+			return true;
 		}
 		return false;
 	}

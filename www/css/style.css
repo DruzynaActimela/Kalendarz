@@ -862,6 +862,7 @@ body {
     display: table-cell;
 }
 .context-menu {
+    display: none;
     border: 1px solid #bfbfbf;
     border-radius: 3px;
     background: white;
@@ -893,4 +894,9 @@ body {
     border-top: 1px solid #bfbfbf;
     height:1px;
     margin: 3px 5px;
+}
+
+select.form-control {
+    border-radius: 3px;
+    width: 100%;
 }

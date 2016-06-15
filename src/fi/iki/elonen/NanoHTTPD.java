@@ -221,7 +221,9 @@ public abstract class NanoHTTPD {
             return dateFormat.format(calendar.getTime());
         }
 
-        private final String n, v, e;
+        private final String n;
+		private final String v;
+		private final String e;
 
         public Cookie(String name, String value) {
             this(name, value, 30);
@@ -332,23 +334,21 @@ public abstract class NanoHTTPD {
     }
 
     /**
-     * Default threading strategy for NanoHTTPD.
-     * <p/>
-     * <p>
-     * By default, the server spawns a new Thread for every incoming request.
-     * These are set to <i>daemon</i> status, and named according to the request
-     * number. The name is useful when profiling the application.
-     * </p>
-     */
+	 * Default threading strategy for NanoHTTPD. <p/> <p> By default, the server spawns a new Thread for every incoming request. These are set to <i>daemon</i> status, and named according to the request number. The name is useful when profiling the application. </p>
+	 */
     public static class DefaultAsyncRunner implements AsyncRunner {
 
         private long requestCount;
 
+        /**
+		 * @uml.property  name="running"
+		 */
         private final List<ClientHandler> running = Collections.synchronizedList(new ArrayList<NanoHTTPD.ClientHandler>());
 
         /**
-         * @return a list with currently running clients.
-         */
+		 * @return  a list with currently running clients.
+		 * @uml.property  name="running"
+		 */
         public List<ClientHandler> getRunning() {
             return running;
         }
@@ -525,6 +525,9 @@ public abstract class NanoHTTPD {
 
     private static final Pattern CONTENT_DISPOSITION_ATTRIBUTE_PATTERN = Pattern.compile(CONTENT_DISPOSITION_ATTRIBUTE_REGEX);
 
+    /**
+	 * @author  4i60r
+	 */
     protected static class ContentType {
 
         private static final String ASCII_ENCODING = "US-ASCII";
@@ -543,12 +546,24 @@ public abstract class NanoHTTPD {
 
         private static final Pattern BOUNDARY_PATTERN = Pattern.compile(BOUNDARY_REGEX, Pattern.CASE_INSENSITIVE);
 
+        /**
+		 * @uml.property  name="contentTypeHeader"
+		 */
         private final String contentTypeHeader;
 
+        /**
+		 * @uml.property  name="contentType"
+		 */
         private final String contentType;
 
+        /**
+		 * @uml.property  name="encoding"
+		 */
         private final String encoding;
 
+        /**
+		 * @uml.property  name="boundary"
+		 */
         private final String boundary;
 
         public ContentType(String contentTypeHeader) {
@@ -572,18 +587,34 @@ public abstract class NanoHTTPD {
             return matcher.find() ? matcher.group(group) : defaultValue;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="contentTypeHeader"
+		 */
         public String getContentTypeHeader() {
             return contentTypeHeader;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="contentType"
+		 */
         public String getContentType() {
             return contentType;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="encoding"
+		 */
         public String getEncoding() {
             return encoding == null ? ASCII_ENCODING : encoding;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="boundary"
+		 */
         public String getBoundary() {
             return boundary;
         }
@@ -600,6 +631,9 @@ public abstract class NanoHTTPD {
         }
     }
 
+    /**
+	 * @author  4i60r
+	 */
     protected class HTTPSession implements IHTTPSession {
 
         private static final int REQUEST_BUFFER_LEN = 512;
@@ -610,26 +644,53 @@ public abstract class NanoHTTPD {
 
         public static final int MAX_HEADER_SIZE = 1024;
 
+        /**
+		 * @uml.property  name="tempFileManager"
+		 * @uml.associationEnd  
+		 */
         private final TempFileManager tempFileManager;
 
         private final OutputStream outputStream;
 
+        /**
+		 * @uml.property  name="inputStream"
+		 */
         private final BufferedInputStream inputStream;
 
         private int splitbyte;
 
         private int rlen;
 
+        /**
+		 * @uml.property  name="uri"
+		 */
         private String uri;
 
+        /**
+		 * @uml.property  name="method"
+		 * @uml.associationEnd  
+		 */
         private Method method;
 
+        /**
+		 * @uml.property  name="parms"
+		 */
         private Map<String, String> parms;
 
+        /**
+		 * @uml.property  name="headers"
+		 */
         private Map<String, String> headers;
 
+        /**
+		 * @uml.property  name="cookies"
+		 * @uml.associationEnd  
+		 */
         private CookieHandler cookies;
 
+        /**
+		 * @uml.property  name="queryParameterString"
+		 */
         private String queryParameterString;
 
         private String remoteIp;
@@ -1033,31 +1094,55 @@ public abstract class NanoHTTPD {
             return res;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="cookies"
+		 */
         @Override
         public CookieHandler getCookies() {
             return this.cookies;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="headers"
+		 */
         @Override
         public final Map<String, String> getHeaders() {
             return this.headers;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="inputStream"
+		 */
         @Override
         public final InputStream getInputStream() {
             return this.inputStream;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="method"
+		 */
         @Override
         public final Method getMethod() {
             return this.method;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="parms"
+		 */
         @Override
         public final Map<String, String> getParms() {
             return this.parms;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="queryParameterString"
+		 */
         @Override
         public String getQueryParameterString() {
             return this.queryParameterString;
@@ -1072,6 +1157,10 @@ public abstract class NanoHTTPD {
             }
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="uri"
+		 */
         @Override
         public final String getUri() {
             return this.uri;
@@ -1243,25 +1332,88 @@ public abstract class NanoHTTPD {
     }
 
     /**
-     * HTTP Request methods, with the ability to decode a <code>String</code>
-     * back to its enum value.
-     */
+	 * HTTP Request methods, with the ability to decode a <code>String</code> back to its enum value.
+	 */
     public enum Method {
+        /**
+		 * @uml.property  name="gET"
+		 * @uml.associationEnd  
+		 */
         GET,
+        /**
+		 * @uml.property  name="pUT"
+		 * @uml.associationEnd  
+		 */
         PUT,
+        /**
+		 * @uml.property  name="pOST"
+		 * @uml.associationEnd  
+		 */
         POST,
+        /**
+		 * @uml.property  name="dELETE"
+		 * @uml.associationEnd  
+		 */
         DELETE,
+        /**
+		 * @uml.property  name="hEAD"
+		 * @uml.associationEnd  
+		 */
         HEAD,
+        /**
+		 * @uml.property  name="oPTIONS"
+		 * @uml.associationEnd  
+		 */
         OPTIONS,
+        /**
+		 * @uml.property  name="tRACE"
+		 * @uml.associationEnd  
+		 */
         TRACE,
+        /**
+		 * @uml.property  name="cONNECT"
+		 * @uml.associationEnd  
+		 */
         CONNECT,
+        /**
+		 * @uml.property  name="pATCH"
+		 * @uml.associationEnd  
+		 */
         PATCH,
+        /**
+		 * @uml.property  name="pROPFIND"
+		 * @uml.associationEnd  
+		 */
         PROPFIND,
+        /**
+		 * @uml.property  name="pROPPATCH"
+		 * @uml.associationEnd  
+		 */
         PROPPATCH,
+        /**
+		 * @uml.property  name="mKCOL"
+		 * @uml.associationEnd  
+		 */
         MKCOL,
+        /**
+		 * @uml.property  name="mOVE"
+		 * @uml.associationEnd  
+		 */
         MOVE,
+        /**
+		 * @uml.property  name="cOPY"
+		 * @uml.associationEnd  
+		 */
         COPY,
+        /**
+		 * @uml.property  name="lOCK"
+		 * @uml.associationEnd  
+		 */
         LOCK,
+        /**
+		 * @uml.property  name="uNLOCK"
+		 * @uml.associationEnd  
+		 */
         UNLOCK;
 
         static Method lookup(String method) {
@@ -1278,8 +1430,8 @@ public abstract class NanoHTTPD {
     }
 
     /**
-     * HTTP response. Return one of these from serve().
-     */
+	 * HTTP response. Return one of these from serve().
+	 */
     public static class Response implements Closeable {
 
         public interface IStatus {
@@ -1290,34 +1442,128 @@ public abstract class NanoHTTPD {
         }
 
         /**
-         * Some HTTP response status codes
-         */
+		 * Some HTTP response status codes
+		 */
         public enum Status implements IStatus {
+            /**
+			 * @uml.property  name="sWITCH_PROTOCOL"
+			 * @uml.associationEnd  
+			 */
             SWITCH_PROTOCOL(101, "Switching Protocols"),
+            /**
+			 * @uml.property  name="oK"
+			 * @uml.associationEnd  
+			 */
             OK(200, "OK"),
+            /**
+			 * @uml.property  name="cREATED"
+			 * @uml.associationEnd  
+			 */
             CREATED(201, "Created"),
+            /**
+			 * @uml.property  name="aCCEPTED"
+			 * @uml.associationEnd  
+			 */
             ACCEPTED(202, "Accepted"),
+            /**
+			 * @uml.property  name="nO_CONTENT"
+			 * @uml.associationEnd  
+			 */
             NO_CONTENT(204, "No Content"),
+            /**
+			 * @uml.property  name="pARTIAL_CONTENT"
+			 * @uml.associationEnd  
+			 */
             PARTIAL_CONTENT(206, "Partial Content"),
+            /**
+			 * @uml.property  name="mULTI_STATUS"
+			 * @uml.associationEnd  
+			 */
             MULTI_STATUS(207, "Multi-Status"),
+            /**
+			 * @uml.property  name="rEDIRECT"
+			 * @uml.associationEnd  
+			 */
             REDIRECT(301, "Moved Permanently"),
+            /**
+			 * @uml.property  name="rEDIRECT_SEE_OTHER"
+			 * @uml.associationEnd  
+			 */
             REDIRECT_SEE_OTHER(303, "See Other"),
+            /**
+			 * @uml.property  name="nOT_MODIFIED"
+			 * @uml.associationEnd  
+			 */
             NOT_MODIFIED(304, "Not Modified"),
+            /**
+			 * @uml.property  name="bAD_REQUEST"
+			 * @uml.associationEnd  
+			 */
             BAD_REQUEST(400, "Bad Request"),
+            /**
+			 * @uml.property  name="uNAUTHORIZED"
+			 * @uml.associationEnd  
+			 */
             UNAUTHORIZED(401, "Unauthorized"),
+            /**
+			 * @uml.property  name="fORBIDDEN"
+			 * @uml.associationEnd  
+			 */
             FORBIDDEN(403, "Forbidden"),
+            /**
+			 * @uml.property  name="nOT_FOUND"
+			 * @uml.associationEnd  
+			 */
             NOT_FOUND(404, "Not Found"),
+            /**
+			 * @uml.property  name="mETHOD_NOT_ALLOWED"
+			 * @uml.associationEnd  
+			 */
             METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
+            /**
+			 * @uml.property  name="nOT_ACCEPTABLE"
+			 * @uml.associationEnd  
+			 */
             NOT_ACCEPTABLE(406, "Not Acceptable"),
+            /**
+			 * @uml.property  name="rEQUEST_TIMEOUT"
+			 * @uml.associationEnd  
+			 */
             REQUEST_TIMEOUT(408, "Request Timeout"),
+            /**
+			 * @uml.property  name="cONFLICT"
+			 * @uml.associationEnd  
+			 */
             CONFLICT(409, "Conflict"),
+            /**
+			 * @uml.property  name="rANGE_NOT_SATISFIABLE"
+			 * @uml.associationEnd  
+			 */
             RANGE_NOT_SATISFIABLE(416, "Requested Range Not Satisfiable"),
+            /**
+			 * @uml.property  name="iNTERNAL_ERROR"
+			 * @uml.associationEnd  
+			 */
             INTERNAL_ERROR(500, "Internal Server Error"),
+            /**
+			 * @uml.property  name="nOT_IMPLEMENTED"
+			 * @uml.associationEnd  
+			 */
             NOT_IMPLEMENTED(501, "Not Implemented"),
+            /**
+			 * @uml.property  name="uNSUPPORTED_HTTP_VERSION"
+			 * @uml.associationEnd  
+			 */
             UNSUPPORTED_HTTP_VERSION(505, "HTTP Version Not Supported");
 
+            /**
+			 * @uml.property  name="requestStatus"
+			 */
             private final int requestStatus;
 
+            /**
+			 * @uml.property  name="description"
+			 */
             private final String description;
 
             Status(int requestStatus, String description) {
@@ -1325,11 +1571,19 @@ public abstract class NanoHTTPD {
                 this.description = description;
             }
 
+            /**
+			 * @return
+			 * @uml.property  name="description"
+			 */
             @Override
             public String getDescription() {
                 return "" + this.requestStatus + " " + this.description;
             }
 
+            /**
+			 * @return
+			 * @uml.property  name="requestStatus"
+			 */
             @Override
             public int getRequestStatus() {
                 return this.requestStatus;
@@ -1377,18 +1631,22 @@ public abstract class NanoHTTPD {
         }
 
         /**
-         * HTTP status code after processing, e.g. "200 OK", Status.OK
-         */
+		 * HTTP status code after processing, e.g. "200 OK", Status.OK
+		 * @uml.property  name="status"
+		 * @uml.associationEnd  
+		 */
         private IStatus status;
 
         /**
-         * MIME type of content, e.g. "text/html"
-         */
+		 * MIME type of content, e.g. "text/html"
+		 * @uml.property  name="mimeType"
+		 */
         private String mimeType;
 
         /**
-         * Data of the response, may be null.
-         */
+		 * Data of the response, may be null.
+		 * @uml.property  name="data"
+		 */
         private InputStream data;
 
         private long contentLength;
@@ -1413,8 +1671,10 @@ public abstract class NanoHTTPD {
         private final Map<String, String> lowerCaseHeader = new HashMap<String, String>();
 
         /**
-         * The request method that spawned this response.
-         */
+		 * The request method that spawned this response.
+		 * @uml.property  name="requestMethod"
+		 * @uml.associationEnd  
+		 */
         private Method requestMethod;
 
         /**
@@ -1479,6 +1739,10 @@ public abstract class NanoHTTPD {
             return "close".equals(getHeader("connection"));
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="data"
+		 */
         public InputStream getData() {
             return this.data;
         }
@@ -1487,14 +1751,26 @@ public abstract class NanoHTTPD {
             return this.lowerCaseHeader.get(name.toLowerCase());
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="mimeType"
+		 */
         public String getMimeType() {
             return this.mimeType;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="requestMethod"
+		 */
         public Method getRequestMethod() {
             return this.requestMethod;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="status"
+		 */
         public IStatus getStatus() {
             return this.status;
         }
@@ -1503,6 +1779,10 @@ public abstract class NanoHTTPD {
             this.encodeAsGzip = encodeAsGzip;
         }
 
+        /**
+		 * @param useKeepAlive
+		 * @uml.property  name="keepAlive"
+		 */
         public void setKeepAlive(boolean useKeepAlive) {
             this.keepAlive = useKeepAlive;
         }
@@ -1624,31 +1904,58 @@ public abstract class NanoHTTPD {
             }
         }
 
+        /**
+		 * @param chunkedTransfer
+		 * @uml.property  name="chunkedTransfer"
+		 */
         public void setChunkedTransfer(boolean chunkedTransfer) {
             this.chunkedTransfer = chunkedTransfer;
         }
 
+        /**
+		 * @param data
+		 * @uml.property  name="data"
+		 */
         public void setData(InputStream data) {
             this.data = data;
         }
 
+        /**
+		 * @param mimeType
+		 * @uml.property  name="mimeType"
+		 */
         public void setMimeType(String mimeType) {
             this.mimeType = mimeType;
         }
 
+        /**
+		 * @param requestMethod
+		 * @uml.property  name="requestMethod"
+		 */
         public void setRequestMethod(Method requestMethod) {
             this.requestMethod = requestMethod;
         }
 
+        /**
+		 * @param status
+		 * @uml.property  name="status"
+		 */
         public void setStatus(IStatus status) {
             this.status = status;
         }
     }
 
+    /**
+	 * @author  4i60r
+	 */
     public static final class ResponseException extends Exception {
 
         private static final long serialVersionUID = 6569838532917408380L;
 
+        /**
+		 * @uml.property  name="status"
+		 * @uml.associationEnd  
+		 */
         private final Response.Status status;
 
         public ResponseException(Response.Status status, String message) {
@@ -1661,6 +1968,10 @@ public abstract class NanoHTTPD {
             this.status = status;
         }
 
+        /**
+		 * @return
+		 * @uml.property  name="status"
+		 */
         public Response.Status getStatus() {
             return this.status;
         }
@@ -1772,11 +2083,15 @@ public abstract class NanoHTTPD {
     public static final String MIME_HTML = "text/html";
     
     public static final String
-    MIME_JS = "application/javascript",
-    MIME_CSS = "text/css",
-    MIME_PNG = "image/png",
-    MIME_DEFAULT_BINARY = "application/octet-stream",
-    MIME_XML = "text/xml";
+    MIME_JS = "application/javascript";
+
+	public static final String MIME_CSS = "text/css";
+
+	public static final String MIME_PNG = "image/png";
+
+	public static final String MIME_DEFAULT_BINARY = "application/octet-stream";
+
+	public static final String MIME_XML = "text/xml";
 
     /**
      * Pseudo-Parameter to use to store the actual query string in the
@@ -1920,24 +2235,44 @@ public abstract class NanoHTTPD {
         }
     }
 
+    /**
+	 * @uml.property  name="hostname"
+	 */
     private final String hostname;
 
+    /**
+	 * @uml.property  name="myPort"
+	 */
     private final int myPort;
 
+    /**
+	 * @uml.property  name="myServerSocket"
+	 */
     private volatile ServerSocket myServerSocket;
 
+    /**
+	 * @uml.property  name="serverSocketFactory"
+	 * @uml.associationEnd  multiplicity="(1 1)"
+	 */
     private ServerSocketFactory serverSocketFactory = new DefaultServerSocketFactory();
 
+    /**
+	 * @uml.property  name="myThread"
+	 */
     private Thread myThread;
 
     /**
-     * Pluggable strategy for asynchronously executing requests.
-     */
+	 * Pluggable strategy for asynchronously executing requests.
+	 * @uml.property  name="asyncRunner"
+	 * @uml.associationEnd  
+	 */
     protected AsyncRunner asyncRunner;
 
     /**
-     * Pluggable strategy for creating and cleaning up temporary files.
-     */
+	 * Pluggable strategy for creating and cleaning up temporary files.
+	 * @uml.property  name="tempFileManagerFactory"
+	 * @uml.associationEnd  
+	 */
     private TempFileManagerFactory tempFileManagerFactory;
 
     /**
@@ -2082,18 +2417,34 @@ public abstract class NanoHTTPD {
         return wasStarted() && !this.myServerSocket.isClosed() && this.myThread.isAlive();
     }
 
+    /**
+	 * @return
+	 * @uml.property  name="serverSocketFactory"
+	 */
     public ServerSocketFactory getServerSocketFactory() {
         return serverSocketFactory;
     }
 
+    /**
+	 * @param serverSocketFactory
+	 * @uml.property  name="serverSocketFactory"
+	 */
     public void setServerSocketFactory(ServerSocketFactory serverSocketFactory) {
         this.serverSocketFactory = serverSocketFactory;
     }
 
+    /**
+	 * @return
+	 * @uml.property  name="hostname"
+	 */
     public String getHostname() {
         return hostname;
     }
 
+    /**
+	 * @return
+	 * @uml.property  name="tempFileManagerFactory"
+	 */
     public TempFileManagerFactory getTempFileManagerFactory() {
         return tempFileManagerFactory;
     }
@@ -2201,21 +2552,19 @@ public abstract class NanoHTTPD {
     }
 
     /**
-     * Pluggable strategy for asynchronously executing requests.
-     * 
-     * @param asyncRunner
-     *            new strategy for handling threads.
-     */
+	 * Pluggable strategy for asynchronously executing requests.
+	 * @param asyncRunner  new strategy for handling threads.
+	 * @uml.property  name="asyncRunner"
+	 */
     public void setAsyncRunner(AsyncRunner asyncRunner) {
         this.asyncRunner = asyncRunner;
     }
 
     /**
-     * Pluggable strategy for creating and cleaning up temporary files.
-     * 
-     * @param tempFileManagerFactory
-     *            new strategy for handling temp files.
-     */
+	 * Pluggable strategy for creating and cleaning up temporary files.
+	 * @param tempFileManagerFactory  new strategy for handling temp files.
+	 * @uml.property  name="tempFileManagerFactory"
+	 */
     public void setTempFileManagerFactory(TempFileManagerFactory tempFileManagerFactory) {
         this.tempFileManagerFactory = tempFileManagerFactory;
     }

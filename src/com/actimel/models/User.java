@@ -7,44 +7,55 @@ public class User {
 	
 	/**
 	 * ID.
+	 * @uml.property  name="id"
 	 */
 	private int id;
 	
 	/**
 	 * Nazwa.
+	 * @uml.property  name="name"
 	 */
 	private String name;
 	
 	/**
 	 * Has³o.
+	 * @uml.property  name="pass"
 	 */
 	private String pass;
 	
 	/**
 	 * E-mail.
+	 * @uml.property  name="email"
 	 */
 	private String email;
 	
 	/**
 	 * Poziom uprawnieñ.
+	 * @uml.property  name="permissionLevel"
 	 */
 	private int permissionLevel;
 
 	/**
 	 * Konstruktor obiektu u¿ytkownika.
+	 * @param uid ID
+	 * @param uName Nazwa
+	 * @param uPass Hash has³a
+	 * @param uEmail E-Mail
+	 * @param uPermissionLevel Poziom uprawnieñs
 	 */
-	public User(final int id, final String name, final String pass, final String email, final int permission_level) {
+	public User(final int uid, final String uName, final String uPass, final String uEmail, final int uPermissionLevel) {
 		super();
-		this.id = id;
-		this.name = name;
-		this.pass = pass;
-		this.email = email;
-		this.permissionLevel = permission_level;
+		this.id = uid;
+		this.name = uName;
+		this.pass = uPass;
+		this.email = uEmail;
+		this.permissionLevel = uPermissionLevel;
 	}
 	
 	/**
 	 * Getter E-Maila u¿ykownika.
-	 * @return E-Mail u¿ytkownika
+	 * @return  E-Mail u¿ytkownika
+	 * @uml.property  name="email"
 	 */
 	public final String getEmail() {
 		return email;
@@ -52,7 +63,8 @@ public class User {
 
 	/**
 	 * Setter E-Maila u¿ytkownika.
-	 * @param eemail Nowy adres E-Mail
+	 * @param eemail  Nowy adres E-Mail
+	 * @uml.property  name="email"
 	 */
 	public final void setEmail(final String eemail) {
 		this.email = eemail;
@@ -60,7 +72,8 @@ public class User {
 	
 	/**
 	 * Getter ID u¿ytkownika.
-	 * @return ID
+	 * @return  ID
+	 * @uml.property  name="id"
 	 */
 	public final int getId() {
 		return id;
@@ -68,7 +81,8 @@ public class User {
 	
 	/**
 	 * Getter nazwy u¿ytkownika.
-	 * @return Nazwa u¿ytkownika
+	 * @return  Nazwa u¿ytkownika
+	 * @uml.property  name="name"
 	 */
 	public final String getName() {
 		return name;
@@ -89,7 +103,8 @@ public class User {
 
 	/**
 	 * Getter dla poziomu uprawnieñ.
-	 * @return Poziom uprawnieñ u¿ytkownika jako int.
+	 * @return  Poziom uprawnieñ u¿ytkownika jako int.
+	 * @uml.property  name="permissionLevel"
 	 */
 	public final int getPermissionLevel() {
 		return permissionLevel;

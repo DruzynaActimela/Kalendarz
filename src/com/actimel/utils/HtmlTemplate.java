@@ -24,24 +24,26 @@ public class HtmlTemplate {
 	private static HashMap<String, HtmlTemplate> templateCache = new HashMap<String, HtmlTemplate>();
 	
 	/**
-	 * Wartosc okreœlaj¹ca prefix zmiennej, 
-	 * która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * Wartosc okreœlaj¹ca prefix zmiennej,  która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * @uml.property  name="yieldVarPrefix"
 	 */	
 	private final String yieldVarPrefix = "__YIELD_START__";
 	
 	/**
-	 * Wartosc okreœlaj¹ca suffix zmiennej, 
-	 * która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * Wartosc okreœlaj¹ca suffix zmiennej,  która zostanie zamieniona na odpowiadaj¹c¹ jej wartosc.
+	 * @uml.property  name="yieldVarSuffix"
 	 */	
 	private final String yieldVarSuffix = "__YIELD_END__";
 	
 	/**
 	 * Zmienna przechowuj¹ca plik, z którego pobrana jest zawartosc HTML.
+	 * @uml.property  name="template"
 	 */
 	private File template;
 	
 	/**
 	 * Wyra¿enie regularne, które wyszukuje dyrektyw templatek.
+	 * @uml.property  name="tVarRegex"
 	 */
 	private final Pattern tVarRegex = Pattern.compile("@([a-zA-Z0-9]+)(\\([\\'](.*?[^,])[\\'](,\\s?[\\'](.*?)[\\'])?\\))?",
 												Pattern.CASE_INSENSITIVE
@@ -49,23 +51,28 @@ public class HtmlTemplate {
 	// non-Java: @([a-zA-Z0-9]+)(\([\'](.*?[^,])[\'](,\s?[\'](.*?)[\'])?\))?
 	
 	/**
-	 * Zmienna przechowuj¹ca wartosci, 
-	 * na które zostan¹ zamienione odpowiadaj¹ce im klucze.
+	 * Zmienna przechowuj¹ca wartosci,  na które zostan¹ zamienione odpowiadaj¹ce im klucze.
+	 * @uml.property  name="variablesToReplace"
+	 * @uml.associationEnd  qualifier="name:java.lang.String java.lang.String"
 	 */
 	private final HashMap<String, String> variablesToReplace = new HashMap<String, String>(); // varName => defaultValue
 	
 	/**
 	 * Zawartosc HTML templatki.
+	 * @uml.property  name="content"
 	 */
 	private String content;
 	
 	/**
 	 * Templatka nadrzêdna do aktualnej (master).
+	 * @uml.property  name="masterTemplate"
+	 * @uml.associationEnd  
 	 */
 	private HtmlTemplate masterTemplate = null;
 	
 	/**
 	 * Zmienna okreœlaj¹ca, czy templatka zosta³a ju¿ przeparsowana.
+	 * @uml.property  name="parsed"
 	 */
 	private boolean parsed = false;
 	
@@ -93,7 +100,7 @@ public class HtmlTemplate {
 			int pos = resourceName.indexOf('@');
 			uniqCacheKey = resourceName.substring(pos + 1);
 			resourceName = resourceName.substring(0, pos);
-			Utils.log("Got uniqueCacheKey: " + uniqCacheKey);
+			doLog("Got uniqueCacheKey: " + uniqCacheKey);
 		}
 		return loadFromResource(resourceName, true, uniqCacheKey);
 	}
@@ -130,15 +137,18 @@ public class HtmlTemplate {
 		HtmlTemplate inst = null; 
 		if (Const.LOAD_FROM_DISK) {
 			URL location = HtmlTemplate.class.getProtectionDomain().getCodeSource().getLocation();
-			File directory = new File(location.getFile());
-			Utils.log(directory.getAbsolutePath());
-			File www_directory = new File(directory.getAbsolutePath() + File.separator + ".."+ File.separator + "www");
+			String url = Utils.urlDecode(location.getFile());
+			doLog(url);
 			
-			inst = new HtmlTemplate(new File(www_directory, resName));
+			File directory = new File(url);
+			doLog(directory.getAbsolutePath());
+			File wwwDirectory = new File(directory.getAbsolutePath() + File.separator + ".." + File.separator + "www");
+			
+			inst = new HtmlTemplate(new File(wwwDirectory, resName));
 		} else {
 			inst = new HtmlTemplate(new File(HtmlTemplate.class.getClassLoader().getResource(resName).getFile()));
 		}
-		Utils.log("Putting " + resName + " at: " + cacheKey);
+		doLog("Putting " + resName + " at: " + cacheKey);
 		templateCache.put(cacheKey, inst);
 		return inst;
 		
@@ -190,8 +200,9 @@ public class HtmlTemplate {
 			return;
 		}
 		
-		content = Utils.readFile(template);
-		content = parse(content);
+		setTemplateContent(Utils.readFile(template));
+		setTemplateContent(parse(content));
+		
 		parsed = true;
 	}
 	
@@ -209,12 +220,12 @@ public class HtmlTemplate {
 		for (String line : lines) {
 			
 			int lineIndex = rawContent.indexOf(line);
-			Utils.log("[" + template.getName() + "] " + line);
+			doLog("[" + template.getName() + "] " + line);
 			Matcher matcher = tVarRegex.matcher(line);
 			
 			if (line.matches("(.*)" + tVarRegex.pattern() + "(.*)") && !isExcludedLine(line, excludedLines)) {
 				String newLine = "";
-				Utils.log("--while begin--");
+				doLog("--while begin--");
 				
 				while (matcher.find()) {
 					int matchCount = 0;
@@ -222,11 +233,11 @@ public class HtmlTemplate {
 					
 					for (int m = 0; m < matcher.groupCount(); m++) {
 						if (matcher.group(m) != null) {
-							Utils.log(m + ". " + matcher.group(m));
+							doLog(m + ". " + matcher.group(m));
 							matchCount = m + 1;
 						}
 					}
-					Utils.log("Match count: " + matchCount);
+					doLog("Match count: " + matchCount);
 					
 					String actionName = matcher.group(1);
 					String firstValue = null;
@@ -247,13 +258,13 @@ public class HtmlTemplate {
 						}
 					}
 					
-					Utils.log(actionName + ", " + firstValue + ", " + secondValue);
+					doLog(actionName + ", " + firstValue + ", " + secondValue);
 					
 					if ("extends".equals(actionName) && masterTemplate == null) {
 						masterTemplate = HtmlTemplate.loadFromResource(firstValue, false);
 						masterTemplate.putYieldVars(variablesToReplace);
 						masterTemplate.parseTemplate();
-						Utils.log("Got master template: " + firstValue);
+						doLog("Got master template: " + firstValue);
 					}
 					
 					if ("yield".equals(actionName)) {
@@ -262,7 +273,7 @@ public class HtmlTemplate {
 						StringBuffer strbuf = new StringBuffer(line);
 						String replacement = yieldVarPrefix + firstValue + yieldVarSuffix;
 						strbuf = strbuf.replace(startPos, endPos, replacement);
-						Utils.log("REPLACING ["+line.substring(startPos, endPos )+"] to ["+replacement+"]");
+						doLog("REPLACING [" + line.substring(startPos, endPos) + "] to [" + replacement + "]");
 						newLine += strbuf.toString();
 						if (!variablesToReplace.containsKey(firstValue)) {
 							String defaultVal = (secondValue != null) ? secondValue : "";
@@ -281,7 +292,7 @@ public class HtmlTemplate {
 						int stopPosition = rawContent.indexOf(endPhrase, lineIndex + sectionPhraseLength - 1);
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
-						Utils.log("znaleziony isset: (match offset: "+sectionOffset+") " + tmpsVal);
+						doLog("znaleziony isset: (match offset: " + sectionOffset + ") " + tmpsVal);
 						String ifExists = "", ifNotExists = "";
 												
 						if (tmpsVal.contains(elsePhrase)) {
@@ -293,8 +304,8 @@ public class HtmlTemplate {
 						}	
 						List<String> excluded = (Arrays.asList(tmpsVal.split(newline)));
 					
-						Utils.log("IF EXISTS" + ifExists);
-						Utils.log("IF NOT EXISTS" + ifNotExists);
+						doLog("IF EXISTS" + ifExists);
+						doLog("IF NOT EXISTS" + ifNotExists);
 						
 						if (variablesToReplace.containsKey(firstValue)) {
 							newLine += replaceVars(ifExists, variablesToReplace).trim();
@@ -313,9 +324,9 @@ public class HtmlTemplate {
 						int substrStart = lineIndex + sectionPhraseLength + sectionOffset;
 						String tmpsVal = rawContent.substring(substrStart, stopPosition);
 						List<String> excluded = (Arrays.asList(tmpsVal.split(newline)));
-						Utils.log("Parsing section... (match offset: "+sectionOffset+")");
+						doLog("Parsing section... (match offset: " + sectionOffset + ")");
 						String parsedSection = parse(tmpsVal);
-						Utils.log("PARSED SECTION" + parsedSection);
+						doLog("PARSED SECTION" + parsedSection);
 						sectionValue = replaceVars(parsedSection, variablesToReplace);						
 						excludedLines.addAll(excluded);
 
@@ -323,7 +334,7 @@ public class HtmlTemplate {
 						sectionValue = secondValue;
 					}
 					if (sectionValue.length() > 0) {
-						Utils.log("section of the content is: [" + sectionValue + "]");
+						doLog("section of the content is: [" + sectionValue + "]");
 					}
 					
 					
@@ -333,7 +344,7 @@ public class HtmlTemplate {
 						}						
 					}
 				}
-				Utils.log("--while end--");
+				doLog("--while end--");
 				builder.append(newLine + "\n");
 			} else {
 				if (!isExcludedLine(line, excludedLines)) {
@@ -344,9 +355,9 @@ public class HtmlTemplate {
 
 		}
 		
-		Utils.log("-- post parse -- ");
+		doLog("-- post parse -- ");
 		
-		Utils.log(builder.toString());
+		doLog(builder.toString());
 		
 		//content = builder.toString();
 		return builder.toString();
@@ -360,9 +371,9 @@ public class HtmlTemplate {
 		if (!parsed) {
 			parseTemplate();
 		}
-		Utils.log("render");
+		doLog("render");
 		
-		Utils.log("RENDER IN " + template.getName());
+		doLog("RENDER IN " + template.getName());
 		return recursiveRender(content, variablesToReplace);
 	}
 	
@@ -374,15 +385,15 @@ public class HtmlTemplate {
 	 * @return Przeparsowana tresc HTML
 	 */
 	private String replaceVars(final String rawContent, final HashMap<String, String> vars) {
-		String tmpContent = "";
+		String tmpContent = rawContent;
 		for (Entry<String, String> entry : vars.entrySet()) {
 			String variableName = entry.getKey();
 			String variableValue = entry.getValue();
-			Utils.log(variableName + "=>" + variableValue);
+			doLog(variableName + "=>" + variableValue);
 			
 			String yieldVar = yieldVarPrefix + variableName + yieldVarSuffix;
 			
-			tmpContent = rawContent.replaceAll(yieldVar, Matcher.quoteReplacement(variableValue));
+			tmpContent = tmpContent.replaceAll(yieldVar, Matcher.quoteReplacement(variableValue));
 		}
 		return tmpContent;
 	}
@@ -390,20 +401,20 @@ public class HtmlTemplate {
 	 * Wewnêtrzna metoda zamieniaj¹ca wartosci 
 	 * na odpowiadaj¹ce im klucze w zmiennej rawContent, 
 	 * rekursywnie razem z treœciami templatek nadrzêdnych.
-	 * @param content Surowa tresc HTML z dyrektywami templatki
+	 * @param rContent Surowa tresc HTML z dyrektywami templatki
 	 * @param vars Lista kluczy i wartosci
 	 * @return Przeparsowana tresc HTML
 	 */
-	private String recursiveRender(final String content, final HashMap<String, String> vars) {
+	private String recursiveRender(final String rContent, final HashMap<String, String> vars) {
 		
 		String render = "";
-		String parsedContent = content;
+		String parsedContent = rContent;
 		if (masterTemplate != null) {
 			render += masterTemplate.render();
 		}
 		
 
-		parsedContent = replaceVars(content, vars);
+		parsedContent = replaceVars(rContent, vars);
 		
 		
 		render += parsedContent;
@@ -411,4 +422,20 @@ public class HtmlTemplate {
 		return render.trim();
 	}
 
+	/**
+	 * Metoda umo¿liwiaj¹ca ustawienie nowej wartosci templatki.
+	 * @param c Nowa wartosc do ustawienia
+	 */
+	private void setTemplateContent(final String c) {
+		content = c;
+	}
+	
+	
+	/**
+	 * Wewnêtrzna funkcja gdzie mo¿na wy³¹czaæ logowanie.
+	 * @param strs Lista zmiennych do wyswietlenia.
+	 */
+	private final static void doLog(String ... strs) {
+		//Utils.log(strs);
+	}
 }

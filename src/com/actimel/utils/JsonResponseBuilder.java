@@ -17,22 +17,26 @@ public class JsonResponseBuilder {
 	
 	/**
 	 * Referencja do aplikacji kalendarza.
+	 * @uml.property  name="app"
+	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
 	private CalendarApp app;
 	
 	/**
 	 * Lista parametrów.
+	 * @uml.property  name="params"
+	 * @uml.associationEnd  qualifier="key:java.lang.String java.lang.String"
 	 */
 	private HashMap<String, String> params = new HashMap<String, String>();
 	
 	/**
 	 * Konstruktor.
-	 * @param app Referencja do aplikacji kalendarza.
+	 * @param cApp Referencja do aplikacji kalendarza.
 	 * @param key Pocz¹tkowy klucz
 	 * @param val Pocz¹tkowa wartoœc
 	 */
-	public JsonResponseBuilder(final CalendarApp app, final String key, final String val) {
-		this.app = app;
+	public JsonResponseBuilder(final CalendarApp cApp, final String key, final String val) {
+		this.app = cApp;
 		params.put(key, val);
 	}
 	
@@ -53,14 +57,22 @@ public class JsonResponseBuilder {
 	 * @return NanoHttpd.Response
 	 */
 	public final Response create() {
-		Type t = Utils.getGsonHashMapType();		
-		String json = app.getGson().toJson(params, t); 
-		
+
 		return NanoHTTPD.newFixedLengthResponse(
 				NanoHTTPD.Response.Status.OK, 
 				"text/json", 
-				json
+				this.toJson()
 		);
 		
+	}
+	
+	
+	/**
+	 * Metoda zwracaj¹ca przechowywane wartosci jako obiekt JSON.
+	 * @return wartosci jako JSON
+	 */
+	public final String toJson() {
+		Type t = Utils.getGsonHashMapType();		
+		return app.getGson().toJson(params, t);		
 	}
 }
